@@ -1,0 +1,34 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "declaration": true,                 // generate .d.ts files
+    "emitDeclarationOnly": true,         // do not emit JS
+    "outDir": "dist",                     // output folder
+    "declarationDir": "dist",             // emit .d.ts into dist root
+    "rootDir": "src/package",             // treat package folder as root for declarations
+    "noEmit": false,
+    "composite": false,
+    "resolveJsonModule": true,           // allow JSON imports
+    "esModuleInterop": true,             // for default imports
+    "skipLibCheck": true,
+    "strict": true,                       // strict type checking
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    
+  },
+  "include": [
+    "src/package/**/*",
+    "src/package/locales/**/*",           // include your JSON locales
+    "src/package/@types/**/*"
+  ]
+  ,
+  "exclude": [
+    "src/package/test/**",
+    "src/package/**/__tests__/**",
+    "src/tests/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}

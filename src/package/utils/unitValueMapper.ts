@@ -1,0 +1,197 @@
+/* eslint-disable no-loss-of-precision */
+
+export const dimensionUnitsMap: Record<string, string[]> = {
+  length: ["m", "cm", "mm", "km", "in", "ft", "yd", "mi"],
+  area: ["m^2", "cm^2", "mm^2", "in^2", "ft^2", "yd^2", "ha", "ac"],
+  volume: ["L", "m^3", "cm^3", "mL", "in^3", "ft^3", "yd^3"],
+  weight: ["kg", "g", "mg", "ton", "lb", "oz"],
+  time: ["m", "s", "h", "ms", "d"],
+  temperature: ["celsius", "fahrenheit", "kelvin"],
+  angle: ["deg", "rad", "gradian", "rev", "minute", "second"],
+};
+
+// Friendly display names for units (per-dimension) used for labels in UI dropdowns
+export const dimensionUnitDisplayMap: Record<string, Record<string, string>> = {
+  length: {
+    mm: "Millimeter (mm)",
+    cm: "Centimeter (cm)",
+    m: "Meter (m)",
+    km: "Kilometer (km)",
+    in: "Inch (in)",
+    ft: "Foot (ft)",
+    yd: "Yard (yd)",
+    mi: "Mile (mi)",
+  },
+  area: {
+    "mm^2": "Square millimeter (mm²)",
+    "m^2": "Square meter (m²)",
+    "cm^2": "Square centimeter (cm²)",
+    "in^2": "Square inch (in²)",
+    "ft^2": "Square foot (ft²)",
+    "yd^2": "Square yard (yd²)",
+    ha: "Hectare (ha)",
+    ac: "Acre (ac)",
+  },
+  volume: {
+    "cm^3": "Cubic centimeter (cm³)",
+    "m^3": "Cubic meter (m³)",
+    L: "Liter (L)",
+    mL: "Milliliter (mL)",
+    "in^3": "Cubic inch (in³)",
+    "ft^3": "Cubic foot (ft³)",
+    "yd^3": "Cubic yard (yd³)",
+  },
+  weight: {
+    mg: "Milligram (mg)",
+    g: "Gram (g)",
+    kg: "Kilogram (kg)",
+    ton: "Ton (t)",
+    lb: "Pound (lb)",
+    oz: "Ounce (oz)",
+  },
+  time: {
+    s: "Second (s)",
+    m: "Minute (m)",
+    h: "Hour (h)",
+    ms: "Millisecond (ms)",
+    d: "Day (d)",
+  },
+  temperature: {
+    celsius: "Celsius (°C)",
+    fahrenheit: "Fahrenheit (°F)",
+    kelvin: "Kelvin (K)",
+  },
+  angle: {
+    deg: "Degree (°)",
+    rad: "Radian (rad)",
+    gradian: "Gradian",
+    rev: "Revolution (rev)",
+    minute: "Arcminute (′)",
+    second: "Arcsecond (″)",
+  },
+};
+
+// Shorter display names for units (per-dimension) used for compact UI displays
+export const dimensionUnitShortDisplayMap: Record<
+  string,
+  Record<string, string>
+> = {
+  length: {
+    m: "m",
+    mm: "mm",
+    cm: "cm",
+    km: "km",
+    in: "in",
+    ft: "ft",
+    yd: "yd",
+    mi: "mi",
+  },
+  area: {
+    "m^2": "m²",
+    "mm^2": "mm²",
+    "cm^2": "cm²",
+    "in^2": "in²",
+    "ft^2": "ft²",
+    "yd^2": "yd²",
+    ha: "ha",
+    ac: "ac",
+  },
+  volume: {
+    L: "L",
+    "cm^3": "cm³",
+    "m^3": "m³",
+    mL: "mL",
+    "in^3": "in³",
+    "ft^3": "ft³",
+    "yd^3": "yd³",
+  },
+  weight: {
+    kg: "kg",
+    g: "g",
+    mg: "mg",
+    ton: "ton",
+    lb: "lb",
+    oz: "oz",
+  },
+  time: {
+    m: "m",
+    s: "s",
+    h: "h",
+    ms: "ms",
+    d: "d",
+  },
+  temperature: {
+    celsius: "celsius",
+    fahrenheit: "fahrenheit",
+    kelvin: "kelvin",
+  },
+  angle: {
+    deg: "deg",
+    rad: "rad",
+    gradian: "gradian",
+    rev: "rev",
+    minute: "minute",
+    second: "second",
+  },
+};
+
+export const dimensonUnitFactorsMap: Record<string, Record<string, number>> = {
+  length: {
+    mm: 1000,
+    cm: 100,
+    m: 1,
+    km: 0.001,
+    in: 39.37007874015748,
+    ft: 3.280839895013123,
+    yd: 1.0936132983377078,
+    mi: 0.000621371192237334,
+  },
+  area: {
+    "m²": 1.0,
+    "mm²": 1000000,
+    "cm²": 10000,
+    "km²": 0.000001,
+    "in²": 1550.0031000062,
+    "ft²": 10.763910416709721,
+    "yd²": 1.1959900463010804,
+    ha: 0.0001,
+    ac: 0.000247105,
+  },
+  volume: {
+    "cm³": 1000000,
+    "m³": 1.0,
+    L: 1.0,
+    mL: 1000000,
+    "in³": 61023.744094732,
+    "ft³": 35.314666721489,
+    "yd³": 1.30795061931439,
+  },
+  weight: {
+    mg: 1000000,
+    g: 1000,
+    kg: 1,
+    t: 0.001,
+    lb: 2.2046226218487757,
+    oz: 35.273961949580416,
+  },
+  time: {
+    ms: 1000,
+    s: 1,
+    min: 0.016666666666666666,
+    h: 0.0002777777777777778,
+    d: 0.000011574074074074074,
+  },
+  temperature: {
+    "°C": 1,
+    "°F": 33.8,
+    K: 274.15,
+  },
+  angle: {
+    "°": 1,
+    rad: Math.PI / 180,
+    gon: 10 / 9,
+    rev: 1 / 360,
+    "'": 60,
+    '"': 3600,
+  },
+};

@@ -1,0 +1,196 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
+
+import React, { useState, useRef, useEffect, useMemo } from "react";
+import ReactDOM from "react-dom";
+import useReactaFormContext from "../hooks/useReactaFormContext";
+
+type TooltipProps = {
+  content: string;
+  size?: "small" | "medium" | "large";
+  animation?: boolean;
+};
+
+const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation = true }) => {
+  const { t, darkMode, formStyle, fieldStyle } = useReactaFormContext();
+  const [hover, setHover] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [positioned, setPositioned] = useState(false);
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const iconRectRef = useRef<DOMRect | null>(null);
+
+  const tooltipStyles = useMemo(() => {
+    const sizeConfig: Record<string, any> = {
+      small: { padding: "4px 8px", fontSize: "11px", maxWidth: "200px" },
+      medium: { padding: "6px 10px", fontSize: "12px", maxWidth: "240px" },
+      large: { padding: "8px 12px", fontSize: "13px", maxWidth: "280px" },
+    };
+
+    const base = {
+      icon: {
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "1.2em",
+        height: "1.2em",
+        fontSize: "0.9em",
+        fontWeight: "bold",
+        borderRadius: "50%",
+        backgroundColor: darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)",
+        color: darkMode ? "#f0f0f0" : "#333",
+        border: `1px solid ${darkMode ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"}`,
+        cursor: "pointer",
+        transition: animation ? "all 0.2s ease" : undefined,
+        marginLeft: "0.3em",
+      } as any,
+      text: {
+        ...sizeConfig[size],
+        position: "absolute" as const,
+        backgroundColor: `var(--reactaform-tooltip-color-bg, ${darkMode ? "rgba(45,45,45,0.95)" : "rgba(60,60,60,0.92)"})`,
+        color: `var(--reactaform-tooltip-color, ${darkMode ? "#f0f0f0" : "#fff"})`,
+        borderRadius: "6px",
+        border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+        boxShadow: darkMode
+          ? "0 8px 16px rgba(0,0,0,0.4)"
+          : "0 6px 18px rgba(0,0,0,0.12)",
+        zIndex: 2147483647,
+        opacity: 0,
+        visibility: "hidden" as const,
+        transition: animation
+          ? "opacity 0.2s ease, visibility 0.2s ease"
+          : undefined,
+        pointerEvents: "none" as const,
+        whiteSpace: "normal" as const,
+        wordBreak: "break-word" as const,
+        boxSizing: "border-box" as const,
+      } as any,
+      textVisible: {
+        opacity: 1,
+        visibility: "visible" as const,
+      } as any,
+    };
+
+    // Merge provider overrides (form-level and field-level)
+    const merged = {
+      icon: { ...(base.icon as any), ...((formStyle as any)?.tooltip?.icon || {}), ...((fieldStyle as any)?.tooltip?.icon || {}) },
+      text: { ...(base.text as any), ...((formStyle as any)?.tooltip?.text || {}), ...((fieldStyle as any)?.tooltip?.text || {}) },
+      textVisible: base.textVisible,
+    };
+
+    return merged;
+  }, [darkMode, size, animation, formStyle, fieldStyle]);
+
+  useEffect(() => {
+    if (hover) {
+      setPositioned(false);
+      const frame = requestAnimationFrame(() => {
+        if (ref.current) {
+          const rect = ref.current.getBoundingClientRect();
+          const margin = 8; // px margin from edge
+          // store icon rect for the measurement pass
+          iconRectRef.current = rect;
+          // initial placement: put to the right of the icon (measurement step will vertically center)
+          // Use viewport coordinates (getBoundingClientRect) because popup root is fixed to viewport.
+          const initX = rect.right + margin;
+          const initY = rect.top;
+          setPos({ x: initX, y: initY });
+          setPositioned(true);
+        }
+      });
+      return () => cancelAnimationFrame(frame);
+    } else {
+      setPositioned(false);
+    }
+  }, [hover]);
+
+  // After the tooltip is rendered, measure and clamp so the tooltip box doesn't overflow the viewport
+  useEffect(() => {
+    if (!positioned) return;
+    const frame = requestAnimationFrame(() => {
+      if (!tooltipRef.current) return;
+      const tr = tooltipRef.current.getBoundingClientRect();
+      const margin = 8;
+      const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
+      const vh = typeof window !== "undefined" ? window.innerHeight : 768;
+      let newX = pos.x;
+      let newY = pos.y;
+      const iconRect = iconRectRef.current;
+      if (iconRect) {
+        // prefer to place to the right of the icon, vertically centered
+        const verticalNudge = -4; // visual tweak to better center the bubble with the icon
+        // Use viewport coords (no page scroll offsets) because popup root is fixed
+        newX = iconRect.right + margin;
+        newY =
+          iconRect.top + iconRect.height / 2 - tr.height / 2 + verticalNudge;
+        // if placing to the right would overflow, place to the left of the icon
+        if (newX + tr.width > vw - margin) {
+          newX = iconRect.left - margin - tr.width;
+        }
+      }
+      // clamp into viewport as a final fallback
+      if (newX + tr.width > vw - margin) {
+        newX = Math.max(margin, vw - tr.width - margin);
+      }
+      if (newX < margin) newX = margin;
+      if (newY + tr.height > vh - margin) {
+        newY = Math.max(margin, vh - tr.height - margin);
+      }
+      if (newY < margin) newY = margin;
+      if (newX !== pos.x || newY !== pos.y) {
+        setPos({ x: newX, y: newY });
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [positioned, pos.x, pos.y]);
+
+  const popupRoot =
+    typeof document !== "undefined"
+      ? document.getElementById("popup-root")
+      : null;
+
+  // Always render the tooltip icon; if `popup-root` is missing we still show
+  // the icon but skip rendering the floating content. Previously the entire
+  // tooltip returned null when popup-root was absent which made icons
+  // disappear in host apps that don't mount the ReactaForm wrapper.
+  const tooltipContent = (
+    <div
+      ref={tooltipRef}
+      style={{
+        ...tooltipStyles.text,
+        transform: positioned
+          ? "translateY(0) scale(1)"
+          : "translateY(-4px) scale(0.98)",
+        transition: "opacity 120ms ease, transform 120ms ease, visibility 120ms ease",
+        width: 240,
+        // When positioned is true, apply the visible styles
+        ...(positioned ? tooltipStyles.textVisible : {}),
+        top: pos.y,
+        left: pos.x,
+      }}
+      data-reactaform-theme={darkMode ? "dark" : "light"}
+    >
+      {t(content)}
+    </div>
+  );
+  return (
+    <>
+      <span
+        data-testid="tooltip-icon"
+        ref={ref}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={{
+          ...tooltipStyles.icon,
+        }}
+      >
+        ?
+      </span>
+      {hover &&
+        (popupRoot
+          ? ReactDOM.createPortal(tooltipContent, popupRoot)
+          : tooltipContent)}
+    </>
+  );
+};
+
+export default Tooltip;

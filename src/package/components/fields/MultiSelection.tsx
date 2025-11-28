@@ -1,0 +1,338 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import React, { useRef, useState, useEffect, useMemo } from "react";
+import ReactDOM from "react-dom";
+
+import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
+import type { BaseInputProps } from "../../core/reactaFormTypes";
+import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { StandardFieldLayout } from "../LayoutComponents";
+import Tooltip from "../Tooltip";
+
+type OptionType = { value: string; label: string };
+export type OptionField = DefinitionPropertyField & { options: OptionType[] };
+
+type MultiSelectionProps = BaseInputProps<string[] | null, OptionField>;
+
+// ---------------------------
+// MULTISELECT COMPONENT
+// ---------------------------
+const MultiSelect: React.FC<MultiSelectionProps> = ({
+  field,
+  value,
+  onChange,
+}) => {
+  const { t, darkMode, formStyle, fieldStyle } = useReactaFormContext();
+  const controlRef = useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [popupPos, setPopupPos] = useState<{ x: number; y: number } | null>(
+    null
+  );
+
+  const options = useMemo(
+    () => field.options.map((o) => ({ value: o.value, label: t(o.label) })),
+    [field.options, t]
+  );
+
+  const selectedValues = useMemo(() => {
+    const arr = Array.isArray(value) ? value : [];
+    const allowed = new Set(options.map((o) => o.value));
+    return arr.filter((v) => allowed.has(v));
+  }, [value, options]);
+
+  // Toggle menu open/close
+  const handleControlClick = () => {
+    if (!controlRef.current) return;
+    const rect = controlRef.current.getBoundingClientRect();
+    setPopupPos({ x: rect.left, y: rect.bottom });
+    setMenuOpen((prev) => !prev);
+  };
+
+  const toggleOption = (val: string) => {
+    const newValues = selectedValues.includes(val)
+      ? selectedValues.filter((v) => v !== val)
+      : [...selectedValues, val];
+    onChange?.(newValues, null);
+  };
+
+  const mergedControlStyle = useMemo<React.CSSProperties>(() => ({
+    height: "var(--reactaform-input-height, 2.5rem)",
+    padding: "var(--reactaform-input-padding, 8px)",
+    display: "flex",
+    alignItems: "center",
+    boxSizing: "border-box",
+    cursor: "pointer",
+    position: "relative",
+    borderRadius: "var(--reactaform-border-radius, 4px)",
+    border: "1px solid var(--reactaform-border-color, #ccc)",
+    background: "var(--reactaform-secondary-bg, #fff)",
+    color: "var(--reactaform-text-color, #000)",
+    ...((formStyle as any)?.multiSelect?.control || {}),
+    ...((fieldStyle as any)?.control || {}),
+  }), [formStyle, fieldStyle]);
+
+  const mergedClearButtonStyle = useMemo<React.CSSProperties>(() => ({
+    position: "absolute",
+    right: "2.2em",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    fontSize: "1.2em",
+    color: "var(--reactaform-text-muted, #999)",
+    padding: 0,
+    ...((formStyle as any)?.multiSelect?.clearButton || {}),
+    ...((fieldStyle as any)?.clearButton || {}),
+  }), [formStyle, fieldStyle]);
+
+  const mergedArrowStyle = useMemo<React.CSSProperties>(() => ({
+    position: "absolute",
+    right: "0.7em",
+    top: "50%",
+    transform: "translateY(-50%)",
+    pointerEvents: "none",
+    color: "var(--reactaform-text-muted, #999)",
+    ...((formStyle as any)?.multiSelect?.arrow || {}),
+    ...((fieldStyle as any)?.arrow || {}),
+  }), [formStyle, fieldStyle]);
+
+  return (
+    <div>
+      <StandardFieldLayout field={field} error={null}>
+        <div style={{ width: "100%" }}>
+          <div
+            ref={controlRef}
+            className={`reactaform-multiselection-control`}
+            style={mergedControlStyle}
+            onClick={handleControlClick}
+          >
+            <span
+              style={{ flex: 1, color: "var(--reactaform-text-muted, #888)" }}
+            >
+              {selectedValues.length} / {options.length} selected
+            </span>
+
+            {selectedValues.length > 0 && (
+              <button
+                type="button"
+                aria-label="Clear selections"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onChange?.([], null);
+                }}
+                style={mergedClearButtonStyle}
+              >
+                ��
+              </button>
+            )}
+
+            <span style={mergedArrowStyle}>��</span>
+          </div>
+
+          {field.tooltip && <Tooltip content={field.tooltip} />}
+        </div>
+      </StandardFieldLayout>
+
+      {menuOpen && popupPos && (
+        <MultiSelectionPopup
+          position={popupPos}
+          options={options}
+          selectedValues={selectedValues}
+          onToggleOption={toggleOption}
+          onClose={() => setMenuOpen(false)}
+          controlRef={controlRef}
+          darkMode={darkMode}
+        />
+      )}
+    </div>
+  );
+};
+
+// ---------------------------
+// POPUP COMPONENT
+// ---------------------------
+interface PopupProps {
+  position: { x: number; y: number };
+  options: OptionType[];
+  selectedValues: string[];
+  onToggleOption: (v: string) => void;
+  onClose: () => void;
+  controlRef: React.RefObject<HTMLDivElement | null>;
+  darkMode?: boolean;
+}
+
+const MultiSelectionPopup: React.FC<PopupProps> = ({
+  position,
+  options,
+  selectedValues,
+  onToggleOption,
+  onClose,
+  controlRef,
+  darkMode,
+}) => {
+  const popupRef = useRef<HTMLDivElement>(null);
+  const { formStyle, fieldStyle } = useReactaFormContext();
+
+  const mergedPopupStyles = useMemo<React.CSSProperties>(() => ({
+    maxHeight: 200,
+    overflowY: "auto",
+    background: "var(--reactaform-secondary-bg, #fff)",
+    border: "1px solid var(--reactaform-border-color, #ccc)",
+    borderRadius: 4,
+    zIndex: 2000,
+    boxShadow: "var(--reactaform-shadow, 0 2px 8px rgba(0,0,0,0.15))",
+    pointerEvents: "auto",
+    color: "var(--reactaform-text-color, #000)",
+    fontSize: "var(--reactaform-popup-font-size, 0.875rem)",
+    ...((formStyle as any)?.multiSelect?.popup || {}),
+    ...((fieldStyle as any)?.popup || {}),
+  }), [formStyle, fieldStyle]);
+
+  const mergedPopupOptionStyles = useMemo<React.CSSProperties>(() => ({
+    padding: "6px 8px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    background: "transparent",
+    color: "var(--reactaform-text-color, #000)",
+    ...((formStyle as any)?.multiSelect?.option || {}),
+    ...((fieldStyle as any)?.option || {}),
+  }), [formStyle, fieldStyle]);
+
+  // -----------------------
+  // OUTSIDE CLICK HANDLER
+  // -----------------------
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        !popupRef.current?.contains(target) &&
+        !controlRef.current?.contains(target)
+      ) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose, controlRef]);
+
+  // -----------------------
+  // PORTAL CONTAINER
+  // -----------------------
+  // compute live position so popup follows the control when the page/form scrolls
+  const baseWidth = 250;
+  const maxHeight = 200;
+
+  const [livePos, setLivePos] = useState<{ left: number; top: number } | null>(
+    null
+  );
+  const [popupWidth, setPopupWidth] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const updatePosition = () => {
+      let left = position.x;
+      let top = position.y;
+      let w = baseWidth;
+
+      const ctrl = controlRef?.current;
+      if (ctrl) {
+        const rect = ctrl.getBoundingClientRect();
+        left = rect.left;
+        top = rect.bottom;
+        // match popup width to control width (but not smaller than a minimum)
+        w = Math.max(80, Math.round(rect.width));
+      }
+
+      left = Math.min(left, window.innerWidth - w);
+      top = Math.min(top, window.innerHeight - maxHeight);
+      setLivePos({ left, top });
+      setPopupWidth(w);
+    };
+
+    updatePosition();
+    // update on scroll (capture to catch scrolls from ancestors) and resize
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+
+    // observe control resize if available
+    let ro: ResizeObserver | null = null;
+    const observed = controlRef?.current;
+    if (typeof ResizeObserver !== "undefined" && observed) {
+      ro = new ResizeObserver(() => updatePosition());
+      ro.observe(observed as Element);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+      if (ro && observed) ro.unobserve(observed);
+    };
+    // re-run if controlRef or position prop changes
+  }, [controlRef, position.x, position.y]);
+
+  if (typeof window === "undefined") return null;
+
+  let root = document.getElementById("popup-root");
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "popup-root";
+    document.body.appendChild(root);
+  }
+
+  return ReactDOM.createPortal(
+    <div
+      ref={popupRef}
+      style={{
+        position: "absolute",
+        top: livePos ? livePos.top : position.y,
+        left: livePos ? livePos.left : position.x,
+        width: popupWidth ?? baseWidth,
+        // spread the static popup styles
+        ...mergedPopupStyles,
+      }}
+      data-reactaform-theme={darkMode ? "dark" : "light"}
+    >
+      {options.map((opt) => {
+        const selected = selectedValues.includes(opt.value);
+        const hoverBg = darkMode
+          ? "var(--reactaform-hover-bg, rgba(255,255,255,0.01))"
+          : "var(--reactaform-hover-bg, #eee)";
+        return (
+          <div
+            key={opt.value}
+            onMouseDown={(e) => {
+              e.stopPropagation(); // prevent popup from closing
+              onToggleOption(opt.value);
+            }}
+            style={mergedPopupOptionStyles}
+            onMouseEnter={(e) => (e.currentTarget.style.background = hoverBg)}
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "transparent")
+            }
+          >
+            <input
+              type="checkbox"
+              checked={selected}
+              readOnly
+              style={{
+                marginRight: 8,
+                width: "1.125em",
+                height: "1.125em",
+                verticalAlign: "middle",
+                accentColor: darkMode ? "#10b981" : "#22c55e",
+                cursor: "pointer",
+              }}
+            />
+            {opt.label}
+          </div>
+        );
+      })}
+    </div>,
+    root
+  );
+};
+
+export default MultiSelect;

@@ -1,4 +1,4 @@
-import { renderWithProvider, screen, waitFor } from '../test-utils';
+import { renderWithProvider, screen, waitFor, act } from '../test-utils';
 import userEvent from '@testing-library/user-event';
 import ReactaFormRenderer from '../../package/components/ReactaFormRenderer';
 import { registerSubmissionHandler } from '../../package/core/registries';
@@ -51,9 +51,11 @@ describe('Form integration: rendering and submission', () => {
     } as unknown as ReactaDefinition;
 
     // Render the form renderer with immediate loading (no chunk delay)
-    renderWithProvider(
-      <ReactaFormRenderer definition={definition} instance={{}} style={{}} chunkDelay={0} chunkSize={1000} />
-    );
+    await act(async () => {
+      renderWithProvider(
+        <ReactaFormRenderer definition={definition} instance={{}} style={{}} chunkDelay={0} chunkSize={1000} />
+      );
+    });
 
     // Ensure fields are present. Some inputs don't include `id`, so use role queries where appropriate.
     const nameInput = await screen.findByRole('textbox');
@@ -68,7 +70,9 @@ describe('Form integration: rendering and submission', () => {
     await user.selectOptions(select, 'two');
 
     // Wait for debounced onChange handlers to flush (components use debounce by default)
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
 
     // Submit
     const submitBtn = screen.getByRole('button', { name: /submit/i });

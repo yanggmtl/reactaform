@@ -1,4 +1,4 @@
-import type { TranslationMap, TranslationCache } from '../core/reactaFormTypes';
+import type { TranslationMap, TranslationCache } from "../core/reactaFormTypes";
 
 /**
  * Translation loading result
@@ -11,54 +11,65 @@ export interface TranslationLoadResult {
 }
 
 // Enhanced caches with metadata
-const commonTranslationCache: TranslationCache = new Map<string, TranslationMap>();
-export const userTranslationCache: TranslationCache = new Map<string, TranslationMap>();
+const commonTranslationCache: TranslationCache = new Map<
+  string,
+  TranslationMap
+>();
+export const userTranslationCache: TranslationCache = new Map<
+  string,
+  TranslationMap
+>();
 export const userFailedSet = new Set<string>();
 
 // Cache metadata
-const cacheMetadata = new Map<string, {
-  loadedAt: Date;
-  size: number;
-  source: 'common' | 'user';
-}>();
+const cacheMetadata = new Map<
+  string,
+  {
+    loadedAt: Date;
+    size: number;
+    source: "common" | "user";
+  }
+>();
 
 /**
  * Enhanced common translation loader with better error handling
  */
-export const loadCommon = async (language: string): Promise<TranslationLoadResult> => {
+export const loadCommon = async (
+  language: string
+): Promise<TranslationLoadResult> => {
   try {
     let translations: TranslationMap;
-    
+
     switch (language.toLowerCase()) {
-      case 'fr':
-        translations = (await import('../locales/fr/common.json')).default;
+      case "fr":
+        translations = (await import("../locales/fr/common.json")).default;
         break;
-      case 'de':
-        translations = (await import('../locales/de/common.json')).default;
+      case "de":
+        translations = (await import("../locales/de/common.json")).default;
         break;
-      case 'es':
-        translations = (await import('../locales/es/common.json')).default;
+      case "es":
+        translations = (await import("../locales/es/common.json")).default;
         break;
-      case 'zh-cn':
-        translations = (await import('../locales/zh-cn/common.json')).default;
+      case "zh-cn":
+        translations = (await import("../locales/zh-cn/common.json")).default;
         break;
-      case 'en':
+      case "en":
         translations = {}; // English is the default language
         break;
       default:
         translations = {};
     }
-    
+
     return {
       success: true,
       translations,
-      fromCache: false
+      fromCache: false,
     };
   } catch (error) {
     return {
       success: false,
       translations: {},
-      error: `Failed to load common translations for ${language}: ${error}`
+      error: `Failed to load common translations for ${language}: ${error}`,
     };
   }
 };
@@ -66,14 +77,16 @@ export const loadCommon = async (language: string): Promise<TranslationLoadResul
 /**
  * Enhanced common translation loading with caching and metadata
  */
-export const loadCommonTranslation = async (language: string): Promise<TranslationLoadResult> => {
+export const loadCommonTranslation = async (
+  language: string
+): Promise<TranslationLoadResult> => {
   if (!language) {
-    return { success: false, translations: {}, error: 'Language is required' };
+    return { success: false, translations: {}, error: "Language is required" };
   }
-  
+
   const normalizedLang = language.toLowerCase();
-  
-  if (normalizedLang === 'en') {
+
+  if (normalizedLang === "en") {
     return { success: true, translations: {}, fromCache: false };
   }
 
@@ -82,23 +95,23 @@ export const loadCommonTranslation = async (language: string): Promise<Translati
     return {
       success: true,
       translations: commonTranslationCache.get(normalizedLang) || {},
-      fromCache: true
+      fromCache: true,
     };
   }
 
   // Load from source
   const result = await loadCommon(normalizedLang);
-  
+
   if (result.success) {
     // Cache successful results
     commonTranslationCache.set(normalizedLang, result.translations);
     cacheMetadata.set(normalizedLang, {
       loadedAt: new Date(),
       size: Object.keys(result.translations).length,
-      source: 'common'
+      source: "common",
     });
   }
-  
+
   return result;
 };
 
@@ -113,19 +126,19 @@ export const loadUserTranslation = async (
     return {
       success: false,
       translations: {},
-      error: 'Both language and localizeName are required'
+      error: "Both language and localizeName are required",
     };
   }
 
   const cacheKey = `${language.toLowerCase()}/${localizeName}`;
-  
+
   // Check failed cache
   if (userFailedSet.has(cacheKey)) {
     return {
       success: false,
       translations: {},
-      error: 'Previously failed to load',
-      fromCache: true
+      error: "Previously failed to load",
+      fromCache: true,
     };
   }
 
@@ -134,80 +147,130 @@ export const loadUserTranslation = async (
     return {
       success: true,
       translations: userTranslationCache.get(cacheKey) || {},
-      fromCache: true
+      fromCache: true,
     };
   }
 
   try {
     let url = localizeName;
-    if (!localizeName.includes('/') && !localizeName.includes('.')) {
+    if (!localizeName.includes("/") && !localizeName.includes(".")) {
       url = `/locales/${language}/${localizeName}.json`;
     }
-    
+
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       const error = `HTTP ${response.status}: ${response.statusText}`;
-      
+
       if (response.status === 404) {
         // 404 is not a failure, just no translations available
         userTranslationCache.set(cacheKey, {});
         cacheMetadata.set(cacheKey, {
           loadedAt: new Date(),
           size: 0,
-          source: 'user'
+          source: "user",
         });
-        
+
         return {
           success: true,
           translations: {},
-          fromCache: false
+          fromCache: false,
         };
       }
-      
+
       userFailedSet.add(cacheKey);
       return {
         success: false,
         translations: {},
-        error
+        error,
       };
     }
 
-    const userMap: TranslationMap = await response.json();
-    
-    // Validate that response is an object
-    if (!userMap || typeof userMap !== 'object') {
-      const error = 'Invalid translation file format';
+    // Read response as text then parse so we can provide better error messages
+    const contentType = response.headers.get("content-type") || "";
+    if (
+      !contentType.includes("application/json") &&
+      !contentType.includes("text/json")
+    ) {
+      // Not strictly required, but warn in debug mode
+      if (isDebugMode()) {
+        console.warn(
+          `Translation file at ${url} has unexpected content-type: ${contentType}`
+        );
+      }
+    }
+
+    const text = await response.text();
+
+    if (!text) {
+      const error = "Empty translation file";
+      userFailedSet.add(cacheKey);
+      return { success: false, translations: {}, error };
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(text);
+    } catch (e) {
+      const error = `Invalid JSON in translation file: ${
+        e instanceof Error ? e.message : String(e)
+      }`;
+      userFailedSet.add(cacheKey);
+      return { success: false, translations: {}, error };
+    }
+
+    // Ensure we received an object and normalize values to strings.
+    if (!parsed || typeof parsed !== "object") {
+      const error = "Invalid translation file format";
       userFailedSet.add(cacheKey);
       return {
         success: false,
         translations: {},
-        error
+        error,
       };
     }
-    
+
+    const userTranslations: TranslationMap = Object.fromEntries(
+      Object.entries(parsed as Record<string, unknown>).map(([k, v]) => [
+        k,
+        typeof v === "string" ? v : String(v),
+      ])
+    );
+
+    // Validate that response is an object
+    if (!userTranslations || typeof userTranslations !== "object") {
+      const error = "Invalid translation file format";
+      userFailedSet.add(cacheKey);
+      return {
+        success: false,
+        translations: {},
+        error,
+      };
+    }
+
     // Cache successful result
-    userTranslationCache.set(cacheKey, userMap);
+    userTranslationCache.set(cacheKey, userTranslations);
     cacheMetadata.set(cacheKey, {
       loadedAt: new Date(),
-      size: Object.keys(userMap).length,
-      source: 'user'
+      size: Object.keys(userTranslations).length,
+      source: "user",
     });
-    
+
     return {
       success: true,
-      translations: userMap,
-      fromCache: false
+      translations: userTranslations,
+      fromCache: false,
     };
-    
   } catch (error) {
-    const errorMessage = `Failed to load user translations: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    const errorMessage = `Failed to load user translations: ${
+      error instanceof Error ? error.message : "Unknown error"
+    }`;
     userFailedSet.add(cacheKey);
-    
+
     return {
       success: false,
       translations: {},
-      error: errorMessage
+      error: errorMessage,
     };
   }
 };
@@ -218,7 +281,9 @@ export const loadUserTranslation = async (
  */
 export function isDebugMode(): boolean {
   try {
-    const meta = (import.meta as unknown) as { env?: { DEV?: boolean } } | undefined;
+    const meta = import.meta as unknown as
+      | { env?: { DEV?: boolean } }
+      | undefined;
     if (meta && meta.env && meta.env.DEV) {
       return true;
     }
@@ -242,15 +307,15 @@ export const createTranslationFunction = (
     void _args;
     let translateText = defaultText;
     let translated = false;
-    
+
     // Handle empty or invalid input
-    if (!defaultText || typeof defaultText !== 'string') {
-      return String(defaultText || '');
+    if (!defaultText || typeof defaultText !== "string") {
+      return String(defaultText || "");
     }
-    
+
     const normalizedLang = language.toLowerCase();
-    
-    if (normalizedLang === 'en') {
+
+    if (normalizedLang === "en") {
       translateText = defaultText;
       translated = true;
     } else {
@@ -267,7 +332,9 @@ export const createTranslationFunction = (
     }
 
     if (!translated && isDebugMode()) {
-      console.debug(`Missing translation for "${defaultText}" in language "${language}"`);
+      console.debug(
+        `Missing translation for "${defaultText}" in language "${language}"`
+      );
     }
     return translateText;
   };

@@ -36,8 +36,6 @@ export interface DefinitionPropertyField {
   readOnly?: boolean;
   disabled?: boolean;
   labelLayout?: 'row' | 'column-left' | 'column-center'; // Optional label layout: 'row' (default), 'column-left' (label left-aligned), or 'column-center' (label center-aligned)
-  minDate?: string;
-  maxDate?: string;
 }
 
 export interface ReactaDefinition {

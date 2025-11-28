@@ -1,5 +1,6 @@
 {
   "name": "reactaform",
+  "private": true,
   "version": "1.0.0",
   "type": "module",
   "main": "dist/reactaform.cjs.js",
@@ -17,18 +18,20 @@
     "react-dom": "^19.2.0"
   },
   "scripts": {
-    "build": "tsc -b && vite build",
-    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.build.json && npx dts-bundle-generator -o dist/index.d.ts --project tsconfig.build.json src/package/index.ts",
+    "build": "npm -w reactaform run build:lib",
+    "build:lib": "npm -w reactaform run build:lib",
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
     "test": "vitest run",
     "dev": "vite",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "preview": "vite preview"
-    ,
-    "pack:staging": "node ./scripts/pack-staging.cjs",
-    "pack:staging:all": "node ./scripts/clean-tgz.cjs && npm run build:lib && node ./scripts/pack-staging.cjs"
+    "preview": "vite preview",
+    "pack:staging": "npm -w reactaform run pack:staging",
+    "pack:staging:all": "node ./scripts/clean-tgz.cjs && npm -w reactaform run build:lib && npm -w reactaform run pack:staging"
   },
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -55,11 +58,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/reactaform.es.js",
       "require": "./dist/reactaform.cjs.js"
-    }
-  ,
-  "./package.json": "./package.json"
+    },
+    "./package.json": "./package.json"
   },
-
   "dependencies": {
     "react-window": "^2.2.3"
   }

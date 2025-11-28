@@ -31,7 +31,7 @@ const exampleDefinition = {
   ]
 }
 
-function App() {
+export default function App() {
   const [darkMode, setDarkMode] = useState(false)
   const [language, setLanguage] = useState('en')
   const [instance, setInstance] = useState<Record<string, FieldValueType>>({})

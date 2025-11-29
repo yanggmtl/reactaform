@@ -57,4 +57,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: reactaform-tgz
-          path: reactaform-*.tgz
+          # npm pack writes the tarball to the package working directory (packages/reactaform)
+          # match the generated file under the package folder so the uploader finds it
+          path: |
+            packages/reactaform/reactaform-*.tgz
+            **/reactaform-*.tgz

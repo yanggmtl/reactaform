@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ReactaForm, serializeInstance, deserializeInstance } from 'reactaform'
+import { ReactaForm, serializeInstance, deserializeInstance, registerSubmissionHandler } from 'reactaform'
 import type { FieldValueType } from 'reactaform'
 import './style.css'
 
@@ -8,6 +8,8 @@ const exampleDefinition = {
   name: 'example-form',
   version: '1.0.0',
   displayName: 'Example Form',
+  // name of the registered submit handler to invoke on submit
+  submitHandlerName: 'exampleSubmitHandler',
   localization: "example-form",
   properties: [
     {
@@ -50,6 +52,7 @@ export default function App() {
   }
 
   const onSerialize = () => {
+    console.log('instance:', instance)
     const res = serializeInstance(instance)
     setSerialized(res.success ? (res.data ?? '') : `// error: ${res.error ?? 'unknown'}`)
   }
@@ -60,6 +63,16 @@ export default function App() {
       setInstance(res.data as Record<string, FieldValueType>)
     }
   }
+
+  // Register a submission handler that stores submitted values into the local `instance` state
+  React.useEffect(() => {
+    registerSubmissionHandler('exampleSubmitHandler', (definition, valuesMap) => {
+      setInstance(valuesMap as Record<string, FieldValueType>)
+      const serializedStr = JSON.stringify(valuesMap, null, 2)
+      setSerialized(serializedStr)
+      return undefined
+    })
+  }, [])
 
   return (
     <div className={`app ${darkMode ? 'dark' : ''}`} data-reactaform-theme={darkMode ? 'dark' : 'light'}>

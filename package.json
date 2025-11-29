@@ -23,7 +23,7 @@
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
     "test": "npm -w reactaform run test",
     "typecheck": "npm -w reactaform run typecheck",
-    "dev": "vite",
+    "dev": "npm --workspace=reactaform-example run dev",
     "lint": "eslint .",
     "preview": "vite preview",
     "pack:staging": "npm -w reactaform run pack:staging",

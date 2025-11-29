@@ -53,7 +53,7 @@ describe('Form integration: rendering and submission', () => {
     // Render the form renderer with immediate loading (no chunk delay)
     await act(async () => {
       renderWithProvider(
-        <ReactaFormRenderer definition={definition} instance={{}} style={{}} chunkDelay={0} chunkSize={1000} />
+        <ReactaFormRenderer definition={definition} instance={{}} chunkDelay={0} chunkSize={1000} />
       );
     });
 

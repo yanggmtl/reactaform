@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 // components/IntegerInput.tsx
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import type { ChangeEvent } from "react";
@@ -58,7 +56,6 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
   const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
-  const [error, setError] = useState<string | null>(null);
 
   // Memoize parse function
   const parseInteger = useCallback((s: string) => {
@@ -120,7 +117,7 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, parsedValue, t);
-      return err ? err : null;
+      return err ?? null;
     },
     [field, definitionName, t, parseInteger]
   );
@@ -136,13 +133,12 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
   useEffect(() => {
     const input = String(value ?? "");
     const err = validateCb(input);
-    setInputValue(input);
-    setError(err);
 
     // Report error changes to parent via optional onError callback.
     // We intentionally do NOT call onChange from this sync effect to avoid
     // creating an update loop; onChange should only be invoked from user
-    // interactions (handleChange).
+    // interactions (handleChange). We also avoid setting local UI state here
+    // to satisfy the `react-hooks/set-state-in-effect` lint rule.
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -155,12 +151,11 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
     const input = e.target.value;
     const err = validateCb(input);
     setInputValue(input);
-    setError(err);
     onChange?.(input, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validateCb(inputValue)}>
       <input
         id={field.name}
         type="text"

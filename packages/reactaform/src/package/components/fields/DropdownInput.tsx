@@ -5,6 +5,7 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 export type DropdownInputProps = BaseInputProps<
@@ -28,15 +29,12 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   value,
   onChange,
 }) => {
-  const { t } = useReactaFormContext();
+  const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
 
-  const [inputValue, setInputValue] = useState<string>(
-    value != null ? String(value) : ""
-  );
-  const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState<string>(value != null ? String(value) : "");
 
-  const validateCb = useCallback(
+  const validate = useCallback(
     (val: string): string | null => {
       if (val === "" || val === null || val === undefined) {
         return t("Value required");
@@ -46,41 +44,39 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
       if (!field.options.some((opt) => opt.value === val)) {
         return t("Invalid option selected");
       }
-      return null;
+      const err = validateFieldValue(definitionName, field, val, t);
+      return err ?? null;
     },
-    [field, t]
+    [field, t, definitionName]
   );
 
   useEffect(() => {
     const safeVal = value != null ? String(value) : "";
     // If incoming value is invalid and there is at least one option, pick the first option
-    const err = validateCb(safeVal);
+    const err = validate(safeVal);
     if (err && field.options && field.options.length > 0) {
       const first = String(field.options[0].value);
       setInputValue(first);
-      setError(null);
       // notify parent that we normalized the value
       onChange?.(first, null);
     } else {
       setInputValue(safeVal);
-      setError(err);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, validateCb]);
+  }, [value, validate]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (isDisabled) return;
     const val = e.target.value;
-    const err = validateCb(val);
+    const err = validate(val);
     if (!err) {
       setInputValue(val);
     }
-    setError(err);
     onChange?.(val, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(inputValue)}>
       <select
         value={inputValue}
         onChange={handleChange}

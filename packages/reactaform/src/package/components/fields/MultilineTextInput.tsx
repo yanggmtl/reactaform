@@ -32,7 +32,6 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   const isDisabled = field.disabled ?? false;
   const height = field.minHeight ?? "80px";
   const [textValue, setTextValue] = useState(value);
-  const [error, setError] = useState<string | null>(null);
 
   const prevErrorRef = React.useRef<string | null>(null);
   const onErrorRef = React.useRef<TextInputProps["onError"] | undefined>(
@@ -42,7 +41,7 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
-  const getValidationError = React.useCallback(
+  const validate = React.useCallback(
     (val: string): string | null => {
       if (val.trim() === "") {
         return field.required ? t("Value required") : null;
@@ -63,23 +62,20 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   ) => {
     if (isDisabled) return;
     const newValue = e.target.value;
-    const err = getValidationError(newValue);
-
+    const err = validate(newValue);
     setTextValue(newValue);
-    setError(err);
     onChange?.(newValue, err);
   };
 
   useEffect(() => {
-    // Validate on initial mount or when value changes
-    const err = getValidationError(value);
-    setError(err);
+    // Validate on initial mount or when value changes; notify parent via onErrorRef
+    const err = validate(value);
     setTextValue(value);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-  }, [value, getValidationError]);
+  }, [value, validate]);
 
   const commonProps = {
     value: textValue,
@@ -95,7 +91,7 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(textValue)}>
       <textarea {...commonProps} />
     </StandardFieldLayout>
   );

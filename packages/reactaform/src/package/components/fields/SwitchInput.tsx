@@ -9,6 +9,7 @@ import type {
 
 export type SwitchField = DefinitionPropertyField;
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateFieldValue } from "../../core/validation";
 
 // Props expected by SwitchInput component
 type SwitchInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
@@ -28,7 +29,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
   onError,
   disabled: propDisabled,
 }) => {
-  const { t, formStyle, fieldStyle } = useReactaFormContext();
+  const { t, formStyle, fieldStyle, definitionName } = useReactaFormContext();
   const labelStyle = React.useMemo<React.CSSProperties>(() => ({
     display: 'inline-block',
     position: 'relative',
@@ -80,14 +81,16 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     ...((fieldStyle as any)?.knob || {}),
   }), [formStyle, fieldStyle]);
   const isOn = Boolean(value);
-  const [error, setError] = React.useState<string | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<typeof onError | undefined>(onError);
 
   const validate = React.useCallback((val: boolean) => {
     if (!val) {
       return field.required ? t('Value required') : null;
     }
-    return null;
-  }, [field, t]);
+    const err = validateFieldValue(definitionName, field, val, t);
+    return err ?? null;
+  }, [field, t, definitionName]);
 
   const isDisabled = field.disabled ?? propDisabled ?? false;
 
@@ -96,18 +99,23 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     if (field.readOnly || isDisabled) return;
     const newVal = !isOn;
     const err = validate(newVal);
-    setError(err);
     onChange?.(newVal, err);
   };
 
   React.useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  React.useEffect(() => {
     const err = validate(isOn);
-    setError(err);
-    onError?.(err ?? null);
-  }, [isOn, field, onError, validate]);
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      onErrorRef.current?.(err ?? null);
+    }
+  }, [isOn, field, validate]);
 
   return (
-    <StandardFieldLayout field={field} error={error} rightAlign={true}>
+    <StandardFieldLayout field={field} error={validate(isOn)} rightAlign={true}>
       <label style={labelStyle}>
         <input
           id={field.name}

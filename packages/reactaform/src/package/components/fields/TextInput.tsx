@@ -30,7 +30,6 @@ const TextInput: React.FC<TextInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
   const [textValue, setTextValue] = useState(value);
-  const [error, setError] = useState<string | null>(null);
 
   const prevErrorRef = React.useRef<string | null>(null);
   const onErrorRef = React.useRef<TextInputProps["onError"] | undefined>(
@@ -46,7 +45,7 @@ const TextInput: React.FC<TextInputProps> = ({
     [field.pattern]
   );
 
-  const getValidationError = React.useCallback(
+  const validate = React.useCallback(
     (val: string): string | null => {
       if (val.trim() === "") {
         return field.required ? t("Value required") : null;
@@ -70,26 +69,24 @@ const TextInput: React.FC<TextInputProps> = ({
   ) => {
     if (isDisabled) return;
     const newValue = e.target.value;
-    const err = getValidationError(newValue);
+    const err = validate(newValue);
 
     setTextValue(newValue);
-    setError(err);
     onChange?.(newValue, err);
   };
 
   useEffect(() => {
-    // Validate on initial mount or when value changes
-    const err = getValidationError(value);
-    setError(err);
+    // Validate on initial mount or when value changes; notify parent via onErrorRef
+    const err = validate(value);
     setTextValue(value);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-  }, [value, getValidationError]);
+  }, [value, validate]);
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(textValue)}>
       <input
         type="text"
         value={textValue}

@@ -29,8 +29,7 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
   const isDisabled = field.disabled ?? false;
 
   // Use default min=0 and max=100 if undefined
@@ -57,7 +56,7 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, value, t);
-      return err ? err : null;
+      return err ?? null;
     },
     [definitionName, field, t, minVal, maxVal]
   );
@@ -73,35 +72,31 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   useEffect(() => {
     setInputValue(String(value));
     const err = validateCb(value);
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
   }, [value, validateCb]);
 
+  const validateFromString = (s: string): string | null => {
+    const trimmed = s.trim();
+    if (trimmed === "") return field.required ? t("Value required") : null;
+    const n = Number(s);
+    return validateCb(n);
+  };
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const newInput = e.target.value;
     const num = e.target.valueAsNumber;
-
-    let err = null;
-    const trimmedInput = newInput.trim();
-    if (trimmedInput === "") {
-      err = field.required ? t("Value required") : null;
-    }
-
-    if (!err) {
-      err = validateCb(num);
-    }
+    const err = validateFromString(newInput);
 
     setInputValue(newInput);
-    setError(err);
     onChange?.(num, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validateFromString(inputValue)}>
       <input
         id={field.name}
         type="number"

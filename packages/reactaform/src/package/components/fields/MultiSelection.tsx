@@ -6,8 +6,8 @@ import ReactDOM from "react-dom";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateFieldValue } from "../../core/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
-import Tooltip from "../Tooltip";
 
 type OptionType = { value: string; label: string };
 export type OptionField = DefinitionPropertyField & { options: OptionType[] };
@@ -22,7 +22,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   value,
   onChange,
 }) => {
-  const { t, darkMode, formStyle, fieldStyle } = useReactaFormContext();
+  const { t, darkMode, formStyle, fieldStyle, definitionName } = useReactaFormContext();
   const controlRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [popupPos, setPopupPos] = useState<{ x: number; y: number } | null>(
@@ -40,6 +40,13 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     return arr.filter((v) => allowed.has(v));
   }, [value, options]);
 
+  const validate = (vals: string[] | null) => {
+    const arr = Array.isArray(vals) ? vals : [];
+    if (field.required && arr.length === 0) return t("Value required");
+    const handlerErr = validateFieldValue(definitionName, field, arr, t);
+    return handlerErr ?? null;
+  };
+
   // Toggle menu open/close
   const handleControlClick = () => {
     if (!controlRef.current) return;
@@ -52,7 +59,8 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     const newValues = selectedValues.includes(val)
       ? selectedValues.filter((v) => v !== val)
       : [...selectedValues, val];
-    onChange?.(newValues, null);
+    const err = validate(newValues);
+    onChange?.(newValues, err);
   };
 
   const mergedControlStyle = useMemo<React.CSSProperties>(() => ({
@@ -129,8 +137,6 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
 
             <span style={mergedArrowStyle}>��</span>
           </div>
-
-          {field.tooltip && <Tooltip content={field.tooltip} />}
         </div>
       </StandardFieldLayout>
 

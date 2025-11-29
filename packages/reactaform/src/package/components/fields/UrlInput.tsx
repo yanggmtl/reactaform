@@ -51,8 +51,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
   const isDisabled = field.disabled ?? false;
 
   // Validation logic
@@ -69,7 +68,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, trimmed, t);
-      return err || null;
+      return err ?? null;
     },
     [definitionName, field, t]
   );
@@ -81,7 +80,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
     setInputValue(newVal);
 
     const err = validateCb(newVal);
-    setError(err);
     onChange?.(newVal.trim(), err);
   };
 
@@ -95,7 +93,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
   useEffect(() => {
     setInputValue(value ?? "");
     const err = validateCb(value ?? "");
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -103,7 +100,7 @@ const UrlInput: React.FC<UrlInputProps> = ({
   }, [value, validateCb]);
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validateCb(inputValue)}>
       <input
         id={field.name}
         type="url"

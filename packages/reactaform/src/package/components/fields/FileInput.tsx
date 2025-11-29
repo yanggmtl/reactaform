@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import type { ChangeEvent } from "react";
-import Tooltip from "../Tooltip";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -23,14 +22,12 @@ export type FileInputProps = BaseInputProps<File | File[] | null, FileField>;
 
 const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [error, setError] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
-  const [menuPosition, setMenuPosition] =
-    useState<PopupOptionMenuPosition | null>(null);
+  const [menuPosition, setMenuPosition] = useState<PopupOptionMenuPosition | null>(null);
   const [menuOptions, setMenuOptions] = useState<PopupOption[] | []>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const validateCb = React.useCallback(
+  const validate = React.useCallback(
     (input: File | File[] | null): string | null => {
       if (
         field.required &&
@@ -40,20 +37,21 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
       }
 
       const err = validateFieldValue(definitionName, field, input, t);
-      return err || null;
+      return err ?? null;
     },
     [field, definitionName, t]
   );
 
+  const error = React.useMemo(() => validate(value), [value, validate]);
+
   useEffect(() => {
-    const err = validateCb(value);
-    setError(err);
+    const err = validate(value);
     // Call onChange for initial validation so consumers/tests receive the
     // current validation state on mount. This mirrors previous behavior and
     // keeps test expectations stable.
     onChange?.(value, err);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, validateCb]);
+  }, [value, validate]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.files;
@@ -62,8 +60,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
     if (input && input.length > 0) {
       selected = field.multiple ? Array.from(input) : input[0];
     }
-    const err = validateCb(selected);
-    setError(err);
+    const err = validate(selected);
     onChange?.(selected, err);
   };
 
@@ -152,8 +149,6 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
             width: "100%",
             height: "inherit",
             textAlign: "center",
-            // Theming: let CSS handle background, border, radius, shadow, padding
-            // Only width/height/textAlign are set here for layout
           }}
         >
           {field.multiple ? t("Choose Files...") : t("Choose File...")}
@@ -186,8 +181,6 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
               onClickOption={() => {}}
             />
           )}
-
-        {field.tooltip && <Tooltip content={field.tooltip} />}
       </div>
     </StandardFieldLayout>
   );

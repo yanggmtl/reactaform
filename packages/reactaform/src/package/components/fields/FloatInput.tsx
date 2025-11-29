@@ -1,7 +1,5 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 // components/FloatInput.tsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -56,10 +54,9 @@ const FloatInput: React.FC<FloatInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
   const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
-  const [error, setError] = useState<string | null>(null);
 
   // Validate the current input value against the field constraints
-  const validateCb = React.useCallback(
+  const validate = React.useCallback(
     (input: string): string | null => {
       if (input.trim() === "") {
         return field.required ? t("Value required") : null;
@@ -99,7 +96,7 @@ const FloatInput: React.FC<FloatInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, parsedValue, t);
-      return err ? err : null;
+      return err ?? null;
     },
     [field, definitionName, t]
   );
@@ -112,28 +109,24 @@ const FloatInput: React.FC<FloatInputProps> = ({
 
   useEffect(() => {
     const input = String(value ?? "");
-    const err = validateCb(input);
-    setInputValue(input);
-    setError(err);
+    const err = validate(input);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    // onError intentionally omitted from deps
-  }, [value, field, validateCb, t]);
+  }, [value, field, validate, t]);
 
   // Handle user input change in the text box
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const input = e.target.value;
-    const err = validateCb(input);
+    const err = validate(input);
     setInputValue(input);
-    setError(err);
     onChange?.(input, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(inputValue)}>
       <input
         id={field.name}
         type="text"

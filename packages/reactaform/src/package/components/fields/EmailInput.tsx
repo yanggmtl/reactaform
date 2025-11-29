@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import React, { useEffect, useState, useRef } from "react";
 import type { ChangeEvent } from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -28,10 +26,9 @@ export const EmailInput: React.FC<EmailInputProps> = ({
 }) => {
   const { definitionName, t } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
-  const [inputValue, setInputValue] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
 
-  const validateCb = React.useCallback(
+  const validate = React.useCallback(
     (input: string): string | null => {
       const trimmedInput = input.trim();
       if (trimmedInput === "")
@@ -46,8 +43,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, input, t);
-
-      return err ? err : null;
+      return err ?? null;
     },
     [field, definitionName, t]
   );
@@ -55,9 +51,8 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const input = e.target.value;
-    const err = validateCb(input);
+    const err = validate(input);
     setInputValue(input);
-    setError(err);
     // pass the fresh value (not the stale state) to the parent
     onChange?.(input, err);
   };
@@ -70,17 +65,15 @@ export const EmailInput: React.FC<EmailInputProps> = ({
 
   useEffect(() => {
     const newVal = value ?? "";
-    const err = validateCb(newVal);
-    setInputValue(newVal);
-    setError(err);
+    const err = validate(newVal);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-  }, [value, validateCb]);
+  }, [value, validate]);
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(inputValue)}>
       <input
         id={field.name}
         type="email"

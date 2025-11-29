@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import useReactaFormContext from "../hooks/useReactaFormContext";
 import { CSS_CLASSES } from "../utils/cssClasses";
 import Tooltip from "./Tooltip";
@@ -83,7 +81,7 @@ ColumnFieldLayout.displayName = 'ColumnFieldLayout';
  * 
  * This component provides the traditional two-column layout pattern:
  * - Label on the left using CSS_CLASSES.label
- * - Value/input area on the right using ValueColumnDiv/ValueRowDiv
+ * - Value/input area on the right
  * - Optional tooltip support
  * - Error display area
  * 
@@ -105,24 +103,17 @@ export const RowFieldLayout = memo(({
 }) => {
   const { t } = useReactaFormContext();
 
-  const valueColumnStyle = React.useMemo<React.CSSProperties>(() => ({
+  const valueColumnStyle = useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
   }), []);
 
-  const valueRowStyle = React.useMemo<React.CSSProperties>(() => ({
+  const valueRowStyle = useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     gap: '3px',
-  }), []);
-
-  const errorStyle = React.useMemo<React.CSSProperties>(() => ({
-    color: "var(--reactaform-error-color)",
-    fontSize: "13px",
-    marginTop: "4px",
-    fontWeight: "var(--reactaform-font-weight)" as unknown as number | string,
   }), []);
 
   return (
@@ -153,7 +144,7 @@ export const RowFieldLayout = memo(({
           )}
           {field.tooltip && <Tooltip content={field.tooltip} />}
         </div>
-        {error && <div style={errorStyle as any}>{error}</div>}
+        {error && <ErrorDiv>{error}</ErrorDiv>}
       </div>
     </div>
   );
@@ -202,40 +193,15 @@ export const StandardFieldLayout = ({
   );
 };
 
-const ValueColumnDiv = memo(({ children }: { children: React.ReactNode }) => {
-  const style = React.useMemo<React.CSSProperties>(() => ({
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 0,
-  }), []);
-
-  return <div style={style}>{children}</div>;
-});
-
-ValueColumnDiv.displayName = 'ValueColumnDiv';
-
-const ValueRowDiv = memo(({ children }: { children: React.ReactNode }) => {
-  const style = React.useMemo<React.CSSProperties>(() => ({
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: '3px',
-  }), []);
-
-  return <div style={style}>{children}</div>;
-});
-
-ValueRowDiv.displayName = 'ValueRowDiv';
-
 export const ErrorDiv = memo(({ children }: { children: React.ReactNode }) => {
-  const style = React.useMemo<React.CSSProperties>(() => ({
-    color: "var(--reactaform-error-color)",
-    fontSize: "13px",
-    marginTop: "4px",
-    fontWeight: "var(--reactaform-font-weight)" as unknown as number | string,
+  const style = useMemo<React.CSSProperties>(() => ({
+    color: 'var(--reactaform-error-color)',
+    fontSize: '13px',
+    marginTop: '4px',
+    fontWeight: 'var(--reactaform-font-weight)',
   }), []);
 
-  return <div style={style as any}>{children}</div>;
+  return <div style={style}>{children}</div>;
 });
 
 ErrorDiv.displayName = 'ErrorDiv';

@@ -1,9 +1,6 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 // components/SpinInput.tsx
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
-import Tooltip from "../Tooltip";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -34,7 +31,17 @@ const SpinInput: React.FC<SpinInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const [inputValue, setInputValue] = useState<string>("");
 
-  const [error, setError] = useState<string | null>(null);
+  const deriveError = (s: string): string | null => {
+    const trimmed = s.trim();
+    if (trimmed === "") {
+      return field.required ? t("Value required") : null;
+    }
+    if (!validIntRegex.test(trimmed)) {
+      return t("Must be a valid integer");
+    }
+    const parsedValue = parseIntValue(trimmed);
+    return validateCb(trimmed, parsedValue);
+  };
 
   // Use default min=0 and max=100 if undefined
   const minVal = field.min ?? 0;
@@ -60,7 +67,7 @@ const SpinInput: React.FC<SpinInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, parsedValue, t);
-      return err ? err : null;
+      return err ?? null;
     },
     [definitionName, field, t, minVal, maxVal]
   );
@@ -80,9 +87,10 @@ const SpinInput: React.FC<SpinInputProps> = ({
 
   useEffect(() => {
     const value1 = isNaN(value) ? "" : String(value);
+    // sync input value from external prop when it changes
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(value1);
     const err = validateCb(value1, value);
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -96,7 +104,6 @@ const SpinInput: React.FC<SpinInputProps> = ({
     if (trimmedInput === "") {
       setInputValue(newVal);
       const err = field.required ? t("Value required") : null;
-      setError(err);
       onChange?.(NaN, err);
       return;
     }
@@ -104,7 +111,6 @@ const SpinInput: React.FC<SpinInputProps> = ({
     if (!validIntRegex.test(trimmedInput)) {
       const err = t("Must be a valid integer");
       setInputValue(newVal);
-      setError(err);
       onChange?.(NaN, err);
       return;
     }
@@ -113,7 +119,6 @@ const SpinInput: React.FC<SpinInputProps> = ({
     const err = validateCb(trimmedInput, parsedValue);
 
     setInputValue(newVal);
-    setError(err);
     onChange?.(parsedValue, err);
   };
 
@@ -128,9 +133,10 @@ const SpinInput: React.FC<SpinInputProps> = ({
 
     const err = validateCb(String(newValue), newValue);
     setInputValue(String(newValue));
-    setError(err);
     onChange?.(newValue, err);
   };
+
+  const error = deriveError(inputValue);
 
   return (
     <StandardFieldLayout field={field} error={error}>
@@ -191,7 +197,6 @@ const SpinInput: React.FC<SpinInputProps> = ({
             ▼
           </button>
         </div>
-        {field.tooltip && <Tooltip content={field.tooltip} />}
       </div>
     </StandardFieldLayout>
   );

@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 // components/IntegerArrayInput.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -58,8 +56,9 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const delimiter = ",";
-  const [inputValue, setInputValue] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState<string>(
+    Array.isArray(value) ? value.join(delimiter + " ") : String(value ?? "")
+  );
   const isDisabled = field.disabled ?? false;
 
   const parseArray = (text: string): number[] => {
@@ -120,7 +119,7 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, numbers, t);
-      return !err ? null : err;
+      return err ?? null;
     },
     [definitionName, field, t]
   );
@@ -130,7 +129,6 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
     const newValue = e.target.value;
     const err = validate(newValue);
     setInputValue(newValue);
-    setError(err);
     onChange?.(newValue, err);
   };
 
@@ -143,15 +141,10 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
-  // synchronize internal input when external value or field metadata change
+  // synchronize validation when external value or field metadata change
   useEffect(() => {
-    const input = Array.isArray(value)
-      ? value.join(delimiter + " ")
-      : String(value ?? "");
-
+    const input = Array.isArray(value) ? value.join(delimiter + " ") : String(value ?? "");
     const err = validate(input);
-    setInputValue(input);
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -159,7 +152,7 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
   }, [value, field.required, validate, t]);
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(inputValue)}>
       <input
         type="text"
         value={inputValue}

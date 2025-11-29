@@ -16,6 +16,7 @@ const starBaseStyle: React.CSSProperties = {
   transition: 'color 0.12s ease',
 };
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateFieldValue } from "../../core/validation";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -36,19 +37,19 @@ const RatingInput: React.FC<RatingInputProps> = ({
   onChange,
   onError,
 }) => {
-  const { t } = useReactaFormContext();
+  const { t, definitionName } = useReactaFormContext();
   const [rating, setRating] = useState<number>(value || 0);
-  const [error, setError] = useState<string | null>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const max = field.max || 5;
 
-  const validateCb = useCallback(
+  const validate = useCallback(
     (val: number): string | null => {
       if (field.required && val === 0) return t("Value required");
-      return null;
+      const err = validateFieldValue(definitionName, field, val, t);
+      return err ?? null;
     },
-    [field, t]
+    [field, t, definitionName]
   );
 
   const prevErrorRef = useRef<string | null>(null);
@@ -66,8 +67,7 @@ const RatingInput: React.FC<RatingInputProps> = ({
       v = max;
     }
     setRating(v);
-    const err = validateCb(v);
-    setError(err);
+    const err = validate(v);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -75,17 +75,16 @@ const RatingInput: React.FC<RatingInputProps> = ({
     //Add lint disable to avoid infinite loop; we only want to run this
     // when the external `value` prop or validator changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, validateCb]);
+  }, [value, validate]);
 
   const handleSelect = (val: number) => {
     setRating(val);
-    const err = validateCb(val);
-    setError(err);
+    const err = validate(val);
     onChange?.(val, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(rating)}>
       <div style={ratingWrapperStyle}>
         {(() => {
           const iconChar =

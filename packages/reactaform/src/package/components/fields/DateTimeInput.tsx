@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import Tooltip from "../Tooltip";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 // Define field shape
@@ -22,28 +22,26 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
   value,
   onChange,
 }) => {
-  const { t } = useReactaFormContext();
-  const [datePart, setDatePart] = useState<string>("");
-  const [timePart, setTimePart] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const { t, definitionName } = useReactaFormContext();
+  const [datePart, setDatePart] = useState<string>(value ? value.split("T")[0] : "");
+  const [timePart, setTimePart] = useState<string>(value ? value.split("T")[1] || "00:00" : "");
 
-  // Split external value into date/time parts. Do not call onChange from this
-  // effect; only update local state and revalidate (consumers should receive
-  // changes only when the user interacts).
+  // Split external value into date/time parts. Synchronize local parts from
+  // `value` prop so inputs update when parent changes the value.
   useEffect(() => {
     if (value) {
       const [date, time] = value.split("T");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDatePart(date || "");
+       
       setTimePart(time || "00:00");
     } else {
+       
       setDatePart("");
+       
       setTimePart("");
     }
-
     // re-validate on external prop change
-    const err = validateParts(value ? value : "");
-    setError(err);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, field.min, field.max]);
 
   // Combine date/time into ISO-like string. If date exists but time is
@@ -61,7 +59,9 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
   };
 
   const validateParts = (isoValue: string) => {
-    if (!isoValue) return field.required ? t("Value is required") : null;
+    if (!isoValue) {
+      return field.required ? t("Value is required") : null;
+    }
 
     if (isoValue) {
       // allow a partial value that ends with 'T' (date with empty time)
@@ -81,7 +81,8 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
         }
       }
     }
-    return null;
+    const err = validateFieldValue(definitionName, field, isoValue, t);
+    return err ?? null;
   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,7 +90,6 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     setDatePart(newDate);
     const combined = combine(newDate, timePart);
     const err = validateParts(combined);
-    setError(err);
     onChange?.(combined, err);
   };
 
@@ -98,12 +98,11 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     setTimePart(newTime);
     const combined = combine(datePart, newTime);
     const err = validateParts(combined);
-    setError(err);
     onChange?.(combined, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validateParts(combine(datePart, timePart))}>
       <div style={{ display: "flex", gap: "8px", width: "100%" }}>
         <input
           type="date"
@@ -114,8 +113,8 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
           // overflow; flex: '1 1 0' allows equal sharing of available space.
           style={{ flex: 1, minWidth: 0 }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${field.name}-error` : undefined}
+          aria-invalid={!!validateParts(combine(datePart, timePart))}
+          aria-describedby={validateParts(combine(datePart, timePart)) ? `${field.name}-error` : undefined}
         />
 
         <input
@@ -125,9 +124,8 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
           step={1}
           style={{ flex: 1, minWidth: 0 }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
-          aria-invalid={!!error}
+          aria-invalid={!!validateParts(combine(datePart, timePart))}
         />
-        {field.tooltip && <Tooltip content={field.tooltip} />}
       </div>
     </StandardFieldLayout>
   );

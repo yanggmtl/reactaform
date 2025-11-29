@@ -1,9 +1,10 @@
 import type { ChangeEvent } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 export type TimeField = DefinitionPropertyField & {
@@ -20,8 +21,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
   onChange,
   onError,
 }) => {
-  const { t } = useReactaFormContext();
-  const [error, setError] = useState<string | null>(null);
+  const { t, definitionName } = useReactaFormContext();
   const prevErrorRef = useRef<string | null>(null);
   const onErrorRef = useRef<TimeInputProps["onError"] | undefined>(onError);
   useEffect(() => {
@@ -29,7 +29,9 @@ const TimeInput: React.FC<TimeInputProps> = ({
   }, [onError]);
 
   const validate = (val: string): string | null => {
-    if (!val) return field.Min || field.Max ? t("Value required") : null;
+    if (!val || val.trim() === "") {
+      return (field.required ||field.Min || field.Max) ? t("Value required") : null;
+    }
     // Time comparison: treat as HH:MM or HH:MM:SS; compare lexicographically when zero-padded
     const toSeconds = (s: string) => {
       const parts = s.split(":").map((p) => parseInt(p, 10));
@@ -59,19 +61,18 @@ const TimeInput: React.FC<TimeInputProps> = ({
       if (!Number.isNaN(maxSec) && sec > maxSec)
         return t("Time must be on or before {{1}}", field.Max);
     }
-    return null;
+    const err = validateFieldValue(definitionName, field, val, t);
+    return err ?? null;
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
     const err = validate(newVal);
-    setError(err);
     onChange?.(newVal, err);
   };
 
   useEffect(() => {
     const err = validate(value);
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -80,7 +81,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
   }, [value, field.Min, field.Max]);
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(value)}>
       <input
         id={field.name}
         type="time"

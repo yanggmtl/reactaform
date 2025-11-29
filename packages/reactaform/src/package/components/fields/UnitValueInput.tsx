@@ -7,7 +7,6 @@ import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
 
-import Tooltip from "../Tooltip";
 import { validateFieldValue } from "../../core/validation";
 
 import PopupOptionMenu from "../PopupOptionMenu";
@@ -39,7 +38,6 @@ export interface UnitValueField extends DefinitionPropertyField {
   dimension: Dimension;
   displayName: string;
   validationHandlerName?: string;
-  tooltip?: string;
   required?: boolean;
 }
 
@@ -166,16 +164,15 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>("");
+  const [inputValue, setInputValue] = useState<string>(String(value[0] ?? ""));
   const [inputUnit, setInputUnit] = useState<string>(unitFactors.default);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] =
     useState<PopupOptionMenuPosition | null>(null);
   const [menuOptions, setMenuOptions] = useState<UnitOption[] | []>([]);
-  const [error, setError] = useState<string | null>(null);
   const isDisabled = field.disabled ?? false;
 
-  const validateCb = useCallback(
+  const validate = useCallback(
     (input: string, unit: string): string | null => {
       if (!input || input.trim() === "")
         return field.required ? t("Value required.") : null;
@@ -196,19 +193,18 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     );
   })();
   useEffect(() => {
+
     const val = String(value[0]);
     let unit = value[1] ?? unitFactors.default;
     unit = normalizeUnit(unit, unitFactors) || unit;
-    const err = validateCb(val, unit);
 
     // Only update local state if values actually changed to avoid unnecessary re-renders
     if (val !== inputValue) setInputValue(val);
     if (unit !== inputUnit) setInputUnit(unit);
-    if (err !== error) setError(err);
     // report error changes to parent via onError (do not call onChange here)
     // use refs to avoid adding onError to deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, unitFactors, field, definitionName, t, validateCb]);
+  }, [value, unitFactors, field, definitionName, t, validate]);
 
   const prevErrorRef = useRef<string | null>(null);
   const onErrorRef = useRef<GenericUnitValueInputProps["onError"] | undefined>(
@@ -223,12 +219,12 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     const val = String(value[0]);
     let unit = value[1] ?? unitFactors.default;
     unit = normalizeUnit(unit, unitFactors) || unit;
-    const err = validateCb(val, unit);
+    const err = validate(val, unit);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-  }, [value, unitFactors, validateCb]);
+  }, [value, unitFactors, validate]);
   // Do NOT call onChange here: this effect synchronizes internal state from props.
   // Calling onChange would notify parent and can cause an update loop when parent
   // echoes the value back into props. Only user interactions should call onChange.
@@ -244,10 +240,9 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const input = e.target.value;
-    const err = validateCb(input, inputUnit);
+    const err = validate(input, inputUnit);
 
     setInputValue(input);
-    setError(err);
     const unit = inputUnit ?? unitFactors.default;
     responseParentOnChange(input, unit, err);
   };
@@ -257,10 +252,9 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     const newUnit = e.target.value;
     const value = inputValue ?? "";
 
-    const err = validateCb(value, newUnit);
+    const err = validate(value, newUnit);
 
     setInputUnit(newUnit);
-    setError(err);
     responseParentOnChange(value, newUnit, err);
   };
 
@@ -268,7 +262,8 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     // Guard: don't open the conversion menu when conversion is disabled
     const val = inputValue ? inputValue : "";
     const parsedValue = parseFloat(val);
-    if (error || !val.trim() || !Number.isFinite(parsedValue)) {
+    const localErr = validate(val, inputUnit ?? unitFactors.default);
+    if (localErr || !val.trim() || !Number.isFinite(parsedValue)) {
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
@@ -302,7 +297,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   };
 
   const disableConversion =
-    isDisabled || Boolean(error) || !(inputValue ?? "").trim();
+    isDisabled || Boolean(validate(inputValue ?? "", inputUnit ?? unitFactors.default)) || !(inputValue ?? "").trim();
 
   // Dark mode aware button styling
   const convertButtonStyle = {
@@ -323,7 +318,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+  <StandardFieldLayout field={field} error={validate(inputValue ?? "", inputUnit ?? unitFactors.default)}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--reactaform-unit-gap, 8px)", width: "100%" }}>
         <input
           type="text"
@@ -384,7 +379,6 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
             />
           )}
         </div>
-        {field.tooltip && <Tooltip content={field.tooltip} />}
       </div>
     </StandardFieldLayout>
   );

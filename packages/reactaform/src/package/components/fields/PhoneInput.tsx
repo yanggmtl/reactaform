@@ -23,7 +23,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
 }) => {
   const { t } = useReactaFormContext();
   const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
-  const [error, setError] = useState<string | null>(null);
 
   const { definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
@@ -61,7 +60,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     const v = String(value ?? "");
     const err = validateCb(v);
     setInputValue(v);
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -80,7 +78,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
       err = field.required ? t("Value required") : null;
       // update local state and notify parent with the new (empty) value and error
       setInputValue(newVal);
-      setError(err);
       onChange?.(newVal, err);
       return;
     }
@@ -94,13 +91,12 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     }
 
     setInputValue(newVal);
-    setError(err);
     // pass the fresh value to the parent (avoid stale state)
     onChange?.(newVal, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validateCb(inputValue)}>
       <input
         type="tel"
         value={inputValue}

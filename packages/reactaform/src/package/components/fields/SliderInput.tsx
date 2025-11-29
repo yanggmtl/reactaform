@@ -48,8 +48,7 @@ const SliderInput: React.FC<SliderInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
 
   // State for the raw string in the text input
-  const [inputValue, setInputValue] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
   const isDisabled = field.disabled ?? false;
 
   const validate = React.useCallback(
@@ -92,7 +91,6 @@ const SliderInput: React.FC<SliderInputProps> = ({
     const input = String(value);
     const err = validate(input);
     setInputValue(input);
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -111,12 +109,11 @@ const SliderInput: React.FC<SliderInputProps> = ({
     const input = e.target.value;
     const err = validate(input);
     setInputValue(input);
-    setError(err);
     onChange?.(input, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(inputValue)}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%" }}>
         <input
           type="range"

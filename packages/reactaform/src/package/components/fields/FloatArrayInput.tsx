@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 // components/FloatArrayInput.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -68,11 +66,12 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState<string>(
+    Array.isArray(value) ? value.join(", ") : String(value ?? "")
+  );
   const isDisabled = field.disabled ?? false;
 
-  const validateCb = React.useCallback(
+  const validate = React.useCallback(
     (inputValue: string): string | null => {
       if (inputValue.trim() === "") {
         return field.required ? t("Value required") : null;
@@ -120,7 +119,7 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
       }
 
       const err = validateFieldValue(definitionName, field, numbers, t);
-      return !err ? null : err;
+      return err ?? null;
     },
     [definitionName, field, t]
   );
@@ -129,10 +128,9 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
     if (isDisabled) return;
     const input = e.target.value;
 
-    const err = validateCb(input);
+    const err = validate(input);
 
     setInputValue(input);
-    setError(err);
     onChange?.(input, err);
   };
 
@@ -144,21 +142,18 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
-  // synchronize internal input when external value or field metadata change
+  // synchronize validation when external value or field metadata change
   useEffect(() => {
     const input = Array.isArray(value) ? value.join(", ") : String(value ?? "");
-
-    const err = validateCb(input);
-    setInputValue(input);
-    setError(err);
+    const err = validate(input);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-  }, [value, field.required, validateCb, t]);
+  }, [value, field.required, validate, t]);
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(inputValue)}>
       <input
         type="text"
         value={inputValue}

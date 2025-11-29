@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -9,6 +9,7 @@ export type DateField = DefinitionPropertyField & {
   maxDate?: string;
 };
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 type DateInputProps = BaseInputProps<string, DateField>;
@@ -62,10 +63,9 @@ const DateInput: React.FC<DateInputProps> = ({
   onChange,
   onError,
 }) => {
-  const { t } = useReactaFormContext();
+  const { t, definitionName } = useReactaFormContext();
   const { name, required } = field;
 
-  const [error, setError] = useState<string | null>(null);
   const prevErrorRef = useRef<string | null>(null);
   const onErrorRef = useRef<DateInputProps["onError"] | undefined>(onError);
 
@@ -77,7 +77,7 @@ const DateInput: React.FC<DateInputProps> = ({
    * Validate the current value.
    */
   const validate = (dateValue: string): string | null => {
-    if (!dateValue) {
+    if (!dateValue || dateValue.trim() === "") {
       return required ? t("Value is required") : null;
     }
 
@@ -100,7 +100,9 @@ const DateInput: React.FC<DateInputProps> = ({
       }
     }
 
-    return null;
+    // run any field-level validation handler
+    const err = validateFieldValue(definitionName, field, dateValue, t);
+    return err ?? null;
   };
 
   /**
@@ -109,7 +111,6 @@ const DateInput: React.FC<DateInputProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
     const err = validate(newDate);
-    setError(err);
     onChange?.(newDate, err);
   };
 
@@ -118,10 +119,7 @@ const DateInput: React.FC<DateInputProps> = ({
    */
   useEffect(() => {
     // Re-validate when external value or required constraint changes.
-    // Do not call onChange here �?onChange should be triggered by user actions
-    // (handleChange) to avoid double notifications on mount.
     const err = validate(value);
-    setError(err);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -130,7 +128,7 @@ const DateInput: React.FC<DateInputProps> = ({
   }, [value, required]);
 
   return (
-    <StandardFieldLayout field={field} error={error}>
+    <StandardFieldLayout field={field} error={validate(value)}>
       <input
         id={name}
         type="date"
@@ -139,8 +137,8 @@ const DateInput: React.FC<DateInputProps> = ({
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         {...(field.minDate ? { min: field.minDate } : {})}
         {...(field.maxDate ? { max: field.maxDate } : {})}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${name}-error` : undefined}
+        aria-invalid={!!validate(value)}
+        aria-describedby={validate(value) ? `${name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

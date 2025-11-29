@@ -104,33 +104,26 @@ export const RowFieldLayout = memo(({
   rightAlign?: boolean; // For checkbox, switch, etc.
 }) => {
   const { t } = useReactaFormContext();
-  const { formStyle, fieldStyle } = useReactaFormContext();
 
   const valueColumnStyle = React.useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
-    ...((formStyle as any)?.valueColumn || {}),
-    ...((fieldStyle as any)?.valueColumn || {}),
-  }), [formStyle, fieldStyle]);
+  }), []);
 
   const valueRowStyle = React.useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     gap: '3px',
-    ...((formStyle as any)?.valueRow || {}),
-    ...((fieldStyle as any)?.valueRow || {}),
-  }), [formStyle, fieldStyle]);
+  }), []);
 
   const errorStyle = React.useMemo<React.CSSProperties>(() => ({
     color: "var(--reactaform-error-color)",
-    fontSize: "12px",
+    fontSize: "13px",
     marginTop: "4px",
     fontWeight: "var(--reactaform-font-weight)" as unknown as number | string,
-    ...((formStyle as any)?.error || {}),
-    ...((fieldStyle as any)?.error || {}),
-  }), [formStyle, fieldStyle]);
+  }), []);
 
   return (
     <div className={`${CSS_CLASSES.field} row-layout`}>
@@ -210,14 +203,11 @@ export const StandardFieldLayout = ({
 };
 
 const ValueColumnDiv = memo(({ children }: { children: React.ReactNode }) => {
-  const { formStyle, fieldStyle } = useReactaFormContext();
   const style = React.useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
-    ...((formStyle as any)?.valueColumn || {}),
-    ...((fieldStyle as any)?.valueColumn || {}),
-  }), [formStyle, fieldStyle]);
+  }), []);
 
   return <div style={style}>{children}</div>;
 });
@@ -225,15 +215,12 @@ const ValueColumnDiv = memo(({ children }: { children: React.ReactNode }) => {
 ValueColumnDiv.displayName = 'ValueColumnDiv';
 
 const ValueRowDiv = memo(({ children }: { children: React.ReactNode }) => {
-  const { formStyle, fieldStyle } = useReactaFormContext();
   const style = React.useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     gap: '3px',
-    ...((formStyle as any)?.valueRow || {}),
-    ...((fieldStyle as any)?.valueRow || {}),
-  }), [formStyle, fieldStyle]);
+  }), []);
 
   return <div style={style}>{children}</div>;
 });
@@ -241,15 +228,12 @@ const ValueRowDiv = memo(({ children }: { children: React.ReactNode }) => {
 ValueRowDiv.displayName = 'ValueRowDiv';
 
 export const ErrorDiv = memo(({ children }: { children: React.ReactNode }) => {
-  const { formStyle, fieldStyle } = useReactaFormContext();
   const style = React.useMemo<React.CSSProperties>(() => ({
     color: "var(--reactaform-error-color)",
-    fontSize: "12px",
+    fontSize: "13px",
     marginTop: "4px",
     fontWeight: "var(--reactaform-font-weight)" as unknown as number | string,
-    ...((formStyle as any)?.error || {}),
-    ...((fieldStyle as any)?.error || {}),
-  }), [formStyle, fieldStyle]);
+  }), []);
 
   return <div style={style as any}>{children}</div>;
 });

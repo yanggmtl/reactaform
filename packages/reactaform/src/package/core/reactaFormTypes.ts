@@ -50,10 +50,11 @@ export interface ReactaDefinition {
 
 export interface ReactaFormProps {
   definitionData: string | Record<string, unknown>; // Json string or map object
-  language: string;
-  darkMode: boolean;
-  instance: Record<string, FieldValueType>;
-  style: React.CSSProperties;
+  language?: string;
+  instance?: Record<string, FieldValueType>;
+  className?: string;
+  darkMode?: boolean;
+  style?: React.CSSProperties;
 }
 
 // Field validator function: returns error string or undefined if valid

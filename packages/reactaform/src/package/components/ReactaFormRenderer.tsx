@@ -18,9 +18,9 @@ import { renameDuplicatedGroups } from "../utils/groupingHelpers";
 import { submitForm } from "../core/submitForm";
 
 export interface ReactaFormRendererProps {
+  className?: string;
   definition: ReactaDefinition;
   instance: Record<string, FieldValueType>;
-  style: React.CSSProperties;
   chunkSize?: number;
   chunkDelay?: number;
   enableVirtualization?: boolean;
@@ -30,6 +30,7 @@ export interface ReactaFormRendererProps {
 }
 
 const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
+  className = null,
   definition,
   instance,
   chunkSize = 50,
@@ -40,7 +41,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   estimatedFieldHeight = 60,
 }) => {
   const { properties, displayName } = definition;
-  const { t, formStyle } = useReactaFormContext();
+  const { t, formStyle, darkMode } = useReactaFormContext();
 
   // Core state
   const [updatedProperties, setUpdatedProperties] = useState<
@@ -299,8 +300,9 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     return <div>Initializing form...</div>;
   }
 
+  const theme = darkMode ? "dark" : "light";
   return (
-    <div style={formStyle.container}>
+    <div className={className ?? ""} data-reactaform-theme={theme} style={formStyle.container}>
       {displayName && <h2 style={formStyle.titleStyle}>{t(displayName)}</h2>}
       {shouldUseVirtualization ? (
         <VirtualizedFieldList

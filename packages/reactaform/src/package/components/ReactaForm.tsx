@@ -29,9 +29,11 @@ function useNearestReactaformTheme(ref?: React.RefObject<HTMLElement>) {
 
 const ReactaForm: React.FC<ReactaFormProps> = ({
   definitionData,
-  language,
   instance,
-  style,
+  language,
+  className,
+  darkMode,
+  style, 
 }) => {
     const definition = useMemo<ReactaDefinition | null>(() => {
       try {
@@ -41,8 +43,11 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
       }
     }, [definitionData]);
     const inputStyle = { fontSize: "inherit", fontFamily: "inherit", ...style };
+    
     const theme = useNearestReactaformTheme();
-    const darkMode = theme === 'dark';
+    const inputDarkMode = darkMode ?? (theme === 'dark');
+
+    const inputLanguage = language ?? 'en';
 
     useEffect(() => {
       // Add popup-root div if not already present to make sure popups work
@@ -63,14 +68,14 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
       <ReactaFormProvider
         defaultDefinitionName={definition.name}
         defaultStyle={inputStyle}
-        defaultLanguage={language}
-        defaultDarkMode={darkMode}
+        defaultLanguage={inputLanguage}
+        defaultDarkMode={inputDarkMode}
         defaultLocalizeName={definition.localization || ""}
       >
         <ReactaFormRenderer
+          className={className}
           definition={definition}
-          instance={instance}
-          style={style}
+          instance={instance?? {}}
         />
       </ReactaFormProvider>
       )

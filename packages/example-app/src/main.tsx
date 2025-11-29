@@ -75,7 +75,7 @@ export default function App() {
   }, [])
 
   return (
-    <div className={`app ${darkMode ? 'dark' : ''}`} data-reactaform-theme={darkMode ? 'dark' : 'light'}>
+    <div className = {`app`}>
       <h1>Reactaform Example</h1>
 
       <div className="controls">

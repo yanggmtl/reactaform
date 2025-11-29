@@ -55,8 +55,6 @@ const formatDateForInput = (dateValue?: string): string => {
  * DateInput Component
  * -------------------
  * Controlled date input for ReactaForm.
- * Validates required/min/max constraints.
- * Safely handles invalid min/max definitions.
  */
 const DateInput: React.FC<DateInputProps> = ({
   field,
@@ -79,7 +77,9 @@ const DateInput: React.FC<DateInputProps> = ({
    * Validate the current value.
    */
   const validate = (dateValue: string): string | null => {
-    if (required && !dateValue) return t("Value is required");
+    if (!dateValue) {
+      return required ? t("Value is required") : null;
+    }
 
     if (dateValue) {
       const parsed = parseDate(dateValue);

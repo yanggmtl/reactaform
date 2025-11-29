@@ -3,8 +3,8 @@
 import BaseRegistry from "./baseRegistry";
 import React, { useEffect } from "react";
 import type { DefinitionPropertyField } from "../reactaFormTypes";
+import { useDebouncedCallback } from "../../hooks/useDebouncedCallback";
 
-// Note: relative path from this file -> components/fields folder is ../../components/fields
 import CheckboxInput from "../../components/fields/CheckboxInput";
 import SwitchInput from "../../components/fields/SwitchInput"
 import ColorInput from "../../components/fields/ColorInput";
@@ -28,9 +28,7 @@ import UnitValueInput from "../../components/fields/UnitValueInput";
 import RatingInput from "../../components/fields/RatingInput";
 import FileInput from "../../components/fields/FileInput";
 import UrlInput from "../../components/fields/UrlInput";
-import DateTimeZoneInput from "../../components/fields/DateTimeZoneInput";
 import NumericStepperInput from "../../components/fields/NumericStepperInput";
-import { useDebouncedCallback } from "../../hooks/useDebouncedCallback";
 import MultilineTextInput from "../../components/fields/MultilineTextInput";
 
 type ComponentType = React.ComponentType<any>;
@@ -106,7 +104,6 @@ export function registerBaseComponents(): void {
     color: ColorInput,
     date: DateInput,
     "date-time": DateTimeInput,
-    "date-time-zone": DateTimeZoneInput,
     dropdown: DropdownInput,
     email: EmailInput,
     file: FileInput,

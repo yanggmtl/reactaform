@@ -74,8 +74,8 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
 
   const validateCb = React.useCallback(
     (inputValue: string): string | null => {
-      if (field.required && inputValue.trim() === "") {
-        return t("Value required");
+      if (inputValue.trim() === "") {
+        return field.required ? t("Value required") : null;
       }
 
       if (!isValidFloatArray(inputValue)) {
@@ -146,7 +146,7 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
 
   // synchronize internal input when external value or field metadata change
   useEffect(() => {
-    const input = Array.isArray(value) ? value.join(", ") : String(value);
+    const input = Array.isArray(value) ? value.join(", ") : String(value ?? "");
 
     const err = validateCb(input);
     setInputValue(input);

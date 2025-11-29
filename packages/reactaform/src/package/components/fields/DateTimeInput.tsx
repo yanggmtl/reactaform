@@ -44,7 +44,7 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     const err = validateParts(value ? value : "");
     setError(err);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, field.required, field.min, field.max]);
+  }, [value, field.min, field.max]);
 
   // Combine date/time into ISO-like string. If date exists but time is
   // empty, return `YYYY-MM-DDT` (trailing T) �?tests and consumers expect
@@ -61,7 +61,8 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
   };
 
   const validateParts = (isoValue: string) => {
-    if (field.required && !isoValue) return t("Value is required");
+    if (!isoValue) return field.required ? t("Value is required") : null;
+
     if (isoValue) {
       // allow a partial value that ends with 'T' (date with empty time)
       if (/^\d{4}-\d{2}-\d{2}T$/.test(isoValue)) return null;

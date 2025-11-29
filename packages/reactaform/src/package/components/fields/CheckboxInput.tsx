@@ -4,67 +4,45 @@ import type {
   BaseInputProps,
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
+import useReactaFormContext from "../../hooks/useReactaFormContext";
 
 export type CheckboxField = DefinitionPropertyField & {
   defaultValue?: boolean;
 };
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 
-// Props expected by CheckboxInput component
 type CheckboxInputProps = BaseInputProps<boolean, CheckboxField>;
 
 /**
  * CheckboxInput
- *
  * Renders a simple checkbox input for boolean values.
- * - Displays label from field.displayName with localization support.
- * - Calls onChange when toggled.
- * - Shows tooltip if provided.
  */
 export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   field,
   value,
   onChange,
-  onError,
   disabled: propDisabled,
 }) => {
-  const { darkMode, t } = useReactaFormContext();
-
+  const { darkMode } = useReactaFormContext();
   const isDisabled = field.disabled ?? propDisabled ?? false;
-
-  const [error, setError] = React.useState<string | null>(null);
-
-  const validate = React.useCallback((checked: boolean) => {
-    if (field.required && !checked) return t('Value required');
-    return null;
-  }, [field, t]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (field.readOnly || isDisabled) return;
     const checked = e.target.checked;
-    const err = validate(checked);
-    setError(err);
-    onChange?.(checked, err);
+    onChange?.(checked, null);
   };
-
-  React.useEffect(() => {
-    const err = validate(!!value);
-    setError(err);
-    onError?.(err ?? null);
-  }, [value, field, onError, validate]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Space' || e.key === 'Enter') {
       e.preventDefault();
       if (field.readOnly || isDisabled) return;
-      onChange?.(!value, validate(!value));
+      onChange?.(!value, null);
     }
   };
 
   const inputId = field.name;
 
   return (
-    <StandardFieldLayout field={field} rightAlign={true} error={error}>
+    <StandardFieldLayout field={field} rightAlign={true}>
       <input
         id={inputId}
         data-testid="boolean-checkbox"

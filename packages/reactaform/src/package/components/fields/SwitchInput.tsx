@@ -83,7 +83,9 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
   const [error, setError] = React.useState<string | null>(null);
 
   const validate = React.useCallback((val: boolean) => {
-    if (field.required && !val) return t('Value required');
+    if (!val) {
+      return field.required ? t('Value required') : null;
+    }
     return null;
   }, [field, t]);
 

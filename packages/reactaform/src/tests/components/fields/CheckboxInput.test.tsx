@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
+import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 import CheckboxInput, { type CheckboxField } from '../../../package/components/fields/CheckboxInput';
 
 describe('CheckboxInput', () => {
@@ -63,21 +63,6 @@ describe('CheckboxInput', () => {
     await user.click(checkbox);
 
     expect(onChange).toHaveBeenCalledWith(false, null);
-  });
-
-  it('shows error for required field when unchecked', async () => {
-    const onError = vi.fn();
-    const field = createMockField<CheckboxField>({ required: true });
-    const { getByRole } = renderWithProvider(
-      <CheckboxInput {...baseFieldProps} field={field} value={false} onError={onError} />
-    );
-
-    const checkbox = getByRole('checkbox');
-    await user.click(checkbox);
-    await user.click(checkbox); // uncheck it
-    
-    await waitForUpdate();
-    expect(onError).toHaveBeenCalledWith(expect.stringContaining('required'));
   });
 
   it('is disabled when disabled prop is true', () => {

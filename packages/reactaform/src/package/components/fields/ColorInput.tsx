@@ -10,8 +10,8 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 type ColorOption = {
-  label: string; // untranslated key
-  value: string; // hex code or "custom"
+  label: string; // Color name
+  value: string; // Color hex value
 };
 
 export type ColorInputProps = BaseInputProps<string, DefinitionPropertyField>;
@@ -91,13 +91,6 @@ function normalizeHexColor(color: string): string {
  * A reusable color input field that supports a predefined list of color options
  * (e.g., Red, Blue, etc.) and also allows the user to choose a custom color via
  * a native HTML `<input type="color">`.
- *
- * Key Features:
- * - Dropdown (`<select>`) with localized labels for common colors.
- * - Custom color selection via color picker.
- * - Fully integrated with the ReactaFormContext for styling and localization.
- * - Handles both predefined and custom color values using the actual color value
- *   (e.g., "#ff0000") as the source of truth, making it language-independent.
  *
  * Props:
  * - field: field metadata including display name and tooltip.

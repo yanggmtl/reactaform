@@ -38,7 +38,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
 
   const validateCb = useCallback(
     (val: string): string | null => {
-      if (field.required && (val === "" || val === null || val === undefined)) {
+      if (val === "" || val === null || val === undefined) {
         return t("Value required");
       }
       // If options are not provided, we can't validate here; treat as valid.

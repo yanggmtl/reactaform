@@ -38,6 +38,7 @@ export interface IntegerField extends DefinitionPropertyField {
   minInclusive?: boolean;
   max?: number;
   maxInclusive?: boolean;
+  step?: number;
 }
 
 export type IntegerInputProps = BaseInputProps<string | number, IntegerField>;
@@ -56,7 +57,7 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
-  const [inputValue, setInputValue] = useState<string>(String(value));
+  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
   const [error, setError] = useState<string | null>(null);
 
   // Memoize parse function
@@ -68,7 +69,9 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
   // Validate the current input value against the field constraints
   const validateCb = React.useCallback(
     (input: string): string | null => {
-      if (field.required && input.trim() === "") return t("Value required");
+      if (input.trim() === "") {
+        return field.required ? t("Value required") : null;
+      }
 
       if (!isValidInteger(input)) {
         return t("Must be a valid integer");
@@ -100,6 +103,19 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
             field.maxInclusive ? "≤" : "<",
             field.max
           );
+        }
+      }
+
+      // Validate step increments for integer fields. If a step is provided and
+      // is an integer, require the parsed value to be a multiple of the step.
+      if (field.step !== undefined) {
+        const stepVal = Number(field.step);
+        if (!Number.isInteger(stepVal)) {
+          // Non-integer step is invalid for IntegerInput
+          return t("Invalid step value");
+        }
+        if (parsedValue % stepVal !== 0) {
+          return t("Must be a multiple of {{1}}", stepVal);
         }
       }
 

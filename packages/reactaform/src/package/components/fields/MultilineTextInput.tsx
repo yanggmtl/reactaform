@@ -44,8 +44,8 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
 
   const getValidationError = React.useCallback(
     (val: string): string | null => {
-      if (field.required && val.trim() === "") {
-        return t("Value required");
+      if (val.trim() === "") {
+        return field.required ? t("Value required") : null;
       }
       if (field.minLength !== undefined && val.length < field.minLength) {
         return t("Must be at least {{1}} characters", field.minLength);

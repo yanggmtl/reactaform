@@ -61,7 +61,9 @@ const FloatInput: React.FC<FloatInputProps> = ({
   // Validate the current input value against the field constraints
   const validateCb = React.useCallback(
     (input: string): string | null => {
-      if (field.required && input.trim() === "") return t("Value required");
+      if (input.trim() === "") {
+        return field.required ? t("Value required") : null;
+      }
 
       if (!validFloatRegex.test(input)) {
         return t("Must be a valid float");

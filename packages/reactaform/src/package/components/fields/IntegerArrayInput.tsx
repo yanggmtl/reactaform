@@ -73,8 +73,8 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
 
   const validate = React.useCallback(
     (input: string): string | null => {
-      if (field.required && input.trim() === "") {
-        return t("Value required");
+      if (input.trim() === "") {
+        return field.required ? t("Value required") : null;
       }
 
       if (!isValidIntegerArray(input)) {
@@ -138,6 +138,7 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
   const onErrorRef = useRef<IntegerArrayInputProps["onError"] | undefined>(
     onError
   );
+  
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
@@ -146,7 +147,7 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
   useEffect(() => {
     const input = Array.isArray(value)
       ? value.join(delimiter + " ")
-      : String(value);
+      : String(value ?? "");
 
     const err = validate(input);
     setInputValue(input);

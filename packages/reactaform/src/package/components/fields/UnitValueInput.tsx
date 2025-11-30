@@ -12,7 +12,7 @@ import { validateFieldValue } from "../../core/validation";
 import PopupOptionMenu from "../PopupOptionMenu";
 import type { PopupOption, PopupOptionMenuPosition } from "../PopupOptionMenu";
 import {
-  dimensionUnitShortDisplayMap,
+  dimensionUnitDisplayMap,
   dimensonUnitFactorsMap,
   dimensionUnitsMap,
 } from "../../utils/unitValueMapper";
@@ -68,9 +68,13 @@ function loadUnitFactorsMap(dimension: string): void {
   }
   // Dynamically load unit factors for the given dimension if available
   const factorsMap = dimensonUnitFactorsMap[dimension];
-  const labelsMap = dimensionUnitShortDisplayMap[dimension];
+  // derive a labelsMap (unit -> shortName) from the merged display map
+  const displayMapForDim = dimensionUnitDisplayMap[dimension] ?? {};
+  const labelsMap: Record<string, string> = Object.fromEntries(
+    Object.entries(displayMapForDim).map(([unit, info]) => [unit, info.shortName])
+  );
   const reverseLabelsMap: Record<string, string> = Object.fromEntries(
-    Object.entries(labelsMap).map(([label, code]) => [code, label])
+    Object.entries(labelsMap).map(([unit, short]) => [short, unit])
   );
 
   if (factorsMap) {
@@ -262,7 +266,9 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     unit: string,
     error: string | null
   ) => {
-    onChange?.([value, reverseLabels[unit] || unit], error);
+    const finalUnit = reverseLabels[unit] || unit;
+    const finalValue: [string, string] = [value, finalUnit];
+    onChange?.(finalValue, error);
   };
 
   const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -294,8 +300,8 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = rect.left + window.scrollX;
-    const y = rect.bottom + window.scrollY;
+    const x = rect.left;
+    const y = rect.bottom;
 
     setMenuPosition({ x, y });
 
@@ -312,12 +318,28 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
 
   const onConversionMenuSelect = (option: UnitOption) => {
     const { value: newVal, unit: newUnit } = option;
-    if (inputRef.current) inputRef.current.value = newVal;
-    if (selectRef.current) selectRef.current.value = newUnit;
+
+    // Close menu first
+    setShowMenu(false);
+    setMenuPosition(null);
+
+    // Update DOM elements (since this is an uncontrolled component)
+    if (inputRef.current) {
+      inputRef.current.value = newVal;
+    }
+    if (selectRef.current) {
+      selectRef.current.value = newUnit;
+    }
+
+    // Update local state to track the conversion
     setLocalInput(newVal);
     setLocalUnit(newUnit);
-    setShowMenu(false);
-    responseParentOnChange(newVal, newUnit, null);
+
+    // Validate the new values
+    const err = validate(newVal, newUnit);
+
+    // Notify parent of the change
+    responseParentOnChange(newVal, newUnit, err);
   };
 
   const propInputForValidation = String(value[0] ?? "");

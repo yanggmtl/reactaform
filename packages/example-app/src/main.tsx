@@ -29,6 +29,14 @@ const exampleDefinition = {
       displayName: 'Subscribe to newsletter',
       type: 'checkbox',
       defaultValue: false
+    },
+    {
+      "type": "unit",
+      "name": "unitValue",
+      "displayName": "unitValue",
+      "dimension": "angle",
+      "defaultValue": 30,
+      "defaultUnit": "deg"
     }
   ]
 }

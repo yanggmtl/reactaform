@@ -76,11 +76,8 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
       rect = null;
     }
 
-    const scrollX = typeof window !== "undefined" && typeof window.scrollX === 'number' ? window.scrollX : 0;
-    const scrollY = typeof window !== "undefined" && typeof window.scrollY === 'number' ? window.scrollY : 0;
-
-    const x = rect && typeof (rect as DOMRect).left === "number" ? (rect as DOMRect).left + scrollX : 10 + scrollX;
-    const y = rect && typeof (rect as DOMRect).bottom === "number" ? (rect as DOMRect).bottom + scrollY : 20 + scrollY;
+    const x = rect && typeof (rect as DOMRect).left === "number" ? (rect as DOMRect).left : 10;
+    const y = rect && typeof (rect as DOMRect).bottom === "number" ? (rect as DOMRect).bottom : 20;
 
     setMenuPosition({ x, y });
 

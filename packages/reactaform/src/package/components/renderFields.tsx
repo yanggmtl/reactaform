@@ -1,3 +1,9 @@
+/* eslint-disable react-hooks/static-components -- This module performs dynamic
+   component lookup (type -> component). Different component references may
+   be produced at render time intentionally; we memoize wrapper components
+   (`FieldWrapper`, `FieldGroup`) to avoid unnecessary re-renders. See file
+   comment below for full rationale. */
+
 /*
   File-level rationale: this module performs dynamic component lookup for
   field types (type -> component). The `react-hooks/static-components`
@@ -14,10 +20,6 @@ import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../core
 import { getComponent } from "../core/registries";
 import { groupConsecutiveFields } from "../utils/groupingHelpers";
 import type { JSX } from "react/jsx-runtime";
-
-// Note: styles should be instance-scoped so different ReactaForm instances
-// can override theme/style via provider. FieldGroup will memoize styles per
-// instance using the ReactaForm context (formStyle/fieldStyle).
 
 // Memoized field wrapper to prevent unnecessary re-renders
 const FieldWrapper = React.memo<{

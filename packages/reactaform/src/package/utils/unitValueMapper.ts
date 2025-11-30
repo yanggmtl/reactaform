@@ -15,9 +15,9 @@ export const dimensionUnitDisplayMap: Record<
   Record<string, { name: string; shortName: string }>
 > = {
   length: {
+    m: { name: "Meter (m)", shortName: "m" },
     mm: { name: "Millimeter (mm)", shortName: "mm" },
     cm: { name: "Centimeter (cm)", shortName: "cm" },
-    m: { name: "Meter (m)", shortName: "m" },
     km: { name: "Kilometer (km)", shortName: "km" },
     in: { name: "Inch (in)", shortName: "in" },
     ft: { name: "Foot (ft)", shortName: "ft" },
@@ -25,8 +25,8 @@ export const dimensionUnitDisplayMap: Record<
     mi: { name: "Mile (mi)", shortName: "mi" },
   },
   area: {
-    "mm^2": { name: "Square millimeter (mm²)", shortName: "mm²" },
     "m^2": { name: "Square meter (m²)", shortName: "m²" },
+    "mm^2": { name: "Square millimeter (mm²)", shortName: "mm²" },
     "cm^2": { name: "Square centimeter (cm²)", shortName: "cm²" },
     "in^2": { name: "Square inch (in²)", shortName: "in²" },
     "ft^2": { name: "Square foot (ft²)", shortName: "ft²" },
@@ -35,18 +35,18 @@ export const dimensionUnitDisplayMap: Record<
     ac: { name: "Acre (ac)", shortName: "ac" },
   },
   volume: {
+    L: { name: "Liter (L)", shortName: "L" },
     "cm^3": { name: "Cubic centimeter (cm³)", shortName: "cm³" },
     "m^3": { name: "Cubic meter (m³)", shortName: "m³" },
-    L: { name: "Liter (L)", shortName: "L" },
     mL: { name: "Milliliter (mL)", shortName: "mL" },
     "in^3": { name: "Cubic inch (in³)", shortName: "in³" },
     "ft^3": { name: "Cubic foot (ft³)", shortName: "ft³" },
     "yd^3": { name: "Cubic yard (yd³)", shortName: "yd³" },
   },
   weight: {
-    mg: { name: "Milligram (mg)", shortName: "mg" },
-    g: { name: "Gram (g)", shortName: "g" },
     kg: { name: "Kilogram (kg)", shortName: "kg" },
+    g: { name: "Gram (g)", shortName: "g" },
+    mg: { name: "Milligram (mg)", shortName: "mg" },
     ton: { name: "Ton (t)", shortName: "ton" },
     lb: { name: "Pound (lb)", shortName: "lb" },
     oz: { name: "Ounce (oz)", shortName: "oz" },
@@ -66,10 +66,10 @@ export const dimensionUnitDisplayMap: Record<
   angle: {
     deg: { name: "Degree (°)", shortName: "°" },
     rad: { name: "Radian (rad)", shortName: "rad" },
-    gradian: { name: "Gradian", shortName: "gradian" },
+    gradian: { name: "Gradian", shortName: "gon" },
     rev: { name: "Revolution (rev)", shortName: "rev" },
-    minute: { name: "Arcminute (′)", shortName: "minute" },
-    second: { name: "Arcsecond (″)", shortName: "second" },
+    minute: { name: "Arcminute (′)", shortName: "′" },
+    second: { name: "Arcsecond (″)", shortName: "″" },
   },
 };
 

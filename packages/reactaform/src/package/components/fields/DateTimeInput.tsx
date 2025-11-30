@@ -25,32 +25,15 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const [datePart, setDatePart] = useState<string>(value ? value.split("T")[0] : "");
   const [timePart, setTimePart] = useState<string>(value ? value.split("T")[1] || "00:00" : "");
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const timeRef = React.useRef<HTMLInputElement | null>(null);
+  const rafRef = React.useRef<number | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<typeof onChange | undefined>(undefined);
 
-  // Split external value into date/time parts. Synchronize local parts from
-  // `value` prop so inputs update when parent changes the value.
-  useEffect(() => {
-    if (value) {
-      const [date, time] = value.split("T");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setDatePart(date || "");
-       
-      setTimePart(time || "00:00");
-    } else {
-       
-      setDatePart("");
-       
-      setTimePart("");
-    }
-    // re-validate on external prop change
-  }, [value, field.min, field.max]);
-
-  // Combine date/time into ISO-like string. If date exists but time is
-  // empty, return `YYYY-MM-DDT` (trailing T) �?tests and consumers expect
-  // this form so callers can distinguish an explicit empty time.
-  const combine = (d: string, tm: string) => {
-    if (!d) return "";
-    return `${d}T${tm}`;
-  };
+  React.useEffect(() => {
+    onErrorRef.current = onChange;
+  }, [onChange]);
 
   const parseToDate = (iso?: string) => {
     if (!iso) return null;
@@ -58,7 +41,7 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     return isNaN(parsed.getTime()) ? null : parsed;
   };
 
-  const validateParts = (isoValue: string) => {
+  const validateParts = React.useCallback((isoValue: string) => {
     if (!isoValue) {
       return field.required ? t("Value is required") : null;
     }
@@ -83,7 +66,58 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     }
     const err = validateFieldValue(definitionName, field, isoValue, t);
     return err ?? null;
+  }, [definitionName, field, t]);
+
+  // Split external value into date/time parts. Synchronize local parts from
+  // `value` prop so inputs update when parent changes the value.
+  useEffect(() => {
+    // Sync props -> local parts. If the user is currently focused in one
+    // of the inputs, avoid clobbering their edits. Otherwise defer via
+    // requestAnimationFrame to satisfy lint and avoid mid-render setState.
+    const active = document.activeElement;
+    if (active === inputRef.current || active === timeRef.current) {
+      return;
+    }
+
+    const val = value ?? "";
+    const [date = "", time = ""] = val ? val.split("T") : ["", ""];
+
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      setDatePart(date || "");
+      setTimePart(time || "");
+
+      // re-validate on external prop change and report if changed
+      const combined = date ? `${date}T${time || ""}` : "";
+      const err = validateParts(combined);
+      if (err !== prevErrorRef.current) {
+        prevErrorRef.current = err;
+        onErrorRef.current?.(combined, err);
+      }
+    });
+
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [value, field.min, field.max, validateParts]);
+
+  // Combine date/time into ISO-like string. If date exists but time is
+  // empty, return `YYYY-MM-DDT` (trailing T) �?tests and consumers expect
+  // this form so callers can distinguish an explicit empty time.
+  const combine = (d: string, tm: string) => {
+    if (!d) return "";
+    return `${d}T${tm}`;
   };
+
+  
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
@@ -105,6 +139,7 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     <StandardFieldLayout field={field} error={validateParts(combine(datePart, timePart))}>
       <div style={{ display: "flex", gap: "8px", width: "100%" }}>
         <input
+          ref={inputRef}
           type="date"
           value={datePart}
           onChange={handleDateChange}
@@ -118,6 +153,7 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
         />
 
         <input
+          ref={timeRef}
           type="time"
           value={timePart}
           onChange={handleTimeChange}

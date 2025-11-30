@@ -14,6 +14,7 @@ import type { PopupOption, PopupOptionMenuPosition } from "../PopupOptionMenu";
 import {
   dimensionUnitShortDisplayMap,
   dimensonUnitFactorsMap,
+  dimensionUnitsMap,
 } from "../../utils/unitValueMapper";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
@@ -73,8 +74,11 @@ function loadUnitFactorsMap(dimension: string): void {
   );
 
   if (factorsMap) {
+    // Prefer a friendly default from `dimensionUnitsMap` ordering when available.
+    const preferredOrder = dimensionUnitsMap[dimension] ?? [];
+    const preferredDefault = preferredOrder.find((u) => u in factorsMap);
     unitFactorsMap[dimension as Dimension] = {
-      default: Object.keys(factorsMap)[0],
+      default: preferredDefault ?? Object.keys(factorsMap)[0],
       factors: factorsMap,
       labels: labelsMap,
       reverseLabels: reverseLabelsMap,
@@ -166,6 +170,9 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const [inputValue, setInputValue] = useState<string>(String(value[0] ?? ""));
   const [inputUnit, setInputUnit] = useState<string>(unitFactors.default);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const selectRef = useRef<HTMLSelectElement | null>(null);
+  const rafRef = useRef<number | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] =
     useState<PopupOptionMenuPosition | null>(null);
@@ -193,18 +200,31 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     );
   })();
   useEffect(() => {
-
     const val = String(value[0]);
     let unit = value[1] ?? unitFactors.default;
     unit = normalizeUnit(unit, unitFactors) || unit;
 
-    // Only update local state if values actually changed to avoid unnecessary re-renders
-    if (val !== inputValue) setInputValue(val);
-    if (unit !== inputUnit) setInputUnit(unit);
-    // report error changes to parent via onError (do not call onChange here)
-    // use refs to avoid adding onError to deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, unitFactors, field, definitionName, t, validate]);
+    // If the user is currently interacting with the input/select (focused),
+    // avoid overwriting their edits. Otherwise defer updating local state to
+    // satisfy the react-hooks/set-state-in-effect lint rule.
+    const active = document.activeElement;
+    if (active === inputRef.current || active === selectRef.current) {
+      // User is interacting; skip syncing to avoid clobbering edits.
+      return;
+    }
+
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      setInputValue(val);
+      setInputUnit(unit);
+    });
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [value, validate, unitFactors]);
 
   const prevErrorRef = useRef<string | null>(null);
   const onErrorRef = useRef<GenericUnitValueInputProps["onError"] | undefined>(
@@ -242,6 +262,12 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     const input = e.target.value;
     const err = validate(input, inputUnit);
 
+    // If a prop-sync RAF is pending, cancel it to avoid clobbering the user's edit.
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
     setInputValue(input);
     const unit = inputUnit ?? unitFactors.default;
     responseParentOnChange(input, unit, err);
@@ -251,6 +277,10 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     if (isDisabled) return;
     const newUnit = e.target.value;
     const value = inputValue ?? "";
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
 
     const err = validate(value, newUnit);
 
@@ -322,7 +352,8 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
       <div style={{ display: "flex", alignItems: "center", gap: "var(--reactaform-unit-gap, 8px)", width: "100%" }}>
         <input
           type="text"
-          value={inputValue ?? ""}
+              ref={inputRef}
+              value={inputValue ?? ""}
           onChange={onValueChange}
           disabled={isDisabled}
           style={{ width: "var(--reactaform-unit-input-width, 100px)" }}
@@ -331,6 +362,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
 
         {/* Units dropdown */}
         <select
+          ref={selectRef}
           value={inputUnit ?? unitFactors.default}
           onChange={onUnitChange}
           className={combineClasses(

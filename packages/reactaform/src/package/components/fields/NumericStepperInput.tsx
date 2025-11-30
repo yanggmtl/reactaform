@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 // components/SpinInput.tsx
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
@@ -68,14 +66,36 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const rafRef = React.useRef<number | null>(null);
 
   useEffect(() => {
-    setInputValue(String(value));
+    const active = document.activeElement;
+    if (active === inputRef.current) return;
+
+    const str = String(value);
     const err = validateCb(value);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
+
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
     }
+
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      setInputValue(str);
+      if (err !== prevErrorRef.current) {
+        prevErrorRef.current = err;
+        onErrorRef.current?.(err ?? null);
+      }
+    });
+
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
   }, [value, validateCb]);
 
   const validateFromString = (s: string): string | null => {
@@ -90,6 +110,10 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
     const newInput = e.target.value;
     const num = e.target.valueAsNumber;
     const err = validateFromString(newInput);
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
 
     setInputValue(newInput);
     onChange?.(num, err);
@@ -98,6 +122,7 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   return (
     <StandardFieldLayout field={field} error={validateFromString(inputValue)}>
       <input
+        ref={inputRef}
         id={field.name}
         type="number"
         value={inputValue}

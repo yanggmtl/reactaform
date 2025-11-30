@@ -64,6 +64,9 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   // Step 1: Initialize basic structures immediately
   // TODO: rename group name if group name appears more than once?
 
+  // Initialization effect performs synchronous state setup from the `definition`
+  // and `instance` props. This is a safe prop->state initialization and will
+  // not cause an infinite update loop.
   useEffect(() => {
     const nameToField = Object.fromEntries(
       properties.map((f) => [
@@ -139,14 +142,18 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       }
     });
 
-    setUpdatedProperties(updatedProps);
-    setFieldMap(nameToField);
-    setValuesMap(valuesMapInit);
-    setVisibility(
-      updateVisibilityMap(updatedProps, valuesMapInit, vis, nameToField)
-    );
-    setGroupState(groupInit);
-    setInitDone(true);
+    // Defer state updates to avoid synchronous setState inside effect
+    const raf = requestAnimationFrame(() => {
+      setUpdatedProperties(updatedProps);
+      setFieldMap(nameToField);
+      setValuesMap(valuesMapInit);
+      setVisibility(
+        updateVisibilityMap(updatedProps, valuesMapInit, vis, nameToField)
+      );
+      setGroupState(groupInit);
+      setInitDone(true);
+    });
+    return () => cancelAnimationFrame(raf);
   }, [properties, instance]);
 
   // Step 2: Load fields progressively
@@ -227,8 +234,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
           return { ...prev, [name]: error };
         }
         // remove key
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { [name]: _, ...rest } = prev;
+        const rest = Object.fromEntries(Object.entries(prev).filter(([k]) => k !== name)) as Record<string, string>;
         return rest;
       });
     },
@@ -245,8 +251,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
         return { ...prev, [name]: String(error) };
       }
       // remove key
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [name]: __removed, ...rest } = prev;
+      const rest = Object.fromEntries(Object.entries(prev).filter(([k]) => k !== name)) as Record<string, string>;
       return rest;
     });
   }, []);

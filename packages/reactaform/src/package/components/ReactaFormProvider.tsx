@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
-
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import type { ReactaFormProviderProps, TranslationMap } from '../core/reactaFormTypes';
 import { ReactaFormContext } from '../hooks/useReactaFormContext';
@@ -17,9 +15,10 @@ registerBaseComponents();
 
 // Local copies of style generators previously in utils/styleConfig.ts
 const getFormStyle = (
-  style: Record<string, any> | undefined,
-  _darkMode = false
-): Record<string, Record<string, any>> => {
+  style: Record<string, unknown> | undefined,
+  _darkMode : boolean = false
+): Record<string, Record<string, unknown>> => {
+  void _darkMode;
   return {
     container: {
       padding: "var(--reactaform-space-sm, 8px)",
@@ -72,12 +71,13 @@ const getFormStyle = (
 };
 
 const getFieldStyle = (
-  style: Record<string, any> | undefined,
-  _darkMode = false
-): Record<string, Record<string, any>> => {
+  style: Record<string, unknown> | undefined,
+  _darkMode : boolean = false
+): Record<string, Record<string, unknown>> => {
+  void _darkMode;
   const baseInputStyle = {
     color: "var(--reactaform-color-text)",
-    fontFamily: style?.fontFamily || "var(--reactaform-font-family, inherit)",
+    fontFamily: (style as Record<string, unknown>)?.fontFamily as string || "var(--reactaform-font-family, inherit)",
     transition: "all 0.2s ease",
     outline: "none",
     width: "100%",
@@ -150,42 +150,54 @@ export const ReactaFormProvider = ({
 
   // Make a stable defaultStyle object so effects that depend on it don't
   // rerun every render when callers omit the prop ({} literal would be new each time)
-  const stableDefaultStyle = useMemo(() => defaultStyle ?? {}, [defaultStyle]);
+  const stableDefaultStyle = useMemo(
+    () => (defaultStyle ?? {}) as Record<string, unknown>,
+    [defaultStyle]
+  );
 
   // Keep common and user maps separate in state so updates trigger rerenders
   // and consumers pick up translations as soon as they load.
   const [commonMapState, setCommonMapState] = useState<TranslationMap>({});
   const [userMapState, setUserMapState] = useState<TranslationMap>({});
-  const [fieldStyle, setFieldStyle] = useState<Record<string, any>>({});
-  const [formStyle, setFormStyle] = useState<Record<string, any>>({});
+  const [fieldStyle, setFieldStyle] = useState<Record<string, unknown>>({});
+  const [formStyle, setFormStyle] = useState<Record<string, unknown>>({});
 
-  // Initialize localization map
+  // Initialize localization map (cancellable)
   useEffect(() => {
+    let mounted = true;
     const loadTranslation = async () => {
       if (language === 'en') {
-        // clear states
-        if (Object.keys(commonMapState).length > 0) setCommonMapState({});
-        if (Object.keys(userMapState).length > 0) setUserMapState({});
+        if (mounted) {
+          setCommonMapState({});
+          setUserMapState({});
+        }
         return;
       }
 
       // Load common translations
-      const commonResult = await loadCommonTranslation(language);
-      const commonMap = commonResult.success ? commonResult.translations : {};
-      if (JSON.stringify(commonMap) !== JSON.stringify(commonMapState)) {
-        setCommonMapState(commonMap);
-      }
+      try {
+        const commonResult = await loadCommonTranslation(language);
+        const commonMap = commonResult.success ? commonResult.translations : {};
+        if (mounted) setCommonMapState(commonMap);
 
-      // Load user translations
-      const userResult = await loadUserTranslation(language, localizeName);
-      const userMap = userResult.success ? userResult.translations : {};
-      if (JSON.stringify(userMap) !== JSON.stringify(userMapState)) {
-        setUserMapState(userMap);
+        // Load user translations
+        const userResult = await loadUserTranslation(language, localizeName);
+        const userMap = userResult.success ? userResult.translations : {};
+        if (mounted) setUserMapState(userMap);
+      } catch {
+        // Fail silently — translation loading shouldn't crash the app
+        if (mounted) {
+          setCommonMapState({});
+          setUserMapState({});
+        }
       }
     };
 
     loadTranslation();
-  }, [language, localizeName, commonMapState, userMapState]);
+    return () => {
+      mounted = false;
+    };
+  }, [language, localizeName]);
 
   // Initialize form and field style
   useEffect(() => {
@@ -193,11 +205,15 @@ export const ReactaFormProvider = ({
     setFieldStyle(getFieldStyle(stableDefaultStyle, darkMode));
   }, [stableDefaultStyle, darkMode]);
 
-  // Translation function, used for whole form
-  const t = useCallback(
-    (defaultText: string, ...args: any[]) => 
-      createTranslationFunction(language, commonMapState, userMapState)(defaultText, ...args),
+  // Memoize the underlying translation function so `t` is stable and cheap to call
+  const translationFn = useMemo(
+    () => createTranslationFunction(language, commonMapState, userMapState),
     [language, commonMapState, userMapState]
+  );
+
+  const t = useCallback(
+    (defaultText: string, ...args: unknown[]) => translationFn(defaultText, ...args),
+    [translationFn]
   );
 
   const contextValue = useMemo(
@@ -214,7 +230,7 @@ export const ReactaFormProvider = ({
 
   return (
     <ReactaFormContext.Provider value={contextValue}>
-      <div 
+      <div
         data-reactaform-theme={darkMode ? 'dark' : 'light'}
         className='reactaform-container'
       >

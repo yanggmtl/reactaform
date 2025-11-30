@@ -1,5 +1,3 @@
-/* eslint-disable no-prototype-builtins, @typescript-eslint/no-explicit-any */
-
 import type { DefinitionPropertyField, FieldValueType } from "./reactaFormTypes";
 
 /**
@@ -19,58 +17,62 @@ export function deepClone<T>(obj: T): T {
   }
   
   const cloned = {} as T;
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      cloned[key] = deepClone(obj[key]);
+  const src = obj as unknown as Record<string, unknown>;
+  const dest = cloned as unknown as Record<string, unknown>;
+  for (const key in src) {
+    if (Object.prototype.hasOwnProperty.call(src, key)) {
+      dest[key] = deepClone(src[key]) as unknown as T;
     }
   }
-  
+
   return cloned;
 }
 
 /**
  * Type-safe value comparison
  */
-export function isEqual(a: any, b: any): boolean {
+export function isEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
-  
+
   if (a == null || b == null) return false;
-  
+
   if (typeof a !== typeof b) return false;
-  
+
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
-    return a.every((item, index) => isEqual(item, b[index]));
+    return a.every((item, index) => isEqual(item, (b as unknown as unknown[])[index]));
   }
-  
-  if (typeof a === 'object') {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
-    
+
+  if (typeof a === 'object' && typeof b === 'object') {
+    const objA = a as Record<string, unknown>;
+    const objB = b as Record<string, unknown>;
+    const keysA = Object.keys(objA);
+    const keysB = Object.keys(objB);
+
     if (keysA.length !== keysB.length) return false;
-    
-    return keysA.every(key => isEqual(a[key], b[key]));
+
+    return keysA.every((key) => isEqual(objA[key], objB[key]));
   }
-  
+
   return false;
 }
 
 /**
  * Safe property access with default value
  */
-export function safeGet<T>(obj: any, path: string, defaultValue?: T): T | undefined {
+export function safeGet<T>(obj: unknown, path: string, defaultValue?: T): T | undefined {
   try {
     const keys = path.split('.');
-    let current = obj;
-    
+    let current: unknown = obj;
+
     for (const key of keys) {
       if (current == null || typeof current !== 'object') {
         return defaultValue;
       }
-      current = current[key];
+      current = (current as Record<string, unknown>)[key];
     }
-    
-    return current !== undefined ? current : defaultValue;
+
+    return (current as unknown as T) !== undefined ? (current as unknown as T) : defaultValue;
   } catch {
     return defaultValue;
   }
@@ -79,38 +81,38 @@ export function safeGet<T>(obj: any, path: string, defaultValue?: T): T | undefi
 /**
  * Debounce function for performance optimization
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number,
   immediate?: boolean
 ): T & { cancel: () => void } {
   let timeout: number | null = null;
-  
-  const debounced = function (this: any, ...args: Parameters<T>) {
+
+  const debounced = function (this: unknown, ...args: Parameters<T>) {
     const later = () => {
       timeout = null;
-      if (!immediate) func.apply(this, args);
+      if (!immediate) (func as (...a: unknown[]) => unknown).apply(this, args as unknown as unknown[]);
     };
-    
+
     const callNow = immediate && !timeout;
-    
+
     if (timeout) {
       clearTimeout(timeout);
     }
     timeout = setTimeout(later, wait) as unknown as number;
-    
+
     if (callNow) {
-      func.apply(this, args);
+      (func as (...a: unknown[]) => unknown).apply(this, args as unknown as unknown[]);
     }
   } as T & { cancel: () => void };
-  
+
   debounced.cancel = () => {
     if (timeout) {
       clearTimeout(timeout as unknown as number);
       timeout = null;
     }
   };
-  
+
   return debounced;
 }
 

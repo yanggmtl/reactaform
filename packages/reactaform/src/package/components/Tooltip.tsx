@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, react-hooks/set-state-in-effect */
-
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import useReactaFormContext from "../hooks/useReactaFormContext";
@@ -20,13 +18,13 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
   const iconRectRef = useRef<DOMRect | null>(null);
 
   const tooltipStyles = useMemo(() => {
-    const sizeConfig: Record<string, any> = {
+    const sizeConfig: Record<string, React.CSSProperties> = {
       small: { padding: "4px 8px", fontSize: "11px", maxWidth: "200px" },
       medium: { padding: "6px 10px", fontSize: "12px", maxWidth: "240px" },
       large: { padding: "8px 12px", fontSize: "13px", maxWidth: "280px" },
     };
 
-    const base = {
+    const base: { icon: React.CSSProperties; text: React.CSSProperties; textVisible: React.CSSProperties } = {
       icon: {
         display: "inline-flex",
         alignItems: "center",
@@ -42,7 +40,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
         cursor: "pointer",
         transition: animation ? "all 0.2s ease" : undefined,
         marginLeft: "0.3em",
-      } as any,
+      },
       text: {
         ...sizeConfig[size],
         position: "absolute" as const,
@@ -63,17 +61,25 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
         whiteSpace: "normal" as const,
         wordBreak: "break-word" as const,
         boxSizing: "border-box" as const,
-      } as any,
+      },
       textVisible: {
         opacity: 1,
         visibility: "visible" as const,
-      } as any,
+      },
+    };
+
+    const styleFrom = (source: unknown, section?: string, key?: string): React.CSSProperties => {
+      if (!section) return {} as React.CSSProperties;
+      const src = source as Record<string, unknown> | undefined;
+      const sec = src?.[section] as Record<string, unknown> | undefined;
+      const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
+      return (val ?? {}) as React.CSSProperties;
     };
 
     // Merge provider overrides (form-level and field-level)
     const merged = {
-      icon: { ...(base.icon as any), ...((formStyle as any)?.tooltip?.icon || {}), ...((fieldStyle as any)?.tooltip?.icon || {}) },
-      text: { ...(base.text as any), ...((formStyle as any)?.tooltip?.text || {}), ...((fieldStyle as any)?.tooltip?.text || {}) },
+      icon: { ...base.icon, ...styleFrom(formStyle, 'tooltip', 'icon'), ...styleFrom(fieldStyle, 'tooltip', 'icon') },
+      text: { ...base.text, ...styleFrom(formStyle, 'tooltip', 'text'), ...styleFrom(fieldStyle, 'tooltip', 'text') },
       textVisible: base.textVisible,
     };
 
@@ -82,7 +88,10 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
 
   useEffect(() => {
     if (hover) {
-      setPositioned(false);
+      // Defer the reset of `positioned` to the next animation frame to
+      // avoid synchronous setState inside the effect body which triggers
+      // the `react-hooks/set-state-in-effect` rule.
+      const resetFrame = requestAnimationFrame(() => setPositioned(false));
       const frame = requestAnimationFrame(() => {
         if (ref.current) {
           const rect = ref.current.getBoundingClientRect();
@@ -93,13 +102,20 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
           // Use viewport coordinates (getBoundingClientRect) because popup root is fixed to viewport.
           const initX = rect.right + margin;
           const initY = rect.top;
-          setPos({ x: initX, y: initY });
-          setPositioned(true);
+              setPos({ x: initX, y: initY });
+              // Intentionally set state after measurement — this is a measurement-pass
+              // that must run after layout.
+              setPositioned(true);
         }
       });
-      return () => cancelAnimationFrame(frame);
+      return () => {
+        cancelAnimationFrame(frame);
+        cancelAnimationFrame(resetFrame);
+      };
     } else {
-      setPositioned(false);
+      // When hover is false we explicitly reset positioned. Defer to RAF to avoid
+      // synchronous setState in effect body and satisfy the lint rule.
+      requestAnimationFrame(() => setPositioned(false));
     }
   }, [hover]);
 

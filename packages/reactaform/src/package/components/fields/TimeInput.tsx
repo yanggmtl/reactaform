@@ -28,7 +28,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
-  const validate = (val: string): string | null => {
+  const validate = React.useCallback((val: string): string | null => {
     if (!val || val.trim() === "") {
       return (field.required ||field.Min || field.Max) ? t("Value required") : null;
     }
@@ -63,7 +63,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
     }
     const err = validateFieldValue(definitionName, field, val, t);
     return err ?? null;
-  };
+  }, [field, definitionName, t]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newVal = e.target.value;
@@ -77,8 +77,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, field.Min, field.Max]);
+  }, [value, validate]);
 
   return (
     <StandardFieldLayout field={field} error={validate(value)}>

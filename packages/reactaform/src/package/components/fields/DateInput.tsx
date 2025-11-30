@@ -76,7 +76,7 @@ const DateInput: React.FC<DateInputProps> = ({
   /**
    * Validate the current value.
    */
-  const validate = (dateValue: string): string | null => {
+  const validate = React.useCallback((dateValue: string): string | null => {
     if (!dateValue || dateValue.trim() === "") {
       return required ? t("Value is required") : null;
     }
@@ -103,7 +103,7 @@ const DateInput: React.FC<DateInputProps> = ({
     // run any field-level validation handler
     const err = validateFieldValue(definitionName, field, dateValue, t);
     return err ?? null;
-  };
+  }, [field, definitionName, t, required]);
 
   /**
    * Handle user input change.
@@ -124,8 +124,7 @@ const DateInput: React.FC<DateInputProps> = ({
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, required]);
+  }, [value, validate]);
 
   return (
     <StandardFieldLayout field={field} error={validate(value)}>

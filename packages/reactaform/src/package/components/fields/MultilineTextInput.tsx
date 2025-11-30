@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import React, { useState, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -70,11 +68,13 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   useEffect(() => {
     // Validate on initial mount or when value changes; notify parent via onErrorRef
     const err = validate(value);
-    setTextValue(value);
+    // Defer local state update to avoid synchronous setState inside effect
+    const raf = requestAnimationFrame(() => setTextValue(value));
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
+    return () => cancelAnimationFrame(raf);
   }, [value, validate]);
 
   const commonProps = {

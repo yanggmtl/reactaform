@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
@@ -30,14 +28,27 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
   disabled: propDisabled,
 }) => {
   const { t, formStyle, fieldStyle, definitionName } = useReactaFormContext();
+  const fs = formStyle as Record<string, unknown> | undefined;
+  const ffs = fieldStyle as Record<string, unknown> | undefined;
+
+  const styleFrom = (
+    source: Record<string, unknown> | undefined,
+    section?: string,
+    key?: string
+  ): React.CSSProperties => {
+    if (!section) return {};
+    const sec = source?.[section] as Record<string, unknown> | undefined;
+    const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
+    return (val ?? {}) as React.CSSProperties;
+  };
   const labelStyle = React.useMemo<React.CSSProperties>(() => ({
     display: 'inline-block',
     position: 'relative',
     width: 44,
     height: 24,
-    ...((formStyle as any)?.switch?.label || {}),
-    ...((fieldStyle as any)?.label || {}),
-  }), [formStyle, fieldStyle]);
+    ...styleFrom(fs, 'switch', 'label'),
+    ...styleFrom(ffs, undefined, 'label'),
+  }), [fs, ffs]);
 
   const hiddenInputStyle = React.useMemo<React.CSSProperties>(() => ({
     position: 'absolute',
@@ -48,9 +59,9 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     height: '100%',
     margin: 0,
     cursor: 'pointer',
-    ...((formStyle as any)?.switch?.hiddenInput || {}),
-    ...((fieldStyle as any)?.hiddenInput || {}),
-  }), [formStyle, fieldStyle]);
+    ...styleFrom(fs, 'switch', 'hiddenInput'),
+    ...styleFrom(ffs, undefined, 'hiddenInput'),
+  }), [fs, ffs]);
 
   const sliderBaseStyle = React.useMemo<React.CSSProperties>(() => ({
     position: 'absolute',
@@ -63,9 +74,9 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     transition: '0.3s',
     borderRadius: 24,
     border: '2px solid transparent',
-    ...((formStyle as any)?.switch?.slider || {}),
-    ...((fieldStyle as any)?.slider || {}),
-  }), [formStyle, fieldStyle]);
+    ...styleFrom(fs, 'switch', 'slider'),
+    ...styleFrom(ffs, undefined, 'slider'),
+  }), [fs, ffs]);
 
   const knobBaseStyle = React.useMemo<React.CSSProperties>(() => ({
     position: 'absolute',
@@ -77,9 +88,9 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     transition: '0.3s',
     borderRadius: '50%',
     boxShadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
-    ...((formStyle as any)?.switch?.knob || {}),
-    ...((fieldStyle as any)?.knob || {}),
-  }), [formStyle, fieldStyle]);
+    ...styleFrom(fs, 'switch', 'knob'),
+    ...styleFrom(ffs, undefined, 'knob'),
+  }), [fs, ffs]);
   const isOn = Boolean(value);
   const prevErrorRef = React.useRef<string | null>(null);
   const onErrorRef = React.useRef<typeof onError | undefined>(onError);

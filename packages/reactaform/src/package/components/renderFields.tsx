@@ -1,4 +1,12 @@
-/* eslint-disable react-hooks/static-components, @typescript-eslint/no-explicit-any */
+/*
+  File-level rationale: this module performs dynamic component lookup for
+  field types (type -> component). The `react-hooks/static-components`
+  rule can flag these patterns because a different component reference
+  may be produced at render time; in our architecture that's intentional
+  and we explicitly memoize wrappers (`FieldWrapper`, `FieldGroup`) to
+  prevent unnecessary re-renders. Keep the rule disabled for this file
+  with this documented reasoning.
+*/
 
 import React from "react";
 import useReactaFormContext from "../hooks/useReactaFormContext";
@@ -18,6 +26,9 @@ const FieldWrapper = React.memo<{
   handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void;
   handleError?: (fieldName: string, error: ErrorType) => void;
 }>(({ field, value, handleChange, handleError }) => {
+  // Dynamic component lookup: this creates a component reference during render
+  // intentionally because fields are dynamic (type -> component). The wrapper
+  // is memoized to avoid unnecessary re-renders.
   const Component = getComponent(field.type);
 
   const onChange = React.useCallback(
@@ -103,15 +114,14 @@ const FieldGroup = React.memo<{
 
   // Use form/field style from context so styles are scoped per ReactaForm instance
   const { formStyle, fieldStyle } = useReactaFormContext();
-
   const fieldsetStyle = React.useMemo<React.CSSProperties>(() => ({
     border: "1px solid var(--reactaform-border-color, #bbb)",
     padding: "var(--reactaform-fieldset-padding, 0.5em)",
     borderRadius: "var(--reactaform-border-radius, 4px)",
     marginBottom: "var(--reactaform-space, 8px)",
     // allow per-form overrides if provider exposes them
-    ...(((formStyle as any)?.fieldset) || {}),
-    ...(((fieldStyle as any)?.fieldset) || {}),
+    ...((formStyle as Record<string, unknown> | undefined)?.fieldset as React.CSSProperties || {}),
+    ...((fieldStyle as Record<string, unknown> | undefined)?.fieldset as React.CSSProperties || {}),
   }), [formStyle, fieldStyle]);
 
   const legendStyle = React.useMemo<React.CSSProperties>(() => ({
@@ -122,8 +132,8 @@ const FieldGroup = React.memo<{
     alignItems: "center",
     padding: "0 var(--reactaform-space, 8px)",
     color: "var(--reactaform-text-color, inherit)",
-    ...(((formStyle as any)?.legend) || {}),
-    ...(((fieldStyle as any)?.legend) || {}),
+    ...((formStyle as Record<string, unknown> | undefined)?.legend as React.CSSProperties || {}),
+    ...((fieldStyle as Record<string, unknown> | undefined)?.legend as React.CSSProperties || {}),
   }), [formStyle, fieldStyle]);
 
   return (

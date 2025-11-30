@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { ReactaDefinition, DefinitionPropertyField } from "../core/reactaFormTypes";
 
 // --- Runtime type guards ---
@@ -9,15 +7,17 @@ function isObject(value: unknown): value is Record<string, unknown> {
 
 export function isDefinitionPropertyField(obj: unknown): obj is DefinitionPropertyField {
   if (!isObject(obj)) return false;
-  return typeof (obj as any).name === "string" && typeof (obj as any).displayName === "string";
+  const o = obj as Record<string, unknown>;
+  return typeof o["name"] === "string" && typeof o["displayName"] === "string";
 }
 
 export function isReactaDefinition(obj: unknown): obj is ReactaDefinition {
   if (!isObject(obj)) return false;
-  if (typeof (obj as any).name !== "string") return false;
-  if (typeof (obj as any).version !== "string") return false;
-  if (!Array.isArray((obj as any).properties)) return false;
-  return (obj as any).properties.every((p: unknown) => isDefinitionPropertyField(p));
+  const o = obj as Record<string, unknown>;
+  if (typeof o["name"] !== "string") return false;
+  if (typeof o["version"] !== "string") return false;
+  if (!Array.isArray(o["properties"])) return false;
+  return (o["properties"] as unknown[]).every((p: unknown) => isDefinitionPropertyField(p));
 }
 
 function isFile(v: unknown): v is File {
@@ -25,7 +25,8 @@ function isFile(v: unknown): v is File {
     return typeof File !== "undefined" && v instanceof File;
   } catch {
     // In some test environments File may be undefined
-    return isObject(v) && typeof (v as any).name === "string" && typeof (v as any).size === "number";
+    const o = isObject(v) ? (v as Record<string, unknown>) : undefined;
+    return !!o && typeof o["name"] === "string" && typeof o["size"] === "number";
   }
 }
 
@@ -106,9 +107,11 @@ export function serializeInstance(
     const props: Record<string, unknown> = {};
     
     // Get definition properties if available
-    const defProps: DefinitionPropertyField[] = isReactaDefinition(definition)
+    const rawProps: unknown[] = isReactaDefinition(definition)
       ? definition.properties
-      : (definition && (definition as Record<string, unknown>).properties ? (definition as any).properties : []);
+      : (isObject(definition) && Array.isArray((definition as Record<string, unknown>)["properties"]) ? ((definition as Record<string, unknown>)["properties"] as unknown[]) : []);
+
+    const defProps: DefinitionPropertyField[] = rawProps.filter(isDefinitionPropertyField) as DefinitionPropertyField[];
 
     // Create a map for faster property lookup
     const propMap = new Map(defProps.map((p) => [p.name, p]));
@@ -142,9 +145,9 @@ export function serializeInstance(
 
     // Include metadata if requested
     if (includeMetadata) {
-      (props as any)._metadata = {
+      (props as Record<string, unknown>)["_metadata"] = {
         serializedAt: new Date().toISOString(),
-        version: (definition as any)?.version || "1.0.0",
+        version: (isObject(definition) ? (definition as Record<string, unknown>)["version"] : undefined) || "1.0.0",
         fieldCount: Object.keys(props).length - 1, // Exclude metadata itself
       };
     }
@@ -347,9 +350,11 @@ export function deserializeInstance(
     const result: Record<string, unknown> = {};
     
     // Get definition properties if available
-    const defProps: DefinitionPropertyField[] = isReactaDefinition(definition)
+    const rawProps: unknown[] = isReactaDefinition(definition)
       ? definition.properties
-      : (definition && (definition as Record<string, unknown>).properties ? (definition as any).properties : []);
+      : (isObject(definition) && Array.isArray((definition as Record<string, unknown>)["properties"]) ? ((definition as Record<string, unknown>)["properties"] as unknown[]) : []);
+
+    const defProps: DefinitionPropertyField[] = rawProps.filter(isDefinitionPropertyField) as DefinitionPropertyField[];
 
     // Create a map for faster property lookup
     const propMap = new Map(defProps.map(p => [p.name, p]));
@@ -486,10 +491,10 @@ export function serializeDefinition(
     
     // Add metadata if requested
     if (includeMetadata) {
-      (result as any)._metadata = {
+      (result as Record<string, unknown>)["_metadata"] = {
         serializedAt: new Date().toISOString(),
-        version: (result as any).version || '1.0.0',
-        propertyCount: (result as any).properties?.length || 0,
+        version: (result["version"] as string) || '1.0.0',
+        propertyCount: (Array.isArray(result["properties"] as unknown) ? (result["properties"] as unknown[]).length : 0) || 0,
       };
     }
 
@@ -499,7 +504,7 @@ export function serializeDefinition(
       success: true,
       data: jsonString,
       metadata: {
-        fieldCount: (result as any).properties?.length || 0,
+        fieldCount: (Array.isArray(result["properties"] as unknown) ? (result["properties"] as unknown[]).length : 0) || 0,
         excludedFields: [],
         warnings: [],
       },
@@ -570,50 +575,52 @@ export function deserializeDefinition(
     }
 
     // Validate and normalize properties array
-    if (!Array.isArray((obj as any).properties)) {
+    const propsArr = Array.isArray((obj as Record<string, unknown>)["properties"]) ? ((obj as Record<string, unknown>)["properties"] as unknown[]) : null;
+    if (!propsArr) {
       if (strict) {
         validationErrors.push("Properties must be an array");
       } else {
         warnings.push("Properties not found or invalid, using empty array");
-        (obj as any).properties = [];
+        (obj as Record<string, unknown>)["properties"] = [];
       }
     } else {
       // Validate each property
-      (obj as any).properties = (obj as any).properties.map((prop: any, index: number) => {
-        const normalized = { ...prop } as Record<string, unknown>;
+      (obj as Record<string, unknown>)["properties"] = propsArr.map((prop: unknown, index: number) => {
+        const p = isObject(prop) ? (prop as Record<string, unknown>) : {};
+        const normalized: Record<string, unknown> = { ...p };
 
-        if (!prop.name) {
+        if (!p["name"]) {
           const error = `Property at index ${index} missing 'name'`;
           if (strict) {
             validationErrors.push(error);
           } else {
             warnings.push(`${error}, using 'field_${index}'`);
-            normalized.name = `field_${index}`;
+            normalized["name"] = `field_${index}`;
           }
         }
 
-        if (!prop.displayName) {
-          normalized.displayName = prop.name || `Field ${index}`;
+        if (!p["displayName"]) {
+          normalized["displayName"] = p["name"] || `Field ${index}`;
         }
 
-        if (!prop.type) {
+        if (!p["type"]) {
           if (strict && validateTypes) {
-            validationErrors.push(`Property '${prop.name || index}' missing 'type'`);
+            validationErrors.push(`Property '${p["name"] || index}' missing 'type'`);
           } else {
-            warnings.push(`Property '${prop.name || index}' missing 'type', using 'string'`);
-            normalized.type = 'string';
+            warnings.push(`Property '${p["name"] || index}' missing 'type', using 'string'`);
+            normalized["type"] = 'string';
           }
         }
 
-        if ((prop as any).defaultValue === undefined) {
-          (normalized as any).defaultValue = null;
+        if (p["defaultValue"] === undefined) {
+          normalized["defaultValue"] = null;
         }
 
-        if ((prop as any).required === undefined) {
-          (normalized as any).required = false;
+        if (p["required"] === undefined) {
+          normalized["required"] = false;
         }
 
-        return normalized as any;
+        return normalized;
       });
     }
 

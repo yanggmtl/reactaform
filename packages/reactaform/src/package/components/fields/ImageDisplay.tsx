@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import { useEffect, useState } from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -72,16 +70,27 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
       localizedFile = `${name}_${language}${ext}`;
     }
 
+    // Use AbortController for fetch cancellation and defer setState via RAF
+    const controller = new AbortController();
+    let raf = 0;
+
     if (localizedFile) {
       const localizedPath = [...parts, localizedFile].join("/");
-      fetch(localizedPath, { method: "HEAD" })
+      fetch(localizedPath, { method: "HEAD", signal: controller.signal })
         .then((res) => {
-          setImageUrl(res.ok ? localizedPath : baseUrl);
+          raf = requestAnimationFrame(() => setImageUrl(res.ok ? localizedPath : baseUrl));
         })
-        .catch(() => setImageUrl(baseUrl));
+        .catch(() => {
+          raf = requestAnimationFrame(() => setImageUrl(baseUrl));
+        });
     } else {
-      setImageUrl(baseUrl);
+      raf = requestAnimationFrame(() => setImageUrl(baseUrl));
     }
+
+    return () => {
+      controller.abort();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [baseUrl, language, langs]);
 
   if (!imageUrl) return null;

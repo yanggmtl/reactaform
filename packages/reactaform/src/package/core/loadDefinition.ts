@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 //import { XMLParser } from "fast-xml-parser";
 
 // // Helpers
@@ -74,30 +72,32 @@ export interface DefinitionLoadResult {
 /**
  * Validates that a definition object has the required structure
  */
-export function validateDefinitionSchema(definition: any): string | null {
+export function validateDefinitionSchema(definition: unknown): string | null {
   if (!definition || typeof definition !== 'object') {
     return "Definition must be a valid object";
   }
 
-  if (!definition.name || typeof definition.name !== 'string') {
+  const defObj = definition as Record<string, unknown>;
+
+  if (!defObj.name || typeof defObj.name !== 'string') {
     return "Definition must have a valid 'name' property";
   }
 
-  if (!definition.version || typeof definition.version !== 'string') {
+  if (!defObj.version || typeof defObj.version !== 'string') {
     return "Definition must have a valid 'version' property";
   }
 
-  if (!definition.displayName || typeof definition.displayName !== 'string') {
+  if (!defObj.displayName || typeof defObj.displayName !== 'string') {
     return "Definition must have a valid 'displayName' property";
   }
 
-  if (!Array.isArray(definition.properties)) {
+  if (!Array.isArray(defObj.properties)) {
     return "Definition must have a 'properties' array";
   }
 
   // Validate each property
-  for (let i = 0; i < definition.properties.length; i++) {
-    const prop = definition.properties[i];
+  for (let i = 0; i < (defObj.properties as unknown[]).length; i++) {
+    const prop = (defObj.properties as unknown[])[i] as Record<string, unknown>;
     if (!prop.name || typeof prop.name !== 'string') {
       return `Property at index ${i} must have a valid 'name'`;
     }
@@ -163,7 +163,7 @@ export async function loadDefinition(
       };
     }
 
-    let definition: any;
+    let definition: unknown;
     if (ext === "json") {
       try {
         definition = JSON.parse(text);
@@ -210,9 +210,9 @@ export async function loadDefinition(
  * Create instance from definition with validation and error handling
  */
 export function createInstanceFromDefinition(
-  definition: ReactaDefinition | Record<string, any>, 
+  definition: ReactaDefinition | Record<string, unknown>, 
   name: string
-): { success: boolean; instance?: Record<string, any>; error?: string } {
+): { success: boolean; instance?: Record<string, unknown>; error?: string } {
   try {
     if (!definition) {
       return { success: false, error: "Definition is required" };
@@ -222,16 +222,18 @@ export function createInstanceFromDefinition(
       return { success: false, error: "Instance name is required" };
     }
 
-    const instance: Record<string, any> = { name };
-    instance.version = definition.version || "1.0.0";
-    instance.definition = definition.name || "unknown";
+    const instance: Record<string, unknown> = { name };
+    const defObj = definition as Record<string, unknown>;
+    instance.version = (defObj.version as string) || "1.0.0";
+    instance.definition = (defObj.name as string) || "unknown";
     instance.values = {};
 
-    const properties = definition.properties || [];
+    const properties = (definition as Record<string, unknown>).properties || [];
     if (Array.isArray(properties)) {
-      properties.forEach((prop: any) => {
-        if (prop.defaultValue !== undefined) {
-          instance.values[prop.name] = prop.defaultValue;
+      (properties as unknown[]).forEach((prop) => {
+        const p = prop as Record<string, unknown>;
+        if (p.defaultValue !== undefined) {
+          (instance.values as Record<string, unknown>)[p.name as string] = p.defaultValue;
         }
       });
     }
@@ -249,14 +251,14 @@ export function createInstanceFromDefinition(
  * Load instance data with validation
  */
 export function loadInstance(
-  instanceData: string | Record<string, any>
-): { success: boolean; instance?: Record<string, any>; error?: string } {
+  instanceData: string | Record<string, unknown>
+): { success: boolean; instance?: Record<string, unknown>; error?: string } {
   try {
     if (!instanceData) {
       return { success: false, error: "Instance data is required" };
     }
 
-    let instance: Record<string, any>;
+    let instance: Record<string, unknown>;
     
     if (typeof instanceData === "string") {
       try {
@@ -268,7 +270,7 @@ export function loadInstance(
         };
       }
     } else {
-      instance = instanceData;
+      instance = instanceData as Record<string, unknown>;
     }
 
     // Basic validation

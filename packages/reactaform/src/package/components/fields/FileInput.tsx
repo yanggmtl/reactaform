@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import React, { useState, useEffect, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -74,28 +72,15 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
     let rect: DOMRect | ClientRect | null = null;
     try {
       rect = e.currentTarget.getBoundingClientRect();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
+    } catch {
       rect = null;
     }
 
-    const scrollX =
-      typeof window !== "undefined" && (window as any).scrollX
-        ? (window as any).scrollX
-        : 0;
-    const scrollY =
-      typeof window !== "undefined" && (window as any).scrollY
-        ? (window as any).scrollY
-        : 0;
+    const scrollX = typeof window !== "undefined" && typeof window.scrollX === 'number' ? window.scrollX : 0;
+    const scrollY = typeof window !== "undefined" && typeof window.scrollY === 'number' ? window.scrollY : 0;
 
-    const x =
-      rect && typeof (rect as any).left === "number"
-        ? (rect as any).left + scrollX
-        : 10 + scrollX;
-    const y =
-      rect && typeof (rect as any).bottom === "number"
-        ? (rect as any).bottom + scrollY
-        : 20 + scrollY;
+    const x = rect && typeof (rect as DOMRect).left === "number" ? (rect as DOMRect).left + scrollX : 10 + scrollX;
+    const y = rect && typeof (rect as DOMRect).bottom === "number" ? (rect as DOMRect).bottom + scrollY : 20 + scrollY;
 
     setMenuPosition({ x, y });
 

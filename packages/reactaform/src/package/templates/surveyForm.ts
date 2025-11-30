@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import type { ReactaDefinition } from "../core/reactaFormTypes";
+import type { ReactaDefinition, DefinitionPropertyField } from "../core/reactaFormTypes";
 
 const surveyForm: ReactaDefinition = {
   name: "surveyForm",
@@ -14,7 +12,7 @@ const surveyForm: ReactaDefinition = {
       defaultValue: 4,
       min: 1,
       max: 5,
-    } as any),
+    } as DefinitionPropertyField),
     ({
       name: "features",
       displayName: "Features used",
@@ -27,7 +25,7 @@ const surveyForm: ReactaDefinition = {
       ],
       minCount: 1,
       maxCount: 3,
-    } as any),
+    } as DefinitionPropertyField),
     {
       name: "comments",
       displayName: "Comments",

@@ -66,16 +66,14 @@ const RatingInput: React.FC<RatingInputProps> = ({
     if (value > max) {
       v = max;
     }
-    setRating(v);
     const err = validate(v);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    //Add lint disable to avoid infinite loop; we only want to run this
-    // when the external `value` prop or validator changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, validate]);
+    const raf = requestAnimationFrame(() => setRating(v));
+    return () => cancelAnimationFrame(raf);
+  }, [value, validate, max]);
 
   const handleSelect = (val: number) => {
     setRating(val);

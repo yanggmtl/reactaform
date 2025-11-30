@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -59,13 +57,14 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   useEffect(() => {
     const v = String(value ?? "");
     const err = validateCb(v);
-    setInputValue(v);
+    // Defer local state update to avoid synchronous setState inside effect
+    // which can trigger the lint rule and cascading renders.
+    const raf = requestAnimationFrame(() => setInputValue(v));
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    // Add lint disable to avoid infinite loop; we only want to run this
-    // when the external `value` prop or validator changes.
+    return () => cancelAnimationFrame(raf);
   }, [value, validateCb]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {

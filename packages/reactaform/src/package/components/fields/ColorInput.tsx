@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import React, { useEffect, useState } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
@@ -102,10 +100,15 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange }) => {
 
   // Store the custom color string separately
   const [inputColor, setInputColor] = useState<string>("#000000");
+  const selectRef = React.useRef<HTMLSelectElement | null>(null);
+  const colorRef = React.useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const inputValue = value && isValidHexColor(value) ? value : "#000000";
     const normColor = normalizeHexColor(inputValue);
+    // Sync prop -> local state immediately. This is a safe prop->state sync
+    // and tests/consumers expect the select to reflect the prop synchronously.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: immediate prop->state sync required by consumers/tests
     setInputColor(normColor);
   }, [value]);
 
@@ -131,6 +134,7 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange }) => {
     <StandardFieldLayout field={field} error={null}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%" }}>
         <select
+          ref={selectRef}
           id={field.name}
           value={inputColor}
           onChange={handleSelectChange}
@@ -148,7 +152,7 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange }) => {
             </option>
           ) : null}
         </select>
-        <label
+          <label
           style={{
             width: "2.5em",
             height: "1.8em",
@@ -162,6 +166,7 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange }) => {
           }}
         >
           <input
+            ref={colorRef}
             type="color"
             value={inputColor}
             onChange={handleColorChange}

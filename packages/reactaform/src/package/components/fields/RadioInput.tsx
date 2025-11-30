@@ -46,19 +46,22 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
     [field, t, definitionName]
   );
 
+  const optionsLen = field.options?.length ?? 0;
+
   useEffect(() => {
     const safeVal = value != null ? String(value) : "";
     const err = validate(safeVal);
     if (err && field.options && field.options.length > 0) {
       const first = String(field.options[0].value);
+      // Safe prop->state sync: intentionally set local state from prop
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: prop->state sync required by consumers/tests
       setInputValue(first);
       // notify parent that we normalized the value
       onChange?.(first, null);
     } else {
       setInputValue(safeVal);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, validate]);
+  }, [value, validate, optionsLen, onChange, field.options]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;

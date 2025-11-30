@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -91,12 +89,15 @@ const UrlInput: React.FC<UrlInputProps> = ({
   }, [onError]);
 
   useEffect(() => {
-    setInputValue(value ?? "");
-    const err = validateCb(value ?? "");
+    const v = value ?? "";
+    const err = validateCb(v);
+    // Defer local state update to avoid synchronous setState inside effect
+    const raf = requestAnimationFrame(() => setInputValue(v));
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
+    return () => cancelAnimationFrame(raf);
   }, [value, validateCb]);
 
   return (

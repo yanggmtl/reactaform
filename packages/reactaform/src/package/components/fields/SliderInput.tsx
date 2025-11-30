@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import React, { useState, useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -90,6 +88,9 @@ const SliderInput: React.FC<SliderInputProps> = ({
   useEffect(() => {
     const input = String(value);
     const err = validate(input);
+    // Sync prop -> local state immediately. This is a safe prop->state sync
+    // and won't cause a render loop. Use a narrow eslint disable here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: prop->state sync
     setInputValue(input);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;

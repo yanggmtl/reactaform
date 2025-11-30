@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import BaseRegistry from "./baseRegistry";
 import React, { useEffect } from "react";
 import type { DefinitionPropertyField } from "../reactaFormTypes";
@@ -31,6 +29,11 @@ import UrlInput from "../../components/fields/UrlInput";
 import NumericStepperInput from "../../components/fields/NumericStepperInput";
 import MultilineTextInput from "../../components/fields/MultilineTextInput";
 
+// Registry needs to accept components with many different prop shapes.
+// Narrow typing here would make registering concrete field components
+// (which each declare their own props) incompatible. Allow `any` for
+// the component props and document the rationale so lint stays explicit.
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- registry holds components with varied, specific prop types */
 type ComponentType = React.ComponentType<any>;
 
 const registry = new BaseRegistry<ComponentType>();

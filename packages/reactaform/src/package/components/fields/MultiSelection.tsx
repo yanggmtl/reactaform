@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 
@@ -23,6 +21,17 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   onChange,
 }) => {
   const { t, darkMode, formStyle, fieldStyle, definitionName } = useReactaFormContext();
+  const styleFrom = (
+    source: unknown,
+    section?: string,
+    key?: string
+  ): React.CSSProperties => {
+    if (!section) return {};
+    const src = source as Record<string, unknown> | undefined;
+    const sec = src?.[section] as Record<string, unknown> | undefined;
+    const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
+    return (val ?? {}) as React.CSSProperties;
+  };
   const controlRef = useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [popupPos, setPopupPos] = useState<{ x: number; y: number } | null>(
@@ -75,8 +84,8 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     border: "1px solid var(--reactaform-border-color, #ccc)",
     background: "var(--reactaform-secondary-bg, #fff)",
     color: "var(--reactaform-text-color, #000)",
-    ...((formStyle as any)?.multiSelect?.control || {}),
-    ...((fieldStyle as any)?.control || {}),
+    ...styleFrom(formStyle, 'multiSelect', 'control'),
+    ...styleFrom(fieldStyle, undefined, 'control'),
   }), [formStyle, fieldStyle]);
 
   const mergedClearButtonStyle = useMemo<React.CSSProperties>(() => ({
@@ -90,8 +99,8 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     fontSize: "1.2em",
     color: "var(--reactaform-text-muted, #999)",
     padding: 0,
-    ...((formStyle as any)?.multiSelect?.clearButton || {}),
-    ...((fieldStyle as any)?.clearButton || {}),
+    ...styleFrom(formStyle, 'multiSelect', 'clearButton'),
+    ...styleFrom(fieldStyle, undefined, 'clearButton'),
   }), [formStyle, fieldStyle]);
 
   const mergedArrowStyle = useMemo<React.CSSProperties>(() => ({
@@ -101,8 +110,8 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     transform: "translateY(-50%)",
     pointerEvents: "none",
     color: "var(--reactaform-text-muted, #999)",
-    ...((formStyle as any)?.multiSelect?.arrow || {}),
-    ...((fieldStyle as any)?.arrow || {}),
+    ...styleFrom(formStyle, 'multiSelect', 'arrow'),
+    ...styleFrom(fieldStyle, undefined, 'arrow'),
   }), [formStyle, fieldStyle]);
 
   return (
@@ -180,6 +189,18 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   const popupRef = useRef<HTMLDivElement>(null);
   const { formStyle, fieldStyle } = useReactaFormContext();
 
+  const styleFrom = (
+    source: unknown,
+    section?: string,
+    key?: string
+  ): React.CSSProperties => {
+    if (!section) return {} as React.CSSProperties;
+    const src = source as Record<string, unknown> | undefined;
+    const sec = src?.[section] as Record<string, unknown> | undefined;
+    const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
+    return (val ?? {}) as React.CSSProperties;
+  };
+
   const mergedPopupStyles = useMemo<React.CSSProperties>(() => ({
     maxHeight: 200,
     overflowY: "auto",
@@ -191,8 +212,8 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     pointerEvents: "auto",
     color: "var(--reactaform-text-color, #000)",
     fontSize: "var(--reactaform-popup-font-size, 0.875rem)",
-    ...((formStyle as any)?.multiSelect?.popup || {}),
-    ...((fieldStyle as any)?.popup || {}),
+    ...styleFrom(formStyle, 'multiSelect', 'popup'),
+    ...styleFrom(fieldStyle, undefined, 'popup'),
   }), [formStyle, fieldStyle]);
 
   const mergedPopupOptionStyles = useMemo<React.CSSProperties>(() => ({
@@ -202,8 +223,8 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     alignItems: "center",
     background: "transparent",
     color: "var(--reactaform-text-color, #000)",
-    ...((formStyle as any)?.multiSelect?.option || {}),
-    ...((fieldStyle as any)?.option || {}),
+    ...styleFrom(formStyle, 'multiSelect', 'option'),
+    ...styleFrom(fieldStyle, undefined, 'option'),
   }), [formStyle, fieldStyle]);
 
   // -----------------------

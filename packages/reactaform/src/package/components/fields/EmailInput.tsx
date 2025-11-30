@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import type { ChangeEvent } from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -26,7 +26,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
 }) => {
   const { definitionName, t } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
-  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const validate = React.useCallback(
     (input: string): string | null => {
@@ -52,7 +52,6 @@ export const EmailInput: React.FC<EmailInputProps> = ({
     if (isDisabled) return;
     const input = e.target.value;
     const err = validate(input);
-    setInputValue(input);
     // pass the fresh value (not the stale state) to the parent
     onChange?.(input, err);
   };
@@ -66,6 +65,9 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   useEffect(() => {
     const newVal = value ?? "";
     const err = validate(newVal);
+    if (inputRef.current && inputRef.current.value !== String(newVal)) {
+      inputRef.current.value = String(newVal);
+    }
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -73,11 +75,12 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   }, [value, validate]);
 
   return (
-    <StandardFieldLayout field={field} error={validate(inputValue)}>
+    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <input
         id={field.name}
         type="email"
-        value={inputValue}
+        defaultValue={String(value ?? "")}
+        ref={inputRef}
         onChange={handleChange}
         disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}

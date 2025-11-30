@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -45,8 +45,8 @@ const SliderInput: React.FC<SliderInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
 
-  // State for the raw string in the text input
-  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const rangeRef = useRef<HTMLInputElement | null>(null);
   const isDisabled = field.disabled ?? false;
 
   const validate = React.useCallback(
@@ -84,41 +84,39 @@ const SliderInput: React.FC<SliderInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
-  // Whenever prop `value` changes externally, update text input and report errors
   useEffect(() => {
     const input = String(value);
     const err = validate(input);
-    // Sync prop -> local state immediately. This is a safe prop->state sync
-    // and won't cause a render loop. Use a narrow eslint disable here.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: prop->state sync
-    setInputValue(input);
+    if (rangeRef.current && document.activeElement !== rangeRef.current) {
+      rangeRef.current.value = !isNaN(Number(input)) ? String(Number(input)) : String(field.min ?? 0);
+    }
+    if (inputRef.current && document.activeElement !== inputRef.current) {
+      inputRef.current.value = input;
+    }
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-  }, [value, validate]);
+  }, [value, validate, field.min]);
 
   // Clean fallback values
   const min = field.min ?? 0;
   const max = field.max ?? 100;
 
-  // Safe numeric value for slider (in case text input is invalid)
-  const sliderValue = !isNaN(Number(inputValue)) ? Number(inputValue) : min;
-
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const input = e.target.value;
     const err = validate(input);
-    setInputValue(input);
     onChange?.(input, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validate(inputValue)}>
+    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%" }}>
         <input
+          ref={rangeRef}
           type="range"
-          value={sliderValue}
+          defaultValue={!isNaN(Number(value)) ? String(Number(value)) : String(min)}
           onChange={handleValueChange}
           disabled={isDisabled}
           min={min}
@@ -130,8 +128,9 @@ const SliderInput: React.FC<SliderInputProps> = ({
           className={CSS_CLASSES.rangeInput}
         />
         <input
+          ref={inputRef}
           type="text"
-          value={inputValue}
+          defaultValue={String(value ?? "")}
           onChange={handleValueChange}
           required
           disabled={isDisabled}

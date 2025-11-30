@@ -1,5 +1,5 @@
 // components/IntegerInput.tsx
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -55,7 +55,7 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
-  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Memoize parse function
   const parseInteger = useCallback((s: string) => {
@@ -143,6 +143,10 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
+    // sync DOM value when prop changes (avoid clobbering while focused)
+    if (inputRef.current && document.activeElement !== inputRef.current) {
+      inputRef.current.value = input;
+    }
   }, [value, field, validateCb, t]);
 
   // Handle user input change in the text box
@@ -150,16 +154,16 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
     if (isDisabled) return;
     const input = e.target.value;
     const err = validateCb(input);
-    setInputValue(input);
     onChange?.(input, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validateCb(inputValue)}>
+    <StandardFieldLayout field={field} error={validateCb(String(value ?? ""))}>
       <input
         id={field.name}
         type="text"
-        value={inputValue}
+        defaultValue={String(value ?? "")}
+        ref={inputRef}
         onChange={handleChange}
         disabled={isDisabled}
         className={combineClasses(

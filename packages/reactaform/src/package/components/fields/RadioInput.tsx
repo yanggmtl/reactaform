@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -28,7 +28,7 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
     field.layout?.toLowerCase() === "horizontal" ? "row" : "column";
   const isDisabled = field.disabled ?? false;
 
-  const [inputValue, setInputValue] = useState<string>(value != null ? String(value) : "");
+  const groupRef = useRef<HTMLDivElement | null>(null);
 
   const validate = useCallback(
     (val: string): string | null => {
@@ -46,35 +46,33 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
     [field, t, definitionName]
   );
 
-  const optionsLen = field.options?.length ?? 0;
-
   useEffect(() => {
     const safeVal = value != null ? String(value) : "";
     const err = validate(safeVal);
-    if (err && field.options && field.options.length > 0) {
-      const first = String(field.options[0].value);
-      // Safe prop->state sync: intentionally set local state from prop
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: prop->state sync required by consumers/tests
-      setInputValue(first);
-      // notify parent that we normalized the value
-      onChange?.(first, null);
-    } else {
-      setInputValue(safeVal);
+    if (groupRef.current) {
+      const inputs = Array.from(
+        groupRef.current.querySelectorAll<HTMLInputElement>("input[type=radio]")
+      );
+      // If normalization required, set first option checked; otherwise set checked by value
+      if (err && field.options && field.options.length > 0) {
+        const first = String(field.options[0].value);
+        inputs.forEach((inp) => (inp.checked = inp.value === first));
+        onChange?.(first, null);
+      } else {
+        inputs.forEach((inp) => (inp.checked = inp.value === safeVal));
+      }
     }
-  }, [value, validate, optionsLen, onChange, field.options]);
+  }, [value, validate, onChange, field.options]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const val = e.target.value;
     const err = validate(val);
-    if (!err) {
-      setInputValue(val);
-    }
     onChange?.(val, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validate(inputValue)}>
+    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <div
         style={{
           display: "flex",
@@ -84,6 +82,7 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
           alignItems: layout === "row" ? "center" : "flex-start",
           width: "100%",
         }}
+        ref={groupRef}
       >
         {(field.options ?? []).map((opt) => (
           <label
@@ -99,7 +98,7 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
               type="radio"
               name={field.name}
               value={String(opt.value)}
-              checked={String(inputValue) === String(opt.value)}
+              defaultChecked={String(value ?? "") === String(opt.value)}
               onChange={handleChange}
               disabled={isDisabled}
             />

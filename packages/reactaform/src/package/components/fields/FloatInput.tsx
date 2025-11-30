@@ -1,5 +1,5 @@
 // components/FloatInput.tsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -53,7 +53,7 @@ const FloatInput: React.FC<FloatInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
-  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Validate the current input value against the field constraints
   const validate = React.useCallback(
@@ -114,6 +114,9 @@ const FloatInput: React.FC<FloatInputProps> = ({
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
+    if (inputRef.current && document.activeElement !== inputRef.current) {
+      inputRef.current.value = input;
+    }
   }, [value, field, validate, t]);
 
   // Handle user input change in the text box
@@ -121,16 +124,16 @@ const FloatInput: React.FC<FloatInputProps> = ({
     if (isDisabled) return;
     const input = e.target.value;
     const err = validate(input);
-    setInputValue(input);
     onChange?.(input, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validate(inputValue)}>
+    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <input
         id={field.name}
         type="text"
-        value={inputValue}
+        defaultValue={String(value ?? "")}
+        ref={inputRef}
         onChange={handleChange}
         disabled={isDisabled}
         className={combineClasses(

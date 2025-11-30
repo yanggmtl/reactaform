@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -23,11 +23,8 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
   onChange,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [datePart, setDatePart] = useState<string>(value ? value.split("T")[0] : "");
-  const [timePart, setTimePart] = useState<string>(value ? value.split("T")[1] || "00:00" : "");
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const timeRef = React.useRef<HTMLInputElement | null>(null);
-  const rafRef = React.useRef<number | null>(null);
   const prevErrorRef = React.useRef<string | null>(null);
   const onErrorRef = React.useRef<typeof onChange | undefined>(undefined);
 
@@ -68,12 +65,8 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     return err ?? null;
   }, [definitionName, field, t]);
 
-  // Split external value into date/time parts. Synchronize local parts from
-  // `value` prop so inputs update when parent changes the value.
+  // Synchronize DOM inputs from external `value` prop when it changes.
   useEffect(() => {
-    // Sync props -> local parts. If the user is currently focused in one
-    // of the inputs, avoid clobbering their edits. Otherwise defer via
-    // requestAnimationFrame to satisfy lint and avoid mid-render setState.
     const active = document.activeElement;
     if (active === inputRef.current || active === timeRef.current) {
       return;
@@ -82,31 +75,15 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
     const val = value ?? "";
     const [date = "", time = ""] = val ? val.split("T") : ["", ""];
 
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
+    if (inputRef.current) inputRef.current.value = date || "";
+    if (timeRef.current) timeRef.current.value = date && !time ? "00:00" : time || "";
+
+    const combined = date ? `${date}T${time || ""}` : "";
+    const err = validateParts(combined);
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      onErrorRef.current?.(combined, err);
     }
-
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      setDatePart(date || "");
-      setTimePart(time || "");
-
-      // re-validate on external prop change and report if changed
-      const combined = date ? `${date}T${time || ""}` : "";
-      const err = validateParts(combined);
-      if (err !== prevErrorRef.current) {
-        prevErrorRef.current = err;
-        onErrorRef.current?.(combined, err);
-      }
-    });
-
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
   }, [value, field.min, field.max, validateParts]);
 
   // Combine date/time into ISO-like string. If date exists but time is
@@ -121,46 +98,46 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
-    setDatePart(newDate);
-    const combined = combine(newDate, timePart);
+    const timePartVal = timeRef.current ? timeRef.current.value : "";
+    const combined = combine(newDate, timePartVal);
     const err = validateParts(combined);
     onChange?.(combined, err);
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTime = e.target.value;
-    setTimePart(newTime);
-    const combined = combine(datePart, newTime);
+    const datePartVal = inputRef.current ? inputRef.current.value : "";
+    const combined = combine(datePartVal, newTime);
     const err = validateParts(combined);
     onChange?.(combined, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validateParts(combine(datePart, timePart))}>
+    <StandardFieldLayout field={field} error={validateParts(value ?? "")}> 
       <div style={{ display: "flex", gap: "8px", width: "100%" }}>
         <input
           ref={inputRef}
           type="date"
-          value={datePart}
+          defaultValue={value ? value.split("T")[0] : ""}
           onChange={handleDateChange}
           // Use flexible sizing so the control fits the parent column. minWidth:0
           // ensures the control can shrink inside a flex container without forcing
           // overflow; flex: '1 1 0' allows equal sharing of available space.
           style={{ flex: 1, minWidth: 0 }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
-          aria-invalid={!!validateParts(combine(datePart, timePart))}
-          aria-describedby={validateParts(combine(datePart, timePart)) ? `${field.name}-error` : undefined}
+          aria-invalid={!!validateParts(value ?? "")}
+          aria-describedby={validateParts(value ?? "") ? `${field.name}-error` : undefined}
         />
 
         <input
           ref={timeRef}
           type="time"
-          value={timePart}
+          defaultValue={value ? value.split("T")[1] || "00:00" : ""}
           onChange={handleTimeChange}
           step={1}
           style={{ flex: 1, minWidth: 0 }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
-          aria-invalid={!!validateParts(combine(datePart, timePart))}
+          aria-invalid={!!validateParts(value ?? "")}
         />
       </div>
     </StandardFieldLayout>

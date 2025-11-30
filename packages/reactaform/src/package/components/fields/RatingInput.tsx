@@ -38,7 +38,6 @@ const RatingInput: React.FC<RatingInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [rating, setRating] = useState<number>(value || 0);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   const max = field.max || 5;
@@ -71,18 +70,23 @@ const RatingInput: React.FC<RatingInputProps> = ({
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    const raf = requestAnimationFrame(() => setRating(v));
-    return () => cancelAnimationFrame(raf);
   }, [value, validate, max]);
 
   const handleSelect = (val: number) => {
-    setRating(val);
+    // Rendered from `value` prop; do not store local rating state.
     const err = validate(val);
     onChange?.(val, err);
   };
 
+  const ratingValue = (() => {
+    let v = value || 0;
+    if (v < 0) v = 0;
+    if (v > max) v = max;
+    return v;
+  })();
+
   return (
-    <StandardFieldLayout field={field} error={validate(rating)}>
+    <StandardFieldLayout field={field} error={validate(ratingValue)}>
       <div style={ratingWrapperStyle}>
         {(() => {
           const iconChar =
@@ -90,7 +94,7 @@ const RatingInput: React.FC<RatingInputProps> = ({
               ? String(field.icon)
               : "★";
           return [...Array(max)].map((_, i) => {
-            const isActive = i < rating;
+            const isActive = i < ratingValue;
             const isHover = hoverIndex !== null && i <= hoverIndex;
             const color = isHover || isActive ? 'gold' : 'lightgray';
             return (

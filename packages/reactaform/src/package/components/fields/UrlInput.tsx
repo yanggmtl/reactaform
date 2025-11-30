@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -49,7 +49,8 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
+  // uncontrolled input: DOM holds transient user edits; use a ref
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const isDisabled = field.disabled ?? false;
 
   // Validation logic
@@ -75,7 +76,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const newVal = e.target.value;
-    setInputValue(newVal);
 
     const err = validateCb(newVal);
     onChange?.(newVal.trim(), err);
@@ -91,21 +91,23 @@ const UrlInput: React.FC<UrlInputProps> = ({
   useEffect(() => {
     const v = value ?? "";
     const err = validateCb(v);
-    // Defer local state update to avoid synchronous setState inside effect
-    const raf = requestAnimationFrame(() => setInputValue(v));
+    if (inputRef.current && inputRef.current.value !== String(v)) {
+      inputRef.current.value = String(v);
+    }
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    return () => cancelAnimationFrame(raf);
+    return undefined;
   }, [value, validateCb]);
 
   return (
-    <StandardFieldLayout field={field} error={validateCb(inputValue)}>
+    <StandardFieldLayout field={field} error={validateCb(String(value ?? ""))}>
       <input
         id={field.name}
         type="url"
-        value={inputValue}
+        defaultValue={String(value ?? "")}
+        ref={inputRef}
         onChange={handleChange}
         disabled={isDisabled}
         style={{ alignItems: "left" }}

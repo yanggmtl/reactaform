@@ -1,5 +1,5 @@
 // components/SpinInput.tsx
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -27,7 +27,7 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
   const isDisabled = field.disabled ?? false;
 
   // Use default min=0 and max=100 if undefined
@@ -66,36 +66,17 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const rafRef = React.useRef<number | null>(null);
 
   useEffect(() => {
     const active = document.activeElement;
     if (active === inputRef.current) return;
-
     const str = String(value);
     const err = validateCb(value);
-
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
+    if (inputRef.current) inputRef.current.value = str;
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      onErrorRef.current?.(err ?? null);
     }
-
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      setInputValue(str);
-      if (err !== prevErrorRef.current) {
-        prevErrorRef.current = err;
-        onErrorRef.current?.(err ?? null);
-      }
-    });
-
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
   }, [value, validateCb]);
 
   const validateFromString = (s: string): string | null => {
@@ -110,22 +91,16 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
     const newInput = e.target.value;
     const num = e.target.valueAsNumber;
     const err = validateFromString(newInput);
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-
-    setInputValue(newInput);
     onChange?.(num, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validateFromString(inputValue)}>
+    <StandardFieldLayout field={field} error={validateFromString(String(value ?? ""))}>
       <input
         ref={inputRef}
         id={field.name}
         type="number"
-        value={inputValue}
+        defaultValue={String(value ?? "")}
         min={minVal}
         max={maxVal}
         step={step}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import type { ChangeEvent } from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -20,7 +20,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   onError,
 }) => {
   const { t } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>(String(value ?? ""));
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const { definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
@@ -57,14 +57,14 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   useEffect(() => {
     const v = String(value ?? "");
     const err = validateCb(v);
-    // Defer local state update to avoid synchronous setState inside effect
-    // which can trigger the lint rule and cascading renders.
-    const raf = requestAnimationFrame(() => setInputValue(v));
+    if (inputRef.current && inputRef.current.value !== String(v)) {
+      inputRef.current.value = String(v);
+    }
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    return () => cancelAnimationFrame(raf);
+    return undefined;
   }, [value, validateCb]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +76,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     if (trimmedInput === "") {
       err = field.required ? t("Value required") : null;
       // update local state and notify parent with the new (empty) value and error
-      setInputValue(newVal);
       onChange?.(newVal, err);
       return;
     }
@@ -89,16 +88,16 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
       err = t("Phone number does not match pattern: {{1}}", `${field.pattern}`);
     }
 
-    setInputValue(newVal);
     // pass the fresh value to the parent (avoid stale state)
     onChange?.(newVal, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validateCb(inputValue)}>
+    <StandardFieldLayout field={field} error={validateCb(String(value ?? ""))}>
       <input
         type="tel"
-        value={inputValue}
+        defaultValue={String(value ?? "")}
+        ref={inputRef}
         onChange={handleChange}
         disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}

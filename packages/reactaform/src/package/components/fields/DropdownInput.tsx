@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -32,7 +32,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
 
-  const [inputValue, setInputValue] = useState<string>(value != null ? String(value) : "");
+  const selectRef = useRef<HTMLSelectElement | null>(null);
 
   const validate = useCallback(
     (val: string): string | null => {
@@ -50,37 +50,32 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     [field, t, definitionName]
   );
 
-  const optionsLen = field.options?.length ?? 0;
   useEffect(() => {
     const safeVal = value != null ? String(value) : "";
     // If incoming value is invalid and there is at least one option, pick the first option
     const err = validate(safeVal);
     if (err && field.options && field.options.length > 0) {
       const first = String(field.options[0].value);
-      // Safe prop->state sync: we intentionally set local state from prop here.
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: prop->state sync required by consumers/tests
-      setInputValue(first);
+      if (selectRef.current) selectRef.current.value = first;
       // notify parent that we normalized the value
       onChange?.(first, null);
     } else {
-      setInputValue(safeVal);
+      if (selectRef.current) selectRef.current.value = safeVal;
     }
-  }, [value, validate, optionsLen, onChange, field.options]);
+  }, [value, validate, onChange, field.options]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (isDisabled) return;
     const val = e.target.value;
     const err = validate(val);
-    if (!err) {
-      setInputValue(val);
-    }
     onChange?.(val, err);
   };
 
   return (
-    <StandardFieldLayout field={field} error={validate(inputValue)}>
+    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <select
-        value={inputValue}
+        defaultValue={String(value ?? "")}
+        ref={selectRef}
         onChange={handleChange}
         disabled={isDisabled}
         className={combineClasses(

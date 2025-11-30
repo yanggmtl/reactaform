@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -29,7 +29,10 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
   const height = field.minHeight ?? "80px";
-  const [textValue, setTextValue] = useState(value);
+  // Use an uncontrolled textarea so the DOM holds the user's transient
+  // edits while we still notify parent via `onChange`. Keep a ref so
+  // external prop updates can overwrite the DOM value when needed.
+  const inputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
   const prevErrorRef = React.useRef<string | null>(null);
   const onErrorRef = React.useRef<TextInputProps["onError"] | undefined>(
@@ -61,37 +64,39 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
     if (isDisabled) return;
     const newValue = e.target.value;
     const err = validate(newValue);
-    setTextValue(newValue);
     onChange?.(newValue, err);
   };
 
   useEffect(() => {
     // Validate on initial mount or when value changes; notify parent via onErrorRef
     const err = validate(value);
-    // Defer local state update to avoid synchronous setState inside effect
-    const raf = requestAnimationFrame(() => setTextValue(value));
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    return () => cancelAnimationFrame(raf);
+    // If parent changed value externally, update the DOM value so the
+    // uncontrolled textarea shows the latest value.
+    if (inputRef.current && inputRef.current.value !== String(value ?? "")) {
+      inputRef.current.value = String(value ?? "");
+    }
   }, [value, validate]);
 
   const commonProps = {
-    value: textValue,
+    defaultValue: String(value ?? ""),
+    ref: inputRef,
     onChange: handleChange,
     disabled: isDisabled,
-    style: { 
-      resize: "vertical" as const, 
+    style: {
+      resize: "vertical" as const,
       minHeight: height,
       width: "100%",
-      boxSizing: "border-box" as const 
+      boxSizing: "border-box" as const,
     },
     className: combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput),
   };
 
   return (
-    <StandardFieldLayout field={field} error={validate(textValue)}>
+    <StandardFieldLayout field={field} error={validate(value)}>
       <textarea {...commonProps} />
     </StandardFieldLayout>
   );

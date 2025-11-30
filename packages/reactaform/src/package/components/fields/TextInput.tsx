@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -27,7 +27,7 @@ const TextInput: React.FC<TextInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const isDisabled = field.disabled ?? false;
-  const [textValue, setTextValue] = useState(value);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const prevErrorRef = React.useRef<string | null>(null);
   const onErrorRef = React.useRef<TextInputProps["onError"] | undefined>(
@@ -68,28 +68,28 @@ const TextInput: React.FC<TextInputProps> = ({
     if (isDisabled) return;
     const newValue = e.target.value;
     const err = validate(newValue);
-
-    setTextValue(newValue);
     onChange?.(newValue, err);
   };
 
   useEffect(() => {
     // Validate on initial mount or when value changes; notify parent via onErrorRef
     const err = validate(value);
-    // Defer local state update to avoid synchronous setState inside effect
-    const raf = requestAnimationFrame(() => setTextValue(value));
+    if (inputRef.current && inputRef.current.value !== String(value ?? "")) {
+      inputRef.current.value = String(value ?? "");
+    }
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
     }
-    return () => cancelAnimationFrame(raf);
+    return undefined;
   }, [value, validate]);
 
   return (
-    <StandardFieldLayout field={field} error={validate(textValue)}>
+    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <input
         type="text"
-        value={textValue}
+        defaultValue={String(value ?? "")}
+        ref={inputRef}
         onChange={handleChange}
         disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}

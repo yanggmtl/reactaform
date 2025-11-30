@@ -45,7 +45,7 @@ jobs:
         run: npm -w reactaform run build:lib
 
       - name: Build example app
-        run: npm --workspace reactaform-example run build
+        run: npm --workspace=reactaform-example run build
 
       - name: Run tests
         run: npm test

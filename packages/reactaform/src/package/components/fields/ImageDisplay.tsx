@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
@@ -48,6 +48,7 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
   const langs = field.localized?.split(";").map((v) => v.trim());
 
   const [imageUrl, setImageUrl] = useState<string>(baseUrl);
+  const lastUrlRef = useRef<string | null>(baseUrl);
 
   /**
    * Try to resolve a localized version of the image
@@ -70,26 +71,36 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
       localizedFile = `${name}_${language}${ext}`;
     }
 
-    // Use AbortController for fetch cancellation and defer setState via RAF
+    // Use AbortController for fetch cancellation and set state directly
     const controller = new AbortController();
-    let raf = 0;
 
     if (localizedFile) {
       const localizedPath = [...parts, localizedFile].join("/");
       fetch(localizedPath, { method: "HEAD", signal: controller.signal })
         .then((res) => {
-          raf = requestAnimationFrame(() => setImageUrl(res.ok ? localizedPath : baseUrl));
+          const resolved = res.ok ? localizedPath : baseUrl;
+          if (resolved !== lastUrlRef.current) {
+            lastUrlRef.current = resolved;
+            setImageUrl(resolved);
+          }
         })
         .catch(() => {
-          raf = requestAnimationFrame(() => setImageUrl(baseUrl));
+          if (baseUrl !== lastUrlRef.current) {
+            lastUrlRef.current = baseUrl;
+            setImageUrl(baseUrl);
+          }
         });
     } else {
-      raf = requestAnimationFrame(() => setImageUrl(baseUrl));
+      // Defer setState slightly to avoid sync setState-in-effect warnings
+      const resolved = baseUrl;
+      if (resolved !== lastUrlRef.current) {
+        lastUrlRef.current = resolved;
+        requestAnimationFrame(() => setImageUrl(resolved));
+      }
     }
 
     return () => {
       controller.abort();
-      if (raf) cancelAnimationFrame(raf);
     };
   }, [baseUrl, language, langs]);
 

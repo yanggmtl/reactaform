@@ -168,11 +168,11 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>(String(value[0] ?? ""));
-  const [inputUnit, setInputUnit] = useState<string>(unitFactors.default);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const selectRef = useRef<HTMLSelectElement | null>(null);
   const rafRef = useRef<number | null>(null);
+  const [localInput, setLocalInput] = useState<string | null>(null);
+  const [localUnit, setLocalUnit] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] =
     useState<PopupOptionMenuPosition | null>(null);
@@ -205,26 +205,34 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     unit = normalizeUnit(unit, unitFactors) || unit;
 
     // If the user is currently interacting with the input/select (focused),
-    // avoid overwriting their edits. Otherwise defer updating local state to
-    // satisfy the react-hooks/set-state-in-effect lint rule.
+    // avoid overwriting their edits. Otherwise update DOM values directly.
     const active = document.activeElement;
     if (active === inputRef.current || active === selectRef.current) {
-      // User is interacting; skip syncing to avoid clobbering edits.
       return;
     }
 
+    if (inputRef.current) inputRef.current.value = val;
+    if (selectRef.current) selectRef.current.value = unit;
+    // clear transient local edits when props change (deferred to avoid sync setState)
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = null;
-      setInputValue(val);
-      setInputUnit(unit);
+      setLocalInput(null);
+      setLocalUnit(null);
     });
+  }, [value, unitFactors]);
+  // cleanup raf if unmounting
+  useEffect(() => {
     return () => {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
     };
-  }, [value, validate, unitFactors]);
+  }, []);
 
   const prevErrorRef = useRef<string | null>(null);
   const onErrorRef = useRef<GenericUnitValueInputProps["onError"] | undefined>(
@@ -260,39 +268,28 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const input = e.target.value;
-    const err = validate(input, inputUnit);
-
-    // If a prop-sync RAF is pending, cancel it to avoid clobbering the user's edit.
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-
-    setInputValue(input);
-    const unit = inputUnit ?? unitFactors.default;
+    const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
+    const err = validate(input, unit);
+    setLocalInput(input);
     responseParentOnChange(input, unit, err);
   };
 
   const onUnitChange = (e: ChangeEvent<HTMLSelectElement>) => {
     if (isDisabled) return;
     const newUnit = e.target.value;
-    const value = inputValue ?? "";
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-
-    const err = validate(value, newUnit);
-
-    setInputUnit(newUnit);
-    responseParentOnChange(value, newUnit, err);
+    const valueStr = inputRef.current ? inputRef.current.value : String(value[0] ?? "");
+    const err = validate(valueStr, newUnit);
+    setLocalUnit(newUnit);
+    if (selectRef.current) selectRef.current.value = newUnit;
+    responseParentOnChange(valueStr, newUnit, err);
   };
 
   const onConvertButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
     // Guard: don't open the conversion menu when conversion is disabled
-    const val = inputValue ? inputValue : "";
+    const val = inputRef.current ? inputRef.current.value : String(value[0] ?? "");
     const parsedValue = parseFloat(val);
-    const localErr = validate(val, inputUnit ?? unitFactors.default);
+    const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
+    const localErr = validate(val, unit);
     if (localErr || !val.trim() || !Number.isFinite(parsedValue)) {
       return;
     }
@@ -302,12 +299,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
 
     setMenuPosition({ x, y });
 
-    const unit = inputUnit ?? unitFactors.default;
-    const convertedOptions = getConvertedOptions(
-      parsedValue,
-      unit,
-      unitFactors
-    );
+    const convertedOptions = getConvertedOptions(parsedValue, unit, unitFactors);
     if (convertedOptions.length === 0) {
       setMenuOptions([]);
       setShowMenu(false);
@@ -319,15 +311,23 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   };
 
   const onConversionMenuSelect = (option: UnitOption) => {
-    const { value, unit } = option;
-    setInputValue(value);
-    setInputUnit(unit);
+    const { value: newVal, unit: newUnit } = option;
+    if (inputRef.current) inputRef.current.value = newVal;
+    if (selectRef.current) selectRef.current.value = newUnit;
+    setLocalInput(newVal);
+    setLocalUnit(newUnit);
     setShowMenu(false);
-    responseParentOnChange(value, unit, null);
+    responseParentOnChange(newVal, newUnit, null);
   };
 
+  const propInputForValidation = String(value[0] ?? "");
+  const propUnitForValidation = normalizeUnit(value[1] ?? unitFactors.default, unitFactors) || (value[1] ?? unitFactors.default);
+
+  const inputForValidation = localInput ?? propInputForValidation;
+  const unitForValidation = localUnit ?? propUnitForValidation;
+
   const disableConversion =
-    isDisabled || Boolean(validate(inputValue ?? "", inputUnit ?? unitFactors.default)) || !(inputValue ?? "").trim();
+    isDisabled || Boolean(validate(inputForValidation, unitForValidation)) || !inputForValidation.trim();
 
   // Dark mode aware button styling
   const convertButtonStyle = {
@@ -348,12 +348,12 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   };
 
   return (
-  <StandardFieldLayout field={field} error={validate(inputValue ?? "", inputUnit ?? unitFactors.default)}>
+  <StandardFieldLayout field={field} error={validate(propInputForValidation, propUnitForValidation)}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--reactaform-unit-gap, 8px)", width: "100%" }}>
         <input
           type="text"
               ref={inputRef}
-              value={inputValue ?? ""}
+              defaultValue={String(value[0] ?? "")}
           onChange={onValueChange}
           disabled={isDisabled}
           style={{ width: "var(--reactaform-unit-input-width, 100px)" }}
@@ -363,7 +363,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
         {/* Units dropdown */}
         <select
           ref={selectRef}
-          value={inputUnit ?? unitFactors.default}
+          defaultValue={normalizeUnit(value[1] ?? unitFactors.default, unitFactors) || (value[1] ?? unitFactors.default)}
           onChange={onUnitChange}
           className={combineClasses(
             CSS_CLASSES.input,

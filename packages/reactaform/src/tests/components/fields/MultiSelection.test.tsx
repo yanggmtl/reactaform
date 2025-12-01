@@ -1,12 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import MultiSelection from '../../../package/components/fields/MultiSelection';
+import MultiSelection, {type OptionsField } from '../../../package/components/fields/MultiSelection';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
-import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
-
-// Local test alias for fields that include options
-type FieldWithOptions = DefinitionPropertyField & { options: { label: string; value: string }[] };
 
 describe('MultiSelection', () => {
   const mockOptions = [
@@ -16,7 +12,7 @@ describe('MultiSelection', () => {
   ];
 
   it('renders control with label', () => {
-    const field = createMockField<FieldWithOptions>({ label: 'Select Multiple', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select Multiple', options: mockOptions });
     renderWithProvider(<MultiSelection {...baseFieldProps} field={field} value={[]} />);
 
     expect(screen.getByText('Select Multiple')).toBeInTheDocument();
@@ -24,14 +20,14 @@ describe('MultiSelection', () => {
   });
 
   it('displays selection count', () => {
-    const field = createMockField<FieldWithOptions>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     renderWithProvider(<MultiSelection {...baseFieldProps} field={field} value={['opt1', 'opt2']} />);
 
     expect(screen.getByText(/2 \/ 3 selected/i)).toBeInTheDocument();
   });
 
   it('shows clear button when items are selected', () => {
-    const field = createMockField<FieldWithOptions>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     renderWithProvider(<MultiSelection {...baseFieldProps} field={field} value={['opt1']} />);
 
     const clearButton = screen.getByRole('button', { name: /clear selections/i });
@@ -39,7 +35,7 @@ describe('MultiSelection', () => {
   });
 
   it('does not show clear button when no items selected', () => {
-    const field = createMockField<FieldWithOptions>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     renderWithProvider(<MultiSelection {...baseFieldProps} field={field} value={[]} />);
 
     const clearButton = screen.queryByRole('button', { name: /clear selections/i });
@@ -48,7 +44,7 @@ describe('MultiSelection', () => {
 
   it('opens dropdown when control is clicked', async () => {
     const user = userEvent.setup();
-    const field = createMockField<FieldWithOptions>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     const { container } = renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={[]} />
     );
@@ -63,7 +59,7 @@ describe('MultiSelection', () => {
 
   it('displays all options in dropdown', async () => {
     const user = userEvent.setup();
-    const field = createMockField<FieldWithOptions>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     const { container } = renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={[]} />
     );
@@ -78,7 +74,7 @@ describe('MultiSelection', () => {
 
   it('checks selected options in dropdown', async () => {
     const user = userEvent.setup();
-    const field = createMockField<FieldWithOptions>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     const { container } = renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={['opt1', 'opt3']} />
     );
@@ -95,7 +91,7 @@ describe('MultiSelection', () => {
   it('calls onChange when option is toggled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField & { options: { label: string; value: string }[] }>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     const { container } = renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -112,7 +108,7 @@ describe('MultiSelection', () => {
   it('adds to selection when unchecked option is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField & { options: { label: string; value: string }[] }>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     const { container } = renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={['opt1']} onChange={onChange} />
     );
@@ -129,7 +125,7 @@ describe('MultiSelection', () => {
   it('removes from selection when checked option is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField & { options: { label: string; value: string }[] }>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     const { container } = renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={['opt1', 'opt2']} onChange={onChange} />
     );
@@ -146,7 +142,7 @@ describe('MultiSelection', () => {
   it('clears all selections when clear button is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField & { options: { label: string; value: string }[] }>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={['opt1', 'opt2']} onChange={onChange} />
     );
@@ -158,7 +154,7 @@ describe('MultiSelection', () => {
   });
 
   it('filters out invalid values from selection', () => {
-    const field = createMockField<DefinitionPropertyField & { options: { label: string; value: string }[] }>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     renderWithProvider(
       <MultiSelection {...baseFieldProps} field={field} value={['opt1', 'invalid', 'opt2']} />
     );
@@ -168,14 +164,14 @@ describe('MultiSelection', () => {
   });
 
   it('handles null value as empty array', () => {
-    const field = createMockField<DefinitionPropertyField & { options: { label: string; value: string }[] }>({ label: 'Select', options: mockOptions });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions });
     renderWithProvider(<MultiSelection {...baseFieldProps} field={field} value={null} />);
 
     expect(screen.getByText(/0 \/ 3 selected/i)).toBeInTheDocument();
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<FieldWithOptions>({ label: 'Select', options: mockOptions, tooltip: 'Choose multiple options' });
+    const field = createMockField<OptionsField>({ label: 'Select', options: mockOptions, tooltip: 'Choose multiple options' });
     renderWithProvider(<MultiSelection {...baseFieldProps} field={field} value={[]} />);
 
     const tooltips = screen.getAllByTestId('tooltip-icon');

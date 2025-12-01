@@ -7,9 +7,11 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
 
+export type OptionsField = DefinitionPropertyField & { options: NonNullable<DefinitionPropertyField['options']> }
+
 type MultiSelectionProps = BaseInputProps<
   string[] | null,
-  DefinitionPropertyField & { options: NonNullable<DefinitionPropertyField['options']> }
+  OptionsField
 >;
 
 // ---------------------------
@@ -90,13 +92,13 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
 
   const mergedClearButtonStyle = useMemo<React.CSSProperties>(() => ({
     position: "absolute",
-    right: "2.2em",
+    right: "1.5em",
     top: "50%",
     transform: "translateY(-50%)",
     background: "none",
     border: "none",
     cursor: "pointer",
-    fontSize: "1.2em",
+    fontSize: "0.8em",
     color: "var(--reactaform-text-muted, #999)",
     padding: 0,
     ...styleFrom(formStyle, 'multiSelect', 'clearButton'),
@@ -109,6 +111,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     top: "50%",
     transform: "translateY(-50%)",
     pointerEvents: "none",
+    fontSize: "0.8em",
     color: "var(--reactaform-text-muted, #999)",
     ...styleFrom(formStyle, 'multiSelect', 'arrow'),
     ...styleFrom(fieldStyle, undefined, 'arrow'),
@@ -123,6 +126,16 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
             className={`reactaform-multiselection-control`}
             style={mergedControlStyle}
             onClick={handleControlClick}
+            tabIndex={0}
+            role="button"
+            aria-haspopup="listbox"
+            aria-expanded={menuOpen}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleControlClick();
+              }
+            }}
           >
             <span
               style={{ flex: 1, color: "var(--reactaform-text-muted, #888)" }}
@@ -140,11 +153,12 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
                 }}
                 style={mergedClearButtonStyle}
               >
-                ��
+                {/* use HTML entity to avoid encoding issues on GitHub; use heavy X for delete */}
+                <span style={mergedClearButtonStyle} aria-hidden>&#x2716;</span>
               </button>
             )}
 
-            <span style={mergedArrowStyle}>��</span>
+            <span style={mergedArrowStyle} aria-hidden>&#x25BC;</span>
           </div>
         </div>
       </StandardFieldLayout>
@@ -187,6 +201,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   darkMode,
 }) => {
   const popupRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
   const { formStyle, fieldStyle } = useReactaFormContext();
 
   const styleFrom = (
@@ -243,6 +258,24 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose, controlRef]);
+
+  // focus management for keyboard navigation: set initial active index when popup mounts
+  useEffect(() => {
+    if (!popupRef.current) return;
+    // initialize active index to first option (defer state update to avoid sync setState in effect)
+    if (options.length > 0) {
+      requestAnimationFrame(() => setActiveIndex((idx) => (idx === -1 ? 0 : idx)));
+    }
+  }, [options.length]);
+
+  // when activeIndex changes, move focus to the corresponding option element
+  useEffect(() => {
+    if (!popupRef.current || activeIndex < 0) return;
+    const el = popupRef.current.querySelector(`#multi-opt-${activeIndex}`) as HTMLElement | null;
+    if (el) {
+      requestAnimationFrame(() => el.focus());
+    }
+  }, [activeIndex]);
 
   // -----------------------
   // PORTAL CONTAINER
@@ -312,6 +345,8 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   return ReactDOM.createPortal(
     <div
       ref={popupRef}
+      role="listbox"
+      aria-activedescendant={activeIndex >= 0 ? `multi-opt-${activeIndex}` : undefined}
       style={{
         position: "absolute",
         top: livePos ? livePos.top : position.y,
@@ -322,23 +357,68 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
       }}
       data-reactaform-theme={darkMode ? "dark" : "light"}
     >
-      {options.map((opt) => {
+          {options.map((opt, idx) => {
         const selected = selectedValues.includes(opt.value);
         const hoverBg = darkMode
           ? "var(--reactaform-hover-bg, rgba(255,255,255,0.01))"
           : "var(--reactaform-hover-bg, #eee)";
+        const optionStyle: React.CSSProperties = {
+          ...mergedPopupOptionStyles,
+          background: idx === activeIndex ? hoverBg : mergedPopupOptionStyles.background,
+        };
+
         return (
           <div
+            id={`multi-opt-${idx}`}
             key={opt.value}
             onMouseDown={(e) => {
               e.stopPropagation(); // prevent popup from closing
               onToggleOption(opt.value);
             }}
-            style={mergedPopupOptionStyles}
-            onMouseEnter={(e) => (e.currentTarget.style.background = hoverBg)}
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "transparent")
-            }
+            onKeyDown={(e) => {
+              const len = options.length;
+              switch (e.key) {
+                case 'ArrowDown':
+                  e.preventDefault();
+                  setActiveIndex((i) => (i + 1) % len);
+                  break;
+                case 'ArrowUp':
+                  e.preventDefault();
+                  setActiveIndex((i) => (i - 1 + len) % len);
+                  break;
+                case 'Home':
+                  e.preventDefault();
+                  setActiveIndex(0);
+                  break;
+                case 'End':
+                  e.preventDefault();
+                  setActiveIndex(len - 1);
+                  break;
+                case 'Enter':
+                case ' ':
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onToggleOption(opt.value);
+                  break;
+                case 'Escape':
+                  e.preventDefault();
+                  onClose();
+                  controlRef?.current?.focus();
+                  break;
+              }
+            }}
+            tabIndex={idx === activeIndex ? 0 : -1}
+            role="option"
+            aria-selected={selected}
+            style={optionStyle}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = hoverBg;
+              setActiveIndex(idx);
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              setActiveIndex((cur) => (cur === idx ? -1 : cur));
+            }}
           >
             <input
               type="checkbox"

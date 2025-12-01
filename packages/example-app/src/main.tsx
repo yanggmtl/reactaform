@@ -37,6 +37,24 @@ const exampleDefinition = {
       "dimension": "angle",
       "defaultValue": 30,
       "defaultUnit": "deg"
+    },
+    {
+      "type": "multi-selection",
+      "name": "multipleSelection",
+      "displayName": "Multiple Selection",
+      "options": [
+        {
+          "label": "Option 1",
+          "value": "1"
+        },
+        {
+          "label": "Option 2",
+          "value": "2"
+        }
+      ],
+      "defaultValue": [
+        "2"
+      ]
     }
   ]
 }

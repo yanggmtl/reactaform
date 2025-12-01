@@ -11,11 +11,7 @@ import { validateFieldValue } from "../../core/validation";
 
 import PopupOptionMenu from "../PopupOptionMenu";
 import type { PopupOption, PopupOptionMenuPosition } from "../PopupOptionMenu";
-import {
-  dimensionUnitDisplayMap,
-  dimensonUnitFactorsMap,
-  dimensionUnitsMap,
-} from "../../utils/unitValueMapper";
+import { unitsByDimension } from "../../utils/unitValueMapper";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 // ========== Unit Types
@@ -52,39 +48,32 @@ interface GenericUnitValueInputProps extends UnitValueInputProps {
 const unitFactorsMap: Record<string, UnitFactors> = {};
 
 // populate unitFactorsMap for the given dimension
-function loadUnitFactorsMap(dimension: string): void {
+function loadUnitFactorsMap(dimension: string, t: (key: string) => string): void {
   if (dimension in unitFactorsMap) {
     return;
   }
-  // Dynamically load unit factors for the given dimension if available
-  const factorsMap = dimensonUnitFactorsMap[dimension];
-  // derive a labelsMap (unit -> shortName) from the merged display map
-  const displayMapForDim = dimensionUnitDisplayMap[dimension] ?? {};
-  const labelsMap: Record<string, string> = Object.fromEntries(
-    Object.entries(displayMapForDim).map(([unit, info]) => [unit, info.shortName])
-  );
-  const reverseLabelsMap: Record<string, string> = Object.fromEntries(
-    Object.entries(labelsMap).map(([unit, short]) => [short, unit])
-  );
+  // Build unit factors and labels from the merged `unitsByDimension` map
+  const unitsForDim = unitsByDimension[dimension] ?? {};
 
-  if (factorsMap) {
-    // Prefer a friendly default from `dimensionUnitsMap` ordering when available.
-    const preferredOrder = dimensionUnitsMap[dimension] ?? [];
-    const preferredDefault = preferredOrder.find((u) => u in factorsMap);
-    unitFactorsMap[dimension as Dimension] = {
-      default: preferredDefault ?? Object.keys(factorsMap)[0],
-      factors: factorsMap,
-      labels: labelsMap,
-      reverseLabels: reverseLabelsMap,
-    };
-  } else {
-    unitFactorsMap[dimension as Dimension] = {
-      default: "",
-      factors: {},
-      labels: {},
-      reverseLabels: {},
-    };
+  const factorsMap: Record<string, number> = {};
+  const labelsMap: Record<string, string> = {};
+  const reverseLabelsMap: Record<string, string> = {};
+
+  // Preserve ordering from the original `dimensionUnitsMap` when possible by iterating unitsForDim in insertion order
+  for (const [u, info] of Object.entries(unitsForDim)) {
+    if (typeof info.factor === "number") factorsMap[u] = info.factor;
+    // labelsMap holds the friendly display name for the unit
+    labelsMap[u] =  t(u);
+    reverseLabelsMap[t(u)] = u;
   }
+
+  const preferredDefault = Object.keys(unitsForDim)[0] ?? "";
+  unitFactorsMap[dimension as Dimension] = {
+    default: preferredDefault,
+    factors: factorsMap,
+    labels: labelsMap,
+    reverseLabels: reverseLabelsMap,
+  };
 }
 
 // Unit Functions
@@ -93,15 +82,15 @@ function getTemperatureConvertValue(
   toUnit: string,
   value: number
 ): number {
-  if (fromUnit === "°C") {
-    if (toUnit === "°F") return value * (9 / 5) + 32;
+  if (fromUnit === "C") {
+    if (toUnit === "F") return value * (9 / 5) + 32;
     if (toUnit === "K") return value + 273.15;
-  } else if (fromUnit === "°F") {
-    if (toUnit === "°C") return ((value - 32) * 5) / 9;
+  } else if (fromUnit === "F") {
+    if (toUnit === "C") return ((value - 32) * 5) / 9;
     if (toUnit === "K") return ((value - 32) * 5) / 9 + 273.15;
   } else if (fromUnit === "K") {
-    if (toUnit === "°C") return value - 273.15;
-    if (toUnit === "°F") return ((value - 273.15) * 9) / 5 + 32;
+    if (toUnit === "C") return value - 273.15;
+    if (toUnit === "F") return ((value - 273.15) * 9) / 5 + 32;
   }
   return value;
 }
@@ -113,43 +102,40 @@ function getConvertedOptions(
 ): UnitOption[] {
   // If input value is not a finite number, no conversion can be performed
   if (!Number.isFinite(value)) return [];
+  const isTemperature = unitFactors === unitFactorsMap.temperature;
+
+  if (isTemperature) {
+    // For temperature, iterate over available units (labels) and use special conversion
+    return Object.keys(unitFactors.labels).map((toUnit) => {
+      const convertedValue = getTemperatureConvertValue(unit, toUnit, value);
+      if (!Number.isFinite(convertedValue)) {
+        return { label: `${String(convertedValue)} ${toUnit}`, value: String(convertedValue), unit: toUnit };
+      }
+      return { label: `${convertedValue.toFixed(6)} ${toUnit}`, value: convertedValue.toString(), unit: toUnit };
+    });
+  }
 
   const selectedFactor = unitFactors.factors[unit];
   if (selectedFactor === undefined) return [];
-  const isTemperature = unitFactors === unitFactorsMap.temperature;
 
-  return (Object.entries(unitFactors.factors) as [string, number][]).map(
-    ([toUnit, toFactor]) => {
-      const convertedValue = isTemperature
-        ? getTemperatureConvertValue(unit, toUnit, value)
-        : (value / selectedFactor) * toFactor;
-
-      if (!Number.isFinite(convertedValue)) {
-        return {
-          label: `${String(convertedValue)} ${toUnit}`,
-          value: String(convertedValue),
-          unit: toUnit,
-        };
-      }
-
-      return {
-        label: `${convertedValue.toFixed(6)} ${toUnit}`,
-        value: convertedValue.toString(),
-        unit: toUnit,
-      };
+  return (Object.entries(unitFactors.factors) as [string, number][]).map(([toUnit, toFactor]) => {
+    const convertedValue = (value / selectedFactor) * toFactor;
+    if (!Number.isFinite(convertedValue)) {
+      return { label: `${String(convertedValue)} ${toUnit}`, value: String(convertedValue), unit: toUnit };
     }
-  );
+    return { label: `${convertedValue.toFixed(6)} ${toUnit}`, value: convertedValue.toString(), unit: toUnit };
+  });
 }
 
 function normalizeUnit(
   inputUnit: string,
   unitFactors: UnitFactors
 ): string | null {
-  // Check if it"s a label
-  const match = Object.entries(unitFactors.labels).find(
-    ([label, code]) => label === inputUnit || code === inputUnit
-  ) as [string, string] | undefined;
-  return match ? match[1] : null;
+  // If input matches a unit key, accept it
+  if (inputUnit in unitFactors.labels) return inputUnit;
+  // If input matches a friendly display name, map it back to the unit key
+  if (unitFactors.reverseLabels && unitFactors.reverseLabels[inputUnit]) return unitFactors.reverseLabels[inputUnit];
+  return null;
 }
 
 const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
@@ -383,9 +369,9 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
           )}
           disabled={isDisabled}
         >
-          {Object.keys(unitFactors.factors).map((u) => (
+          {Object.keys(unitFactors.labels).map((u) => (
             <option key={u} value={u}>
-              {u}
+              {unitFactors.labels[u] ?? u}
             </option>
           ))}
         </select>
@@ -429,10 +415,11 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
 };
 
 function UnitValueInput({ field, value, onChange }: UnitValueInputProps) {
+  const { t } = useReactaFormContext();
   const dimension = (field as DefinitionPropertyField & { dimension?: Dimension }).dimension;
   if (!dimension) return null;
   if (!unitFactorsMap[dimension]) {
-    loadUnitFactorsMap(dimension);
+    loadUnitFactorsMap(dimension, t);
   }
 
   const unitFactors = unitFactorsMap[dimension];

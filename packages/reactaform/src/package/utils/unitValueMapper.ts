@@ -1,135 +1,172 @@
 
 export const dimensionUnitsMap: Record<string, string[]> = {
   length: ["m", "cm", "mm", "km", "in", "ft", "yd", "mi"],
-  area: ["m^2", "cm^2", "mm^2", "in^2", "ft^2", "yd^2", "ha", "ac"],
+  area: ["m^2", "cm^2", "mm^2", "in^2", "ft^2", "yd^2"],
   volume: ["L", "m^3", "cm^3", "mL", "in^3", "ft^3", "yd^3"],
-  weight: ["kg", "g", "mg", "ton", "lb", "oz"],
-  time: ["m", "s", "h", "ms", "d"],
-  temperature: ["celsius", "fahrenheit", "kelvin"],
-  angle: ["deg", "rad", "gradian", "rev", "minute", "second"],
+  weight: ["kg", "g", "mg", "t", "lb", "oz"],
+  time: ["min", "s", "h", "ms", "d"],
+  temperature: ["C", "F", "K"],
+  angle: ["deg", "rad", "rev"],
 };
 
 // Friendly display names for units (per-dimension) used for labels in UI dropdowns
-export const dimensionUnitDisplayMap: Record<
-  string,
-  Record<string, { name: string; shortName: string }>
-> = {
+export const dimensionUnitDisplayMap: Record<string, Record<string, string>> = {
   length: {
-    m: { name: "Meter (m)", shortName: "m" },
-    mm: { name: "Millimeter (mm)", shortName: "mm" },
-    cm: { name: "Centimeter (cm)", shortName: "cm" },
-    km: { name: "Kilometer (km)", shortName: "km" },
-    in: { name: "Inch (in)", shortName: "in" },
-    ft: { name: "Foot (ft)", shortName: "ft" },
-    yd: { name: "Yard (yd)", shortName: "yd" },
-    mi: { name: "Mile (mi)", shortName: "mi" },
+    m: "Meter (m)",
+    mm: "Millimeter (mm)",
+    cm: "Centimeter (cm)",
+    km: "Kilometer (km)",
+    in: "Inch (in)",
+    ft: "Foot (ft)",
+    yd: "Yard (yd)",
+    mi: "Mile (mi)",
   },
   area: {
-    "m^2": { name: "Square meter (m²)", shortName: "m²" },
-    "mm^2": { name: "Square millimeter (mm²)", shortName: "mm²" },
-    "cm^2": { name: "Square centimeter (cm²)", shortName: "cm²" },
-    "in^2": { name: "Square inch (in²)", shortName: "in²" },
-    "ft^2": { name: "Square foot (ft²)", shortName: "ft²" },
-    "yd^2": { name: "Square yard (yd²)", shortName: "yd²" },
-    ha: { name: "Hectare (ha)", shortName: "ha" },
-    ac: { name: "Acre (ac)", shortName: "ac" },
+    "m^2": "Square meter (m^2)",
+    "mm^2": "Square millimeter (mm^2)",
+    "cm^2": "Square centimeter (cm^2)",
+    "in^2": "Square inch (in^2)",
+    "ft^2": "Square foot (ft^2)",
+    "yd^2": "Square yard (yd^2)",
   },
   volume: {
-    L: { name: "Liter (L)", shortName: "L" },
-    "cm^3": { name: "Cubic centimeter (cm³)", shortName: "cm³" },
-    "m^3": { name: "Cubic meter (m³)", shortName: "m³" },
-    mL: { name: "Milliliter (mL)", shortName: "mL" },
-    "in^3": { name: "Cubic inch (in³)", shortName: "in³" },
-    "ft^3": { name: "Cubic foot (ft³)", shortName: "ft³" },
-    "yd^3": { name: "Cubic yard (yd³)", shortName: "yd³" },
+    L: "Liter (L)",
+    "cm^3": "Cubic centimeter (cm^3)",
+    "m^3": "Cubic meter (m^3)",
+    mL: "Milliliter (mL)",
+    "in^3": "Cubic inch (in^3)",
+    "ft^3": "Cubic foot (ft^3)",
+    "yd^3": "Cubic yard (yd^3)",
   },
   weight: {
-    kg: { name: "Kilogram (kg)", shortName: "kg" },
-    g: { name: "Gram (g)", shortName: "g" },
-    mg: { name: "Milligram (mg)", shortName: "mg" },
-    ton: { name: "Ton (t)", shortName: "ton" },
-    lb: { name: "Pound (lb)", shortName: "lb" },
-    oz: { name: "Ounce (oz)", shortName: "oz" },
+    kg: "Kilogram (kg)",
+    g: "Gram (g)",
+    mg: "Milligram (mg)",
+    t: "Tonne (t)",
+    lb: "Pound (lb)",
+    oz: "Ounce (oz)",
   },
   time: {
-    s: { name: "Second (s)", shortName: "s" },
-    m: { name: "Minute (m)", shortName: "m" },
-    h: { name: "Hour (h)", shortName: "h" },
-    ms: { name: "Millisecond (ms)", shortName: "ms" },
-    d: { name: "Day (d)", shortName: "d" },
+    s: "Second (s)",
+    min: "Minute (min)",
+    h: "Hour (h)",
+    ms: "Millisecond (ms)",
+    d: "Day (d)",
+    wk: "Week (wk)",
   },
   temperature: {
-    celsius: { name: "Celsius (°C)", shortName: "°C" },
-    fahrenheit: { name: "Fahrenheit (°F)", shortName: "°F" },
-    kelvin: { name: "Kelvin (K)", shortName: "K" },
+    C: "Celsius (C)",
+    F: "Fahrenheit (F)",
+    K: "Kelvin (K)",
   },
   angle: {
-    deg: { name: "Degree (°)", shortName: "°" },
-    rad: { name: "Radian (rad)", shortName: "rad" },
-    gradian: { name: "Gradian", shortName: "gon" },
-    rev: { name: "Revolution (rev)", shortName: "rev" },
-    minute: { name: "Arcminute (′)", shortName: "′" },
-    second: { name: "Arcsecond (″)", shortName: "″" },
+    deg: "Degree (deg)",
+    rad: "Radian (rad)",
+    rev: "Revolution (rev)",
   },
 };
 
 export const dimensonUnitFactorsMap: Record<string, Record<string, number>> = {
   length: {
-    mm: 1000,
-    cm: 100,
-    m: 1,
-    km: 0.001,
-    in: 100 / 2.54,
-    ft: 100 / (2.54 * 12),
-    yd: 100 / (2.54 * 36),
-    mi: 1 / 1609.344,
+    "mm": 1000,
+    "cm": 100,
+    "m": 1,
+    "km": 0.001,
+    "in": 100 / 2.54,
+    "ft": 100 / (2.54 * 12),
+    "yd": 100 / (2.54 * 36),
+    "mi": 1 / 1609.344,
   },
   area: {
-    "m²": 1.0,
-    "mm²": 1000000,
-    "cm²": 10000,
-    "km²": 1 / 1000000,
-    "in²": (100 / 2.54) ** 2,
-    "ft²": (100 / (2.54 * 12)) ** 2,
-    "yd²": (100 / (2.54 * 36)) ** 2,
-    ha: 1 / 10000,
-    ac: 1 / 4046.8564224,
+    "m^2": 1.0,
+    "mm^2": 1000000,
+    "cm^2": 10000,
+    "km^2": 1 / 1000000,
+    "in^2": (100 / 2.54) ** 2,
+    "ft^2": (100 / (2.54 * 12)) ** 2,
+    "yd^2": (100 / (2.54 * 36)) ** 2,
   },
   volume: {
-    "cm³": 1000000,
-    "m³": 1.0,
-    L: 1.0,
-    mL: 1000000,
-    "in³": (100 / 2.54) ** 3,
-    "ft³": (100 / (2.54 * 12)) ** 3,
-    "yd³": (100 / (2.54 * 36)) ** 3,
+    "cm^3": 1000000,
+    "m^3": 1.0,
+    "L": 1.0,
+    "mL": 1000000,
+    "in^3": (100 / 2.54) ** 3,
+    "ft^3": (100 / (2.54 * 12)) ** 3,
+    "yd^3": (100 / (2.54 * 36)) ** 3,
   },
   weight: {
-    mg: 1000000,
-    g: 1000,
-    kg: 1,
-    t: 0.001,
-    lb: 1 / 0.45359237,
-    oz: 1 / 0.028349523125,
+    "mg": 1000000,
+    "g": 1000,
+    "kg": 1,
+    "t": 0.001,
+    "lb": 1 / 0.45359237,
+    "oz": 1 / 0.028349523125,
   },
   time: {
-    ms: 1000,
-    s: 1,
-    min: 1 / 60,
-    h: 1 / 3600,
-    d: 1 / 86400,
+    "ms": 1000,
+    "s": 1,
+    "min": 1 / 60,
+    "h": 1 / 3600,
+    "d": 1 / 86400,
+    "wk": 1 / 604800,
   },
   temperature: {
-    "°C": 1,
-    "°F": 33.8,
-    K: 274.15,
+    "C": 1,
+    "F": 33.8,
+    "K": 274.15,
   },
   angle: {
-    "°": 1,
-    rad: Math.PI / 180,
-    gon: 10 / 9,
-    rev: 1 / 360,
-    "'": 60,
-    '"': 3600,
+    "deg": 1,
+    "rad": Math.PI / 180,
+    "rev": 1 / 360,
   },
 };
+
+// Merge the three maps (unit lists, displays, and factors) into a single lookup
+export const unitsByDimension: Record<
+  string,
+  Record<string, { name: string; shortName: string; factor?: number }>
+> = {};
+
+// Collect all dimension keys present in any of the maps
+const allDimensions = new Set<string>([
+  ...Object.keys(dimensionUnitsMap),
+  ...Object.keys(dimensionUnitDisplayMap),
+  ...Object.keys(dimensonUnitFactorsMap),
+]);
+
+for (const dim of allDimensions) {
+  const units: Record<string, { name: string; shortName: string; factor?: number }> = {};
+
+  const list = dimensionUnitsMap[dim] ?? [];
+  const display = dimensionUnitDisplayMap[dim] ?? {};
+  const factors = dimensonUnitFactorsMap[dim] ?? {};
+
+  // Start from the ordered list when present
+  for (const u of list) {
+    const displayVal = display[u];
+    units[u] = {
+      name: typeof displayVal === "string" ? displayVal : String(u),
+      shortName: u,
+      factor: Object.prototype.hasOwnProperty.call(factors, u) ? factors[u] : undefined,
+    };
+  }
+
+  // Include any units mentioned in display map but not in list
+  for (const [u, info] of Object.entries(display)) {
+    if (!units[u]) {
+      const name = typeof info === "string" ? info : String(u);
+      units[u] = { name, shortName: u, factor: Object.prototype.hasOwnProperty.call(factors, u) ? factors[u] : undefined };
+    }
+  }
+
+  // Include any units present in factors but not yet added
+  for (const [u, f] of Object.entries(factors)) {
+    if (!units[u]) {
+      units[u] = { name: String(u), shortName: String(u), factor: f };
+    }
+  }
+
+  unitsByDimension[dim] = units;
+}

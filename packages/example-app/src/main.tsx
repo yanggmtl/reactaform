@@ -34,9 +34,9 @@ const exampleDefinition = {
       "type": "unit",
       "name": "unitValue",
       "displayName": "unitValue",
-      "dimension": "angle",
+      "dimension": "temperature",
       "defaultValue": 30,
-      "defaultUnit": "deg"
+      "defaultUnit": "C"
     },
     {
       "type": "multi-selection",

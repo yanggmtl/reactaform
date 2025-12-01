@@ -9,7 +9,7 @@ export default defineConfig({
       entry: path.resolve(__dirname, "src/package/index.ts"),
       name: "ReactaForm",
       // produce ES, UMD and CommonJS bundles
-      formats: ["es", "umd", "cjs"],
+      formats: ["es", "cjs"],
       fileName: (format) => `reactaform.${format}.js`
     },
     outDir: "dist",
@@ -21,16 +21,6 @@ export default defineConfig({
           // ES module
           format: 'es',
           entryFileNames: 'reactaform.es.js',
-          globals: {
-            react: 'React',
-            'react-dom': 'ReactDOM'
-          }
-        },
-        {
-          // UMD
-          format: 'umd',
-          name: 'ReactaForm',
-          entryFileNames: 'reactaform.umd.js',
           globals: {
             react: 'React',
             'react-dom': 'ReactDOM'

@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
-import DateTimeInput, { type DateTimeField } from '../../../package/components/fields/DateTimeInput';
+import DateTimeInput from '../../../package/components/fields/DateTimeInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('DateTimeInput', () => {
   it('renders date and time inputs with label', () => {
-    const field = createMockField<DateTimeField>({ displayName: 'Appointment' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Appointment' });
     const { container } = renderWithProvider(<DateTimeInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByText(field.displayName)).toBeInTheDocument();
@@ -16,7 +17,7 @@ describe('DateTimeInput', () => {
   });
 
   it('displays initial value split into date and time', () => {
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="2024-03-15T14:30" />
     );
@@ -30,7 +31,7 @@ describe('DateTimeInput', () => {
 
   it('calls onChange when date is changed', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -45,7 +46,7 @@ describe('DateTimeInput', () => {
 
   it('calls onChange when time is changed', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="2024-01-01T" onChange={onChange} />
     );
@@ -60,7 +61,7 @@ describe('DateTimeInput', () => {
 
   it('combines date and time into ISO format', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -77,7 +78,7 @@ describe('DateTimeInput', () => {
   });
 
   it('validates required field', async () => {
-    const field = createMockField<DateTimeField>({ displayName: 'Required DateTime', required: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Required DateTime', required: true });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" />
     );
@@ -92,7 +93,7 @@ describe('DateTimeInput', () => {
 
   it('validates min datetime constraint', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime', min: '2024-01-01T09:00' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime', min: '2024-01-01T09:00' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -109,7 +110,7 @@ describe('DateTimeInput', () => {
 
   it('validates max datetime constraint', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime', max: '2024-12-31T17:00' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime', max: '2024-12-31T17:00' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -126,7 +127,7 @@ describe('DateTimeInput', () => {
 
   it('accepts valid datetime within min/max range', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime', min: '2024-01-01T00:00', max: '2024-12-31T23:59' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime', min: '2024-01-01T00:00', max: '2024-12-31T23:59' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -144,7 +145,7 @@ describe('DateTimeInput', () => {
 
   it('handles date only with trailing T', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -157,7 +158,7 @@ describe('DateTimeInput', () => {
   });
 
   it('defaults time to 00:00 when value has date only', () => {
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime' });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="2024-03-15" />
     );
@@ -168,7 +169,7 @@ describe('DateTimeInput', () => {
   });
 
   it('sets aria-invalid on inputs when error exists', async () => {
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime', required: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime', required: true });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" />
     );
@@ -181,7 +182,7 @@ describe('DateTimeInput', () => {
   });
 
   it('displays tooltip when provided', () => {
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime', tooltip: 'Select date and time' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime', tooltip: 'Select date and time' });
     renderWithProvider(<DateTimeInput {...baseFieldProps} field={field} value="" />);
 
     const icons = screen.getAllByTestId('tooltip-icon');
@@ -190,7 +191,7 @@ describe('DateTimeInput', () => {
 
   it('handles empty value for optional field', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DateTimeField>({ displayName: 'Optional DateTime', required: false });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Optional DateTime', required: false });
     const { container } = renderWithProvider(
       <DateTimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -205,7 +206,7 @@ describe('DateTimeInput', () => {
   });
 
   it('time input has step attribute for seconds', () => {
-    const field = createMockField<DateTimeField>({ displayName: 'DateTime' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'DateTime' });
     const { container } = renderWithProvider(<DateTimeInput {...baseFieldProps} field={field} value="" />);
 
     const timeInput = container.querySelector('input[type="time"]')!;

@@ -6,11 +6,7 @@ import type {
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 
-export type CheckboxField = DefinitionPropertyField & {
-  defaultValue?: boolean;
-};
-
-type CheckboxInputProps = BaseInputProps<boolean, CheckboxField>;
+type CheckboxInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
 
 /**
  * CheckboxInput

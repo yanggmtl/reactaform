@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import TextInput, { type TextField } from '../../../package/components/fields/TextInput';
+import TextInput from '../../../package/components/fields/TextInput';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 
 describe('TextInput', () => {
   const user = userEvent.setup();
@@ -11,7 +12,7 @@ describe('TextInput', () => {
   });
 
   it('renders with basic props', () => {
-    const field = createMockField<TextField>({ name: 'text', type: 'string' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'text', type: 'string' });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" />
     );
@@ -22,7 +23,7 @@ describe('TextInput', () => {
   });
 
   it('displays initial value', () => {
-    const field = createMockField<TextField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByDisplayValue } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="initial value" />
     );
@@ -32,7 +33,7 @@ describe('TextInput', () => {
 
   it('calls onChange when user types', async () => {
     const onChange = vi.fn();
-    const field = createMockField<TextField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -45,7 +46,7 @@ describe('TextInput', () => {
 
   it('shows error for required field when empty', async () => {
     const onError = vi.fn();
-    const field = createMockField<TextField>({ required: true });
+    const field = createMockField<DefinitionPropertyField>({ required: true });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" onError={onError} />
     );
@@ -60,7 +61,7 @@ describe('TextInput', () => {
 
   it('respects maxLength validation', async () => {
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ maxLength: 5 });
+    const field = createMockField<DefinitionPropertyField>({ maxLength: 5 });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -72,7 +73,7 @@ describe('TextInput', () => {
   });
 
   it('is disabled when field.disabled is true', () => {
-    const field = createMockField<TextField>({ disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ disabled: true });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" />
     );
@@ -81,7 +82,7 @@ describe('TextInput', () => {
   });
 
   it('handles tooltip display when tooltip is provided', () => {
-    const field = createMockField<TextField>({ tooltip: 'This is a tooltip' });
+    const field = createMockField<DefinitionPropertyField>({ tooltip: 'This is a tooltip' });
     const { getByTestId } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" />
     );
@@ -92,7 +93,7 @@ describe('TextInput', () => {
   });
 
   it('renders with expected CSS classes', () => {
-    const field = createMockField<TextField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" />
     );

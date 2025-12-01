@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import ImageDisplay, { type ImageField } from '../../../package/components/fields/ImageDisplay';
+import ImageDisplay from '../../../package/components/fields/ImageDisplay';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 
 describe('ImageDisplay', () => {
   it('renders image with label', () => {
-    const field = createMockField<ImageField>({ displayName: 'Logo', defaultValue: 'logo.png' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Logo', defaultValue: 'logo.png' });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="logo.png" />);
 
     expect(screen.getByText(field.displayName)).toBeInTheDocument();
@@ -13,7 +14,7 @@ describe('ImageDisplay', () => {
   });
 
   it('displays image from value', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: '' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: '' });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.jpg" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -21,7 +22,7 @@ describe('ImageDisplay', () => {
   });
 
   it('displays image from defaultValue when value is empty', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'default.png' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'default.png' });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -30,7 +31,7 @@ describe('ImageDisplay', () => {
   });
 
   it('does not render when no image URL is provided', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: '' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: '' });
     const { container } = renderWithProvider(
       <ImageDisplay {...baseFieldProps} field={field} value="" />
     );
@@ -45,7 +46,7 @@ describe('ImageDisplay', () => {
   });
 
   it('sets width and height when both are provided', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'test.png', width: 200, height: 150 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'test.png', width: 200, height: 150 });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.png" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -54,7 +55,7 @@ describe('ImageDisplay', () => {
   });
 
   it('sets width when only width is provided', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'test.png', width: 300 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'test.png', width: 300 });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.png" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -62,7 +63,7 @@ describe('ImageDisplay', () => {
   });
 
   it('sets height when only height is provided', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'test.png', height: 200 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'test.png', height: 200 });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.png" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -70,7 +71,7 @@ describe('ImageDisplay', () => {
   });
 
   it('renders without dimensions when neither width nor height provided', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'test.png' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'test.png' });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.png" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -79,37 +80,34 @@ describe('ImageDisplay', () => {
   });
 
   it('aligns image to center by default', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'test.png' });
-    const { container } = renderWithProvider(
-      <ImageDisplay {...baseFieldProps} field={field} value="test.png" />
-    );
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'test.png' });
+    renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.png" />);
 
-    const wrapper = container.querySelector('div[style*="justify-content"]');
+    const wrapper = screen.getByTestId('image-wrapper');
     expect(wrapper).toBeInTheDocument();
+    expect(wrapper).toHaveStyle('justify-content: center');
   });
 
   it('aligns image to left when specified', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'test.png', alignment: 'left' });
-    const { container } = renderWithProvider(
-      <ImageDisplay {...baseFieldProps} field={field} value="test.png" />
-    );
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'test.png', alignment: 'left' });
+    renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.png" />);
 
-    const wrapper = container.querySelector('div[style*="justify-content"]');
+    const wrapper = screen.getByTestId('image-wrapper');
     expect(wrapper).toBeInTheDocument();
+    expect(wrapper).toHaveStyle('justify-content: flex-start');
   });
 
   it('aligns image to right when specified', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'test.png', alignment: 'right' });
-    const { container } = renderWithProvider(
-      <ImageDisplay {...baseFieldProps} field={field} value="test.png" />
-    );
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'test.png', alignment: 'right' });
+    renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="test.png" />);
 
-    const wrapper = container.querySelector('div[style*="justify-content"]');
+    const wrapper = screen.getByTestId('image-wrapper');
     expect(wrapper).toBeInTheDocument();
+    expect(wrapper).toHaveStyle('justify-content: flex-end');
   });
 
   it('prepends BASE_URL to relative paths', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: 'images/logo.png' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: 'images/logo.png' });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="images/logo.png" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -118,7 +116,7 @@ describe('ImageDisplay', () => {
   });
 
   it('does not modify absolute paths', () => {
-    const field = createMockField<ImageField>({ displayName: 'Image', defaultValue: '/absolute/path.png' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Image', defaultValue: '/absolute/path.png' });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="/absolute/path.png" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
@@ -126,7 +124,7 @@ describe('ImageDisplay', () => {
   });
 
   it('uses displayName for alt text', () => {
-    const field = createMockField<ImageField>({ displayName: 'Company Logo', defaultValue: 'logo.png' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Company Logo', defaultValue: 'logo.png' });
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="logo.png" />);
 
     expect(screen.getByAltText(field.displayName)).toBeInTheDocument();

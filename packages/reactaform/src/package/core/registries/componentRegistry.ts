@@ -60,13 +60,13 @@ export function registerComponent(type: string, component: ComponentType): void 
   }
 
   type WrappedProps = {
-    field?: Partial<DefinitionPropertyField> & { debounceMs?: number };
+    field?: Partial<DefinitionPropertyField>;
     onChange?: ((...args: unknown[]) => void) | undefined;
   } & Record<string, unknown>;
 
   const Wrapped: ComponentType = (props: WrappedProps) => {
-    // Allow per-field override via `field.debounceMs`; default to 200ms.
-    const wait = (props.field?.debounceMs as number) ?? 200;
+    // Default debounce to 200ms
+    const wait = 200;
     const { callback: debouncedOnChange, cancel } = useDebouncedCallback(
       (...args: unknown[]) => {
         const onChange = props.onChange;

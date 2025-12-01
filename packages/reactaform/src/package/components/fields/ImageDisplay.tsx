@@ -6,15 +6,7 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 
-export type ImageField = DefinitionPropertyField & {
-  alignment?: "left" | "center" | "right";
-  defaultValue?: string;
-  width?: number;
-  height?: number;
-  localized?: string;
-};
-
-export type ImageProps = BaseInputProps<string, ImageField>;
+export type ImageProps = BaseInputProps<string, DefinitionPropertyField>;
 
 /**
  * ImageDisplay is a React component that renders an image with optional
@@ -40,15 +32,19 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
     right: "flex-end",
   };
 
-  // Determine base image URL from value or defaultValue
-  let baseUrl = typeof value === "string" ? value : field.defaultValue || "";
-  if (!baseUrl.startsWith("/")) {
+  // Determine base image URL from value or defaultValue.
+  // Treat an empty string `value` as absent so `defaultValue` can be used as a fallback.
+  const valueStr = typeof value === "string" ? value : "";
+  let baseUrl: string = valueStr && valueStr.trim() !== ""
+    ? valueStr
+    : (typeof field.defaultValue === "string" ? field.defaultValue : "");
+  if (baseUrl && !baseUrl.startsWith("/")) {
     baseUrl = `${import.meta.env.BASE_URL}${baseUrl}`;
   }
   const langs = field.localized?.split(";").map((v) => v.trim());
 
-  const [imageUrl, setImageUrl] = useState<string>(baseUrl);
-  const lastUrlRef = useRef<string | null>(baseUrl);
+  const [imageUrl, setImageUrl] = useState<string>(baseUrl || "");
+  const lastUrlRef = useRef<string | null>(baseUrl || null);
 
   /**
    * Try to resolve a localized version of the image
@@ -141,6 +137,7 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
   return (
     <StandardFieldLayout field={field}>
       <div
+        data-testid="image-wrapper"
         style={{
           display: "flex",
           justifyContent: alignmentMap[alignment] || "center",

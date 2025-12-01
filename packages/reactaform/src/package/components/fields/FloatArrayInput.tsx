@@ -1,27 +1,13 @@
 // components/FloatArrayInput.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
-import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
-import type { BaseInputProps } from "../../core/reactaFormTypes";
+import type { DefinitionPropertyField, BaseInputProps } from "../../core/reactaFormTypes";
 import { validateFieldValue } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
-// Base field type for float arrays
-export interface FloatArrayField extends DefinitionPropertyField {
-  minCount?: number;
-  maxCount?: number;
-  min?: number;
-  max?: number;
-  minInclusive?: boolean;
-  maxInclusive?: boolean;
-}
-
 // Props for the generic number array input
-export type FloatArrayInputProps = BaseInputProps<
-  string | number[],
-  FloatArrayField
->;
+export type FloatArrayInputProps = BaseInputProps<string | number[], DefinitionPropertyField>;
 
 const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
 function isValidFloatArray(input: string) {
@@ -135,9 +121,7 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   };
 
   const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<FloatArrayInputProps["onError"] | undefined>(
-    onError
-  );
+  const onErrorRef = useRef<FloatArrayInputProps["onError"] | undefined>(onError);
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);

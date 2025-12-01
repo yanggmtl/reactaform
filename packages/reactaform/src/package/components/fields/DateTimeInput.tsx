@@ -8,14 +8,7 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
-// Define field shape
-export type DateTimeField = DefinitionPropertyField & {
-  // min/max expected as ISO date-time strings or date-only strings (YYYY-MM-DD)
-  min?: string;
-  max?: string;
-};
-
-export type DateTimeInputProps = BaseInputProps<string, DateTimeField>;
+export type DateTimeInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 const DateTimeInput: React.FC<DateTimeInputProps> = ({
   field,
@@ -48,13 +41,13 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
       if (/^\d{4}-\d{2}-\d{2}T$/.test(isoValue)) return null;
       const parsed = parseToDate(isoValue);
       if (!parsed) return t("Invalid date/time");
-      if (field.min) {
+      if (field.min && typeof field.min === 'string') {
         const minParsed = parseToDate(field.min);
         if (minParsed && parsed.getTime() < minParsed.getTime()) {
           return t("Date/time must be on or after {{1}}", field.min);
         }
       }
-      if (field.max) {
+      if (field.max && typeof field.max === 'string') {
         const maxParsed = parseToDate(field.max);
         if (maxParsed && parsed.getTime() > maxParsed.getTime()) {
           return t("Date/time must be on or before {{1}}", field.max);

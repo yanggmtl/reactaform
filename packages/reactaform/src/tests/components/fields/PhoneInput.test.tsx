@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import PhoneInput, { type PhoneInputField } from '../../../package/components/fields/PhoneInput';
+import PhoneInput from '../../../package/components/fields/PhoneInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('PhoneInput', () => {
   it('renders input with label', () => {
-    const field = createMockField<PhoneInputField>({ label: 'Phone Number' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Phone Number' });
     renderWithProvider(<PhoneInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
@@ -14,7 +15,7 @@ describe('PhoneInput', () => {
   });
 
   it('renders as tel input type', () => {
-    const field = createMockField<PhoneInputField>({ label: 'Phone' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Phone' });
     renderWithProvider(<PhoneInput {...baseFieldProps} field={field} value="" />);
 
     const input = screen.getByRole('textbox');
@@ -22,7 +23,7 @@ describe('PhoneInput', () => {
   });
 
   it('displays initial value', () => {
-    const field = createMockField<PhoneInputField>({ label: 'Phone' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Phone' });
     const value = '+1234567890';
     renderWithProvider(<PhoneInput {...baseFieldProps} field={field} value={value} />);
 
@@ -33,7 +34,7 @@ describe('PhoneInput', () => {
   it('calls onChange when user types', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<PhoneInputField>({ label: 'Phone' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Phone' });
     renderWithProvider(
       <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -48,7 +49,7 @@ describe('PhoneInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<PhoneInputField>({ label: 'Required Phone', required: true });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Required Phone', required: true });
     renderWithProvider(
       <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -64,7 +65,7 @@ describe('PhoneInput', () => {
   it('validates pattern constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<PhoneInputField>({ 
+    const field = createMockField<DefinitionPropertyField>({ 
       label: 'Phone', 
       pattern: '^\\+?[1-9]\\d{1,14}$' // E.164 format
     });
@@ -83,7 +84,7 @@ describe('PhoneInput', () => {
   it('accepts valid phone matching pattern', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<PhoneInputField>({ 
+    const field = createMockField<DefinitionPropertyField>({ 
       label: 'Phone', 
       pattern: '^\\+?[1-9]\\d{1,14}$'
     });
@@ -102,7 +103,7 @@ describe('PhoneInput', () => {
   it('trims whitespace in validation', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<PhoneInputField>({ 
+    const field = createMockField<DefinitionPropertyField>({ 
       label: 'Phone', 
       pattern: '^\\d{10}$'
     });
@@ -119,7 +120,7 @@ describe('PhoneInput', () => {
   });
 
   it('disables input when disabled prop is true', () => {
-    const field = createMockField<PhoneInputField>({ label: 'Disabled Phone', disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled Phone', disabled: true });
     renderWithProvider(<PhoneInput {...baseFieldProps} field={field} value="+123456" />);
 
     const input = screen.getByRole('textbox');
@@ -129,7 +130,7 @@ describe('PhoneInput', () => {
   it('does not call onChange when disabled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<PhoneInputField>({ label: 'Disabled', disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled', disabled: true });
     renderWithProvider(
       <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -141,7 +142,7 @@ describe('PhoneInput', () => {
   });
 
   it('displays tooltip when provided', () => {
-    const field = createMockField<PhoneInputField>({ label: 'Phone', tooltip: 'Enter your phone number' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Phone', tooltip: 'Enter your phone number' });
     renderWithProvider(<PhoneInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByTestId('tooltip-icon')).toBeInTheDocument();
@@ -150,7 +151,7 @@ describe('PhoneInput', () => {
   it('handles empty value correctly', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<PhoneInputField>({ label: 'Optional Phone', required: false });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Optional Phone', required: false });
     renderWithProvider(
       <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );

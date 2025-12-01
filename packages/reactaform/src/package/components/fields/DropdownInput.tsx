@@ -13,8 +13,6 @@ export type DropdownInputProps = BaseInputProps<
   DefinitionPropertyField
 >;
 
-export type DropdownField = DefinitionPropertyField;
-
 /**
  * DropdownInput
  *

@@ -7,10 +7,10 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
 
-type OptionType = { value: string; label: string };
-export type OptionField = DefinitionPropertyField & { options: OptionType[] };
-
-type MultiSelectionProps = BaseInputProps<string[] | null, OptionField>;
+type MultiSelectionProps = BaseInputProps<
+  string[] | null,
+  DefinitionPropertyField & { options: NonNullable<DefinitionPropertyField['options']> }
+>;
 
 // ---------------------------
 // MULTISELECT COMPONENT
@@ -169,7 +169,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
 // ---------------------------
 interface PopupProps {
   position: { x: number; y: number };
-  options: OptionType[];
+  options: NonNullable<DefinitionPropertyField['options']>;
   selectedValues: string[];
   onToggleOption: (v: string) => void;
   onClose: () => void;

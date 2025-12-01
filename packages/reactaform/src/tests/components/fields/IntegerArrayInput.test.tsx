@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import IntegerArrayInput, { type IntegerArrayField } from '../../../package/components/fields/IntegerArrayInput';
+import IntegerArrayInput from '../../../package/components/fields/IntegerArrayInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 
 describe('IntegerArrayInput', () => {
   it('renders text input with label', () => {
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [] });
     renderWithProvider(<IntegerArrayInput {...baseFieldProps} field={field} value={[]} />);
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
@@ -14,7 +15,7 @@ describe('IntegerArrayInput', () => {
   });
 
   it('displays initial array value as comma-separated string', () => {
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [1, 2, 3] });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [1, 2, 3] });
     renderWithProvider(<IntegerArrayInput {...baseFieldProps} field={field} value={[1, 2, 3]} />);
 
     const input = screen.getByRole('textbox') as HTMLInputElement;
@@ -24,7 +25,7 @@ describe('IntegerArrayInput', () => {
   it('calls onChange when user types', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [] });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -38,7 +39,7 @@ describe('IntegerArrayInput', () => {
   it('validates integer format', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [] });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -53,7 +54,7 @@ describe('IntegerArrayInput', () => {
   it('rejects decimal values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [] });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -68,7 +69,7 @@ describe('IntegerArrayInput', () => {
   it('rejects non-numeric values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ label: 'Numbers', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Numbers', defaultValue: [] });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -82,7 +83,7 @@ describe('IntegerArrayInput', () => {
 
   it('validates required field', async () => {
     const onError = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Required Numbers', defaultValue: [], required: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Required Numbers', defaultValue: [], required: true });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onError={onError} />
     );
@@ -96,7 +97,7 @@ describe('IntegerArrayInput', () => {
   it('validates minCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [], minCount: 3 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [], minCount: 3 });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -111,7 +112,7 @@ describe('IntegerArrayInput', () => {
   it('validates maxCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [], maxCount: 3 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [], maxCount: 3 });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -126,7 +127,7 @@ describe('IntegerArrayInput', () => {
   it('validates min value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [], min: 5 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [], min: 5 });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -141,7 +142,7 @@ describe('IntegerArrayInput', () => {
   it('validates max value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [], max: 10 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [], max: 10 });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -156,7 +157,7 @@ describe('IntegerArrayInput', () => {
   it('accepts valid array within constraints', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [], min: 1, max: 100, minCount: 2, maxCount: 5 });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [], min: 1, max: 100, minCount: 2, maxCount: 5 });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -171,7 +172,7 @@ describe('IntegerArrayInput', () => {
   it('handles negative integers', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [] });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -184,7 +185,7 @@ describe('IntegerArrayInput', () => {
   });
 
   it('disables input when disabled prop is true', () => {
-    const field = createMockField<IntegerArrayField>({ displayName: 'Disabled', defaultValue: [], disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled', defaultValue: [], disabled: true });
     renderWithProvider(<IntegerArrayInput {...baseFieldProps} field={field} value={[]} />);
 
     const input = screen.getByRole('textbox');
@@ -194,7 +195,7 @@ describe('IntegerArrayInput', () => {
   it('does not call onChange when disabled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<IntegerArrayField>({ displayName: 'Disabled', defaultValue: [], disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled', defaultValue: [], disabled: true });
     renderWithProvider(
       <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -207,7 +208,7 @@ describe('IntegerArrayInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<IntegerArrayField>({ displayName: 'Numbers', defaultValue: [], tooltip: 'Enter comma-separated integers' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [], tooltip: 'Enter comma-separated integers' });
     renderWithProvider(<IntegerArrayInput {...baseFieldProps} field={field} value={[]} />);
     const icons = screen.getAllByTestId('tooltip-icon');
     expect(icons.length).toBeGreaterThan(0);

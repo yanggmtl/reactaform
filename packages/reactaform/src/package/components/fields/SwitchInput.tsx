@@ -5,7 +5,6 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 
-export type SwitchField = DefinitionPropertyField;
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 

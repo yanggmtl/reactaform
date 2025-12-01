@@ -24,18 +24,59 @@ export interface DefinitionPropertyField {
   displayName: string;
   type: string; // 'string' | 'number' | 'boolean' | etc.
   defaultValue: FieldValueType;
-  defaultUnit?: string; // for 'unit' type fields
   required?: boolean;
-  options?: Array<{ label: string; value: string }>;
   parents?: ParentField;
   children?: Record<string, string[]>;
   group?: string;
   tooltip?: string;
-  unit?: string; 
-  validationHandlerName?: string;
   readOnly?: boolean;
   disabled?: boolean;
   labelLayout?: 'row' | 'column-left' | 'column-center'; // Optional label layout: 'row' (default), 'column-left' (label left-aligned), or 'column-center' (label center-aligned)
+
+  // Custom validation handler name
+  validationHandlerName?: string;
+
+  // Unit field properties
+  dimension?: string; // for 'unit' type fields, e.g. 'length', 'angle', etc.
+  defaultUnit?: string; // for 'unit' type fields
+
+  // Enum/select field properties
+  options?: Array<{ label: string; value: string }>;
+
+  // Text/String field properties
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  placeholder?: string;
+  
+  // Numeric field properties
+  min?: number;
+  max?: number;
+  minInclusive?: boolean;
+  maxInclusive?: boolean;
+  step?: number;
+
+  // Array/collection properties
+  minCount?: number;
+  maxCount?: number;
+  
+  // Date/Time field properties
+  minDate?: string;
+  maxDate?: string;
+  
+  // Layout properties
+  layout?: 'horizontal' | 'vertical' | 'row' | 'column';
+  alignment?: 'left' | 'center' | 'right';
+  
+  // Image/Display properties
+  width?: number;
+  height?: number;
+  localized?: string;
+  minHeight?: string; // For textarea minimum height
+  
+  // File input properties
+  accept?: string; // e.g. "image/*,.pdf"
+  multiple?: boolean;
 }
 
 export interface ReactaDefinition {

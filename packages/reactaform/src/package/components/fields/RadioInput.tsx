@@ -7,11 +7,7 @@ import type {
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 
-export type RadioField = DefinitionPropertyField & {
-  layout?: "horizontal" | "vertical";
-};
-
-export type RadioInputProps = BaseInputProps<string, RadioField>;
+export type RadioInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 /**
  * RadioInput

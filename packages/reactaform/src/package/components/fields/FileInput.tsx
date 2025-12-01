@@ -1,22 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
-import type {
-  BaseInputProps,
-  DefinitionPropertyField,
-} from "../../core/reactaFormTypes";
+import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import { validateFieldValue } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import PopupOptionMenu from "../PopupOptionMenu";
 import type { PopupOption, PopupOptionMenuPosition } from "../PopupOptionMenu";
 import { CSS_CLASSES } from "../../utils/cssClasses";
 
-export interface FileField extends DefinitionPropertyField {
-  accept?: string; // e.g. "image/*,.pdf"
-  multiple?: boolean;
-}
-
-export type FileInputProps = BaseInputProps<File | File[] | null, FileField>;
+export type FileInputProps = BaseInputProps<File | File[] | null, DefinitionPropertyField>;
 
 const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
   const { t, definitionName } = useReactaFormContext();

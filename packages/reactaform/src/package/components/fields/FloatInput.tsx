@@ -26,15 +26,7 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
  * - Supports tooltip display for additional field information.
  * - Integrates with Reacta form context for localization and styling.
  */
-export interface FloatField extends DefinitionPropertyField {
-  defaultValue: number;
-  min?: number;
-  minInclusive?: boolean;
-  max?: number;
-  maxInclusive?: boolean;
-}
-
-export type FloatInputProps = BaseInputProps<string | number, FloatField>;
+export type FloatInputProps = BaseInputProps<string | number, DefinitionPropertyField>;
 
 // Regex to validate floating-point input (optional leading +/-, digits, optional decimal, optional exponent)
 const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;

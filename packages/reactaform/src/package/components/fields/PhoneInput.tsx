@@ -7,11 +7,7 @@ import { validateFieldValue } from "../../core/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
-export interface PhoneInputField extends DefinitionPropertyField {
-  pattern?: string;
-}
-
-export type PhoneInputProps = BaseInputProps<string, PhoneInputField>;
+export type PhoneInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 export const PhoneInput: React.FC<PhoneInputProps> = ({
   field,

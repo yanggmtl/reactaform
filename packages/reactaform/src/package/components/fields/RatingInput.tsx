@@ -23,13 +23,7 @@ import { StandardFieldLayout } from "../LayoutComponents";
 
 // lib/baseTypes.ts or similar
 
-export interface RatingField extends DefinitionPropertyField {
-  type: "rating";
-  max?: number; // default 5
-  icon?: string; // optional custom icon
-}
-
-export type RatingInputProps = BaseInputProps<number, RatingField>;
+export type RatingInputProps = BaseInputProps<number, DefinitionPropertyField>;
 
 const RatingInput: React.FC<RatingInputProps> = ({
   field,
@@ -89,10 +83,8 @@ const RatingInput: React.FC<RatingInputProps> = ({
     <StandardFieldLayout field={field} error={validate(ratingValue)}>
       <div style={ratingWrapperStyle}>
         {(() => {
-          const iconChar =
-            field.icon && String(field.icon).trim()
-              ? String(field.icon)
-              : "★";
+          const iconProp = (field as DefinitionPropertyField & { icon?: string }).icon;
+          const iconChar = iconProp && String(iconProp).trim() ? String(iconProp) : "★";
           return [...Array(max)].map((_, i) => {
             const isActive = i < ratingValue;
             const isHover = hoverIndex !== null && i <= hoverIndex;

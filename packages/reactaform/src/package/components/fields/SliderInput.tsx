@@ -1,16 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
-import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
-import type { BaseInputProps } from "../../core/reactaFormTypes";
+import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
-
-// Extend field type with min/max
-export type SliderField = DefinitionPropertyField & {
-  min: number;
-  max: number;
-};
 
 /**
  * SliderInput component
@@ -23,14 +16,14 @@ export type SliderField = DefinitionPropertyField & {
  * - Integration with ReactaForm context (for styling, translation, and validation)
  *
  * Props:
- * - field: SliderField (extends DefinitionPropertyField)
+ * - field: DefinitionPropertyField
  *   - Required: min, max
  *   - Optional: tooltip
  * - value: current numeric value
  * - onChange: callback triggered with new value and optional error string
  */
 
-type SliderInputProps = BaseInputProps<string | number, SliderField>;
+type SliderInputProps = BaseInputProps<string | number, DefinitionPropertyField>;
 
 const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
 function isValidFloat(input: string) {
@@ -62,11 +55,11 @@ const SliderInput: React.FC<SliderInputProps> = ({
       }
 
       const numValue = Number(input);
-      if (numValue < field.min) {
+      if (typeof field.min === 'number' && numValue < field.min) {
         return t("Value should be at least {{1}}", field.min);
       }
 
-      if (numValue > field.max) {
+      if (typeof field.max === 'number' && numValue > field.max) {
         return t("Value should be at most {{1}}", field.max);
       }
 

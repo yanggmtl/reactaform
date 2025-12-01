@@ -2,17 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-
-// Concrete field type for DateInput — includes optional min/max date strings
-export type DateField = DefinitionPropertyField & {
-  minDate?: string;
-  maxDate?: string;
-};
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
-type DateInputProps = BaseInputProps<string, DateField>;
+type DateInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 /**
  * Safely parse a date string into a Date object.

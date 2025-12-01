@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import SliderInput, { type SliderField } from '../../../package/components/fields/SliderInput';
+import SliderInput from '../../../package/components/fields/SliderInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 
 describe('SliderInput', () => {
   it('renders slider and text input with label', () => {
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Volume', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Volume', min: 0, max: 100 });
     const { container } = renderWithProvider(<SliderInput {...baseFieldProps} field={field} value={50} />);
 
     const slider = container.querySelector('input[type="range"]');
@@ -18,7 +19,7 @@ describe('SliderInput', () => {
   });
 
   it('displays initial value in both inputs', () => {
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Level', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Level', min: 0, max: 100 });
     const { container } = renderWithProvider(<SliderInput {...baseFieldProps} field={field} value={75} />);
 
     const slider = container.querySelector('input[type="range"]') as HTMLInputElement;
@@ -30,7 +31,7 @@ describe('SliderInput', () => {
 
   it('calls onChange when slider is moved', async () => {
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -44,7 +45,7 @@ describe('SliderInput', () => {
   it('calls onChange when text input is changed', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -61,7 +62,7 @@ describe('SliderInput', () => {
   it('validates min constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 10, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 10, max: 100 });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -77,7 +78,7 @@ describe('SliderInput', () => {
   it('validates max constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -93,7 +94,7 @@ describe('SliderInput', () => {
   it('accepts valid value within min/max range', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -110,7 +111,7 @@ describe('SliderInput', () => {
   it('accepts decimal values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -127,7 +128,7 @@ describe('SliderInput', () => {
   it('validates invalid number format', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -143,7 +144,7 @@ describe('SliderInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Required Value', min: 0, max: 100, required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Required Value', min: 0, max: 100, required: true });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -156,7 +157,7 @@ describe('SliderInput', () => {
   });
 
   it('sets min and max attributes on slider', () => {
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 10, max: 90 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 10, max: 90 });
     const { container } = renderWithProvider(<SliderInput {...baseFieldProps} field={field} value={50} />);
 
     const slider = container.querySelector('input[type="range"]');
@@ -165,7 +166,7 @@ describe('SliderInput', () => {
   });
 
   it('disables both inputs when disabled prop is true', () => {
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Disabled', min: 0, max: 100, disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Disabled', min: 0, max: 100, disabled: true });
     const { container } = renderWithProvider(<SliderInput {...baseFieldProps} field={field} value={50} />);
 
     const slider = container.querySelector('input[type="range"]');
@@ -178,7 +179,7 @@ describe('SliderInput', () => {
   it('does not call onChange when disabled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Disabled', min: 0, max: 100, disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Disabled', min: 0, max: 100, disabled: true });
     const { container } = renderWithProvider(
       <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
     );
@@ -191,7 +192,7 @@ describe('SliderInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<SliderField>({ type: 'slider', label: 'Value', min: 0, max: 100, tooltip: 'Adjust the value' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100, tooltip: 'Adjust the value' });
     renderWithProvider(<SliderInput {...baseFieldProps} field={field} value={50} />);
 
     expect(screen.getByTestId('tooltip-icon')).toBeInTheDocument();

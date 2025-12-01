@@ -7,13 +7,7 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
-export type TimeField = DefinitionPropertyField & {
-  Min?: string; // e.g. "08:00"
-  Max?: string; // e.g. "17:00"
-  // tooltip may already be on DefinitionPropertyField
-};
-
-type TimeInputProps = BaseInputProps<string, TimeField>;
+type TimeInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 const TimeInput: React.FC<TimeInputProps> = ({
   field,
@@ -30,7 +24,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
 
   const validate = React.useCallback((val: string): string | null => {
     if (!val || val.trim() === "") {
-      return (field.required ||field.Min || field.Max) ? t("Value required") : null;
+      return (field.required || field.min || field.max) ? t("Value required") : null;
     }
     // Time comparison: treat as HH:MM or HH:MM:SS; compare lexicographically when zero-padded
     const toSeconds = (s: string) => {
@@ -51,15 +45,15 @@ const TimeInput: React.FC<TimeInputProps> = ({
 
     const sec = toSeconds(val);
     if (Number.isNaN(sec)) return t("Invalid time format");
-    if (field.Min) {
-      const minSec = toSeconds(field.Min);
+    if (field.min && typeof field.min === 'string') {
+      const minSec = toSeconds(field.min);
       if (!Number.isNaN(minSec) && sec < minSec)
-        return t("Time must be on or after {{1}}", field.Min);
+        return t("Time must be on or after {{1}}", field.min);
     }
-    if (field.Max) {
-      const maxSec = toSeconds(field.Max);
+    if (field.max && typeof field.max === 'string') {
+      const maxSec = toSeconds(field.max);
       if (!Number.isNaN(maxSec) && sec > maxSec)
-        return t("Time must be on or before {{1}}", field.Max);
+        return t("Time must be on or before {{1}}", field.max);
     }
     const err = validateFieldValue(definitionName, field, val, t);
     return err ?? null;
@@ -87,8 +81,8 @@ const TimeInput: React.FC<TimeInputProps> = ({
         value={value}
         step={1}
         onChange={handleChange}
-        min={field.Min}
-        max={field.Max}
+        min={typeof field.min === 'string' ? field.min : undefined}
+        max={typeof field.max === 'string' ? field.max : undefined}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
       />
     </StandardFieldLayout>

@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import UrlInput, { type UrlField } from '../../../package/components/fields/UrlInput';
+import UrlInput from '../../../package/components/fields/UrlInput';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 
 describe('UrlInput', () => {
   it('renders input with label', () => {
-    const field = createMockField<UrlField>({ type: 'url', label: 'Website URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Website URL' });
     renderWithProvider(<UrlInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
@@ -14,7 +15,7 @@ describe('UrlInput', () => {
   });
 
   it('renders as url input type', () => {
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     renderWithProvider(<UrlInput {...baseFieldProps} field={field} value="" />);
 
     const input = screen.getByRole('textbox');
@@ -22,7 +23,7 @@ describe('UrlInput', () => {
   });
 
   it('displays placeholder', () => {
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     renderWithProvider(<UrlInput {...baseFieldProps} field={field} value="" />);
 
     const input = screen.getByRole('textbox');
@@ -30,7 +31,7 @@ describe('UrlInput', () => {
   });
 
   it('displays initial value', () => {
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     const value = 'https://example.com';
     renderWithProvider(<UrlInput {...baseFieldProps} field={field} value={value} />);
 
@@ -41,7 +42,7 @@ describe('UrlInput', () => {
   it('calls onChange when user types', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -57,7 +58,7 @@ describe('UrlInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ type: 'url', label: 'Required URL', required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Required URL', required: true });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -75,7 +76,7 @@ describe('UrlInput', () => {
   it('validates URL format', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -91,7 +92,7 @@ describe('UrlInput', () => {
   it('accepts valid HTTP URL', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -107,7 +108,7 @@ describe('UrlInput', () => {
   it('accepts valid HTTPS URL', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -123,7 +124,7 @@ describe('UrlInput', () => {
   it('accepts FTP URL', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'URL' });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -139,7 +140,7 @@ describe('UrlInput', () => {
   it('trims whitespace in validation', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ label: 'URL' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'URL' });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -153,7 +154,7 @@ describe('UrlInput', () => {
   });
 
   it('disables input when disabled prop is true', () => {
-    const field = createMockField<UrlField>({ type: 'url', label: 'Disabled URL', disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Disabled URL', disabled: true });
     renderWithProvider(<UrlInput {...baseFieldProps} field={field} value="https://test.com" />);
 
     const input = screen.getByRole('textbox');
@@ -163,7 +164,7 @@ describe('UrlInput', () => {
   it('does not call onChange when disabled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ type: 'url', label: 'Disabled', disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Disabled', disabled: true });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -175,7 +176,7 @@ describe('UrlInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<UrlField>({ type: 'url', label: 'URL', tooltip: 'Enter a valid website URL' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL', tooltip: 'Enter a valid website URL' });
     renderWithProvider(<UrlInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByTestId('tooltip-icon')).toBeInTheDocument();
@@ -184,7 +185,7 @@ describe('UrlInput', () => {
   it('handles empty value for optional field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<UrlField>({ type: 'url', label: 'Optional URL', required: false });
+    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Optional URL', required: false });
     renderWithProvider(
       <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );

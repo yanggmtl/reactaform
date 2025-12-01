@@ -22,11 +22,7 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
  * - Validates using a robust URL regex and `URL` constructor fallback.
  * - Supports tooltip, localization, and inline validation errors.
  */
-export interface UrlField extends DefinitionPropertyField {
-  defaultValue: string;
-}
-
-export type UrlInputProps = BaseInputProps<string, UrlField>;
+export type UrlInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 // Simple URL validation (accepts http(s), ftp, file, etc.)
 const urlRegex =

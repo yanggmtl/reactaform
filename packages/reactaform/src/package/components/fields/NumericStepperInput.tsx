@@ -8,17 +8,7 @@ import { validateFieldValue } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES } from "../../utils/cssClasses";
 
-export interface NumericStepperField extends DefinitionPropertyField {
-  defaultValue: number;
-  min?: number; // will default to 0
-  max?: number; // will default to 100
-  step?: number; // will default to 1
-}
-
-export type NumericStepperInputProps = BaseInputProps<
-  number,
-  NumericStepperField
->;
+export type NumericStepperInputProps = BaseInputProps<number, DefinitionPropertyField>;
 
 const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   field,

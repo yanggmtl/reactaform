@@ -8,20 +8,8 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 // Base field type for number arrays
-export interface IntegerArrayField extends DefinitionPropertyField {
-  minCount?: number;
-  maxCount?: number;
-  min?: number;
-  max?: number;
-  minInclusive?: boolean;
-  maxInclusive?: boolean;
-}
-
 // Props for the generic number array input
-export type IntegerArrayInputProps = BaseInputProps<
-  string | number[],
-  IntegerArrayField
->;
+export type IntegerArrayInputProps = BaseInputProps<string | number[], DefinitionPropertyField>;
 
 function isValidIntegerArray(input: string) {
   const integerRegex = /^-?\d+$/;

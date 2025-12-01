@@ -1,17 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import type { ChangeEvent } from "react";
-import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
-import type { BaseInputProps } from "../../core/reactaFormTypes";
+import type { DefinitionPropertyField, BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
 import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
-export interface EmailInputField extends DefinitionPropertyField {
-  pattern?: string;
-}
-
-export type EmailInputProps = BaseInputProps<string, EmailInputField>;
+export type EmailInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

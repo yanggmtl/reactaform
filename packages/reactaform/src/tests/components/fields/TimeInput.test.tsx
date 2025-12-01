@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import TimeInput, { type TimeField } from '../../../package/components/fields/TimeInput';
+import TimeInput from '../../../package/components/fields/TimeInput';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 
 describe('TimeInput', () => {
   it('renders time input with label', () => {
-    const field = createMockField<TimeField>({ label: 'Meeting Time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Meeting Time' });
     const { container } = renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="" />);
 
     const timeInput = container.querySelector('input[type="time"]');
@@ -15,7 +16,7 @@ describe('TimeInput', () => {
   });
 
   it('renders as time input type', () => {
-    const field = createMockField<TimeField>({ label: 'Time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time' });
     const { container } = renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="" />);
 
     const input = container.querySelector('input[type="time"]');
@@ -23,7 +24,7 @@ describe('TimeInput', () => {
   });
 
   it('displays initial value in HH:MM format', () => {
-    const field = createMockField<TimeField>({ label: 'Time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time' });
     const { container } = renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="14:30" />);
 
     const input = container.querySelector('input[type="time"]') as HTMLInputElement;
@@ -32,7 +33,7 @@ describe('TimeInput', () => {
 
   it('calls onChange when user selects a time', async () => {
     const onChange = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Time', defaultValue: '' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', defaultValue: '' });
     const { container } = renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -47,7 +48,7 @@ describe('TimeInput', () => {
 
   it('validates Min time constraint', async () => {
     const onChange = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Time', defaultValue: '', Min: '09:00' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', defaultValue: '', min: '09:00' });
     const { container } = renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="10:00" onChange={onChange} />
     );
@@ -60,10 +61,10 @@ describe('TimeInput', () => {
     expect(lastCall[1]).toBeTruthy(); // error for Min
   });
 
-  it('validates Max time constraint', async () => {
+  it('validates max time constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Time', Max: '17:00' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', max: '17:00' });
     const { container } = renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -78,7 +79,7 @@ describe('TimeInput', () => {
 
   it('accepts valid time within Min/Max range', async () => {
     const onChange = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Time', defaultValue: '', Min: '09:00', Max: '17:00' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', defaultValue: '', min: '09:00', max: '17:00' });
     const { container } = renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="10:00" onChange={onChange} />
     );
@@ -92,7 +93,7 @@ describe('TimeInput', () => {
   });
 
   it('sets min attribute when Min is provided', () => {
-    const field = createMockField<TimeField>({ label: 'Time', Min: '09:00' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', min: '09:00' });
     const { container } = renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="" />);
 
     const input = container.querySelector('input[type="time"]');
@@ -100,7 +101,7 @@ describe('TimeInput', () => {
   });
 
   it('sets max attribute when Max is provided', () => {
-    const field = createMockField<TimeField>({ label: 'Time', Max: '17:00' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', max: '17:00' });
     const { container } = renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="" />);
 
     const input = container.querySelector('input[type="time"]');
@@ -108,7 +109,7 @@ describe('TimeInput', () => {
   });
 
   it('includes seconds in step attribute', () => {
-    const field = createMockField<TimeField>({ label: 'Time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time' });
     const { container } = renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="" />);
 
     const input = container.querySelector('input[type="time"]');
@@ -116,7 +117,7 @@ describe('TimeInput', () => {
   });
 
   it('handles HH:MM:SS format with seconds', () => {
-    const field = createMockField<TimeField>({ label: 'Time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time' });
     const { container } = renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="14:30:45" />);
 
     const input = container.querySelector('input[type="time"]') as HTMLInputElement;
@@ -126,7 +127,7 @@ describe('TimeInput', () => {
   it('validates empty value when Min/Max are set', async () => {
     const onChange = vi.fn();
     const onError = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Time', Min: '09:00' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', min: '09:00' });
     renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
@@ -137,7 +138,7 @@ describe('TimeInput', () => {
 
   it('allows empty value when no Min/Max constraints', () => {
     const onError = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Optional Time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Optional Time' });
     renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="" onError={onError} />
     );
@@ -147,7 +148,7 @@ describe('TimeInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<TimeField>({ label: 'Time', tooltip: 'Select meeting time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', tooltip: 'Select meeting time' });
     renderWithProvider(<TimeInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByTestId('tooltip-icon')).toBeInTheDocument();
@@ -156,7 +157,7 @@ describe('TimeInput', () => {
   it('handles midnight time (00:00)', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Time' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time' });
     const { container } = renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -171,7 +172,7 @@ describe('TimeInput', () => {
 
   it('handles end of day time (23:59)', async () => {
     const onChange = vi.fn();
-    const field = createMockField<TimeField>({ label: 'Time', defaultValue: '' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Time', defaultValue: '' });
     const { container } = renderWithProvider(
       <TimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );

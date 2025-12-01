@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import RadioInput, { type RadioField } from '../../../package/components/fields/RadioInput';
+import RadioInput from '../../../package/components/fields/RadioInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 
 describe('RadioInput', () => {
   const mockOptions = [
@@ -12,7 +13,7 @@ describe('RadioInput', () => {
   ];
 
   it('renders radio buttons with label', () => {
-    const field = createMockField<RadioField>({ displayName: 'Choose One', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Choose One', options: mockOptions });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="a" />);
 
     expect(screen.getByText('Choose One')).toBeInTheDocument();
@@ -22,7 +23,7 @@ describe('RadioInput', () => {
   });
 
   it('displays all radio options', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="a" />);
 
     const radios = screen.getAllByRole('radio');
@@ -30,7 +31,7 @@ describe('RadioInput', () => {
   });
 
   it('checks the initially selected value', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="b" />);
 
     const radioB = screen.getByRole('radio', { name: /option b/i }) as HTMLInputElement;
@@ -40,7 +41,7 @@ describe('RadioInput', () => {
   it('calls onChange when radio button is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="a" onChange={onChange} />
     );
@@ -53,7 +54,7 @@ describe('RadioInput', () => {
 
   it('validates required field with empty value', () => {
     const onChange = vi.fn();
-    const field = createMockField<RadioField>({ displayName: 'Required Radio', options: mockOptions, required: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Required Radio', options: mockOptions, required: true });
     renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -64,7 +65,7 @@ describe('RadioInput', () => {
 
   it('auto-corrects invalid value to first option', () => {
     const onChange = vi.fn();
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="invalid" onChange={onChange} />
     );
@@ -74,7 +75,7 @@ describe('RadioInput', () => {
   });
 
   it('renders vertical layout by default', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     const { container } = renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="a" />
     );
@@ -84,7 +85,7 @@ describe('RadioInput', () => {
   });
 
   it('renders horizontal layout when specified', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions, layout: 'horizontal' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions, layout: 'horizontal' });
     const { container } = renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="a" />
     );
@@ -94,7 +95,7 @@ describe('RadioInput', () => {
   });
 
   it('disables all radio buttons when disabled prop is true', () => {
-    const field = createMockField<RadioField>({ displayName: 'Disabled Radio', options: mockOptions, disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled Radio', options: mockOptions, disabled: true });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="a" />);
 
     const radios = screen.getAllByRole('radio');
@@ -106,7 +107,7 @@ describe('RadioInput', () => {
   it('does not call onChange when disabled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<RadioField>({ displayName: 'Disabled', options: mockOptions, disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled', options: mockOptions, disabled: true });
     renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="a" onChange={onChange} />
     );
@@ -119,7 +120,7 @@ describe('RadioInput', () => {
   });
 
   it('handles empty options array', () => {
-    const field = createMockField<RadioField>({ displayName: 'Empty Radio', options: [] });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Empty Radio', options: [] });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="" />);
 
     const radios = screen.queryAllByRole('radio');
@@ -127,7 +128,7 @@ describe('RadioInput', () => {
   });
 
   it('groups radios with same name attribute', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', name: 'choice', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', name: 'choice', options: mockOptions });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="a" />);
 
     const radios = screen.getAllByRole('radio') as HTMLInputElement[];
@@ -144,7 +145,7 @@ describe('RadioInput', () => {
       { label: 'Two', value: '2' },
       { label: 'Three', value: '3' },
     ];
-    const field = createMockField<RadioField>({ displayName: 'Numbers', options: numericOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', options: numericOptions });
     renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="1" onChange={onChange} />
     );
@@ -158,7 +159,7 @@ describe('RadioInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions, tooltip: 'Select one option' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions, tooltip: 'Select one option' });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="a" />);
 
     const icons = screen.queryAllByTestId('tooltip-icon');
@@ -166,7 +167,7 @@ describe('RadioInput', () => {
   });
 
   it('maintains selection across re-renders', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     const { rerender } = renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="b" />
     );
@@ -181,7 +182,7 @@ describe('RadioInput', () => {
   });
 
   it('updates when value prop changes', () => {
-    const field = createMockField<RadioField>({ displayName: 'Radio', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     const { rerender } = renderWithProvider(
       <RadioInput {...baseFieldProps} field={field} value="a" />
     );

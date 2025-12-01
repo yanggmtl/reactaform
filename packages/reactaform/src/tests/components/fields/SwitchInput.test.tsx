@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import SwitchInput, { type SwitchField } from '../../../package/components/fields/SwitchInput';
+import SwitchInput from '../../../package/components/fields/SwitchInput';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('SwitchInput', () => {
   const user = userEvent.setup();
@@ -11,7 +12,7 @@ describe('SwitchInput', () => {
   });
 
   it('renders with switch role/appearance', () => {
-    const field = createMockField<SwitchField>({ name: 'switch', type: 'boolean' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'switch', type: 'boolean' });
     const { container } = renderWithProvider(
       <SwitchInput {...baseFieldProps} field={field} value={false} />
     );
@@ -22,7 +23,7 @@ describe('SwitchInput', () => {
   });
 
   it('shows active state when value is true', () => {
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={true} {...baseFieldProps} />
     );
@@ -32,7 +33,7 @@ describe('SwitchInput', () => {
   });
 
   it('shows inactive state when value is false', () => {
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={false} {...baseFieldProps} />
     );
@@ -43,7 +44,7 @@ describe('SwitchInput', () => {
 
   it('calls onChange when clicked', async () => {
     const onChange = vi.fn();
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={false} onChange={onChange} {...baseFieldProps} />
     );
@@ -56,7 +57,7 @@ describe('SwitchInput', () => {
 
   it('toggles from on to off', async () => {
     const onChange = vi.fn();
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={true} onChange={onChange} {...baseFieldProps} />
     );
@@ -69,7 +70,7 @@ describe('SwitchInput', () => {
 
   it('shows error for required field when false', async () => {
     const onError = vi.fn();
-    const field = createMockField<SwitchField>({ required: true });
+    const field = createMockField<DefinitionPropertyField>({ required: true });
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={false} onError={onError} {...baseFieldProps} />
     );
@@ -83,7 +84,7 @@ describe('SwitchInput', () => {
   });
 
   it('is disabled when disabled prop is true', () => {
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={false} disabled={true} {...baseFieldProps} />
     );
@@ -93,7 +94,7 @@ describe('SwitchInput', () => {
   });
 
   it('has proper accessibility attributes', () => {
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={false} {...baseFieldProps} />
     );
@@ -103,7 +104,7 @@ describe('SwitchInput', () => {
   });
 
   it('updates aria-checked when value changes', () => {
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container, rerender } = renderWithProvider(
       <SwitchInput field={field} value={false} {...baseFieldProps} />
     );
@@ -121,7 +122,7 @@ describe('SwitchInput', () => {
 
   it('handles keyboard interaction', async () => {
     const onChange = vi.fn();
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByTestId } = renderWithProvider(
       <SwitchInput field={field} value={false} onChange={onChange} {...baseFieldProps} />
     );
@@ -134,7 +135,7 @@ describe('SwitchInput', () => {
   });
 
   it('shows tooltip when configured', () => {
-    const field = createMockField<SwitchField>({ tooltip: 'This is a switch tooltip' });
+    const field = createMockField<DefinitionPropertyField>({ tooltip: 'This is a switch tooltip' });
     const { getByTestId } = renderWithProvider(
       <SwitchInput field={field} value={false} {...baseFieldProps} />
     );
@@ -143,7 +144,7 @@ describe('SwitchInput', () => {
   });
 
   it('handles undefined/null values as false', () => {
-    const field = createMockField<SwitchField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
       <SwitchInput field={field} value={false} {...baseFieldProps} />
     );

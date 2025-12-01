@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import EmailInput, { type EmailInputField } from '../../../package/components/fields/EmailInput';
+import EmailInput from '../../../package/components/fields/EmailInput';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('EmailInput', () => {
   const user = userEvent.setup();
@@ -11,7 +12,7 @@ describe('EmailInput', () => {
   });
 
   it('renders with email input type', () => {
-    const field = createMockField<EmailInputField>({ name: 'email', type: 'email' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'email', type: 'email' });
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" />
     );
@@ -23,7 +24,7 @@ describe('EmailInput', () => {
 
   it('validates email format on blur', async () => {
     const onChange = vi.fn();
-    const field = createMockField<EmailInputField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -41,7 +42,7 @@ describe('EmailInput', () => {
   it('accepts valid email addresses', async () => {
     const onChange = vi.fn();
     const onError = vi.fn();
-    const field = createMockField<EmailInputField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
@@ -56,7 +57,7 @@ describe('EmailInput', () => {
 
   it('shows error for required field when empty', async () => {
     const onError = vi.fn();
-    const field = createMockField<EmailInputField>({ required: true });
+    const field = createMockField<DefinitionPropertyField>({ required: true });
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" onError={onError} />
     );
@@ -71,7 +72,7 @@ describe('EmailInput', () => {
 
   it('handles edge case email formats', async () => {
     const onChange = vi.fn();
-    const field = createMockField<EmailInputField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByLabelText } = renderWithProvider(
       <EmailInput field={field} value="" onChange={onChange} {...baseFieldProps} />
     );
@@ -104,7 +105,7 @@ describe('EmailInput', () => {
   });
 
   it('is disabled when field.disabled is true', () => {
-    const field = createMockField<EmailInputField>({ disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ disabled: true });
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" />
     );
@@ -113,7 +114,7 @@ describe('EmailInput', () => {
   });
 
   it('handles tooltip display when tooltip is provided', () => {
-    const field = createMockField<EmailInputField>({ tooltip: 'Enter a valid email address' });
+    const field = createMockField<DefinitionPropertyField>({ tooltip: 'Enter a valid email address' });
     const { getByTestId } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" />
     );

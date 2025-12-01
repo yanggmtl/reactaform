@@ -8,14 +8,7 @@ import { validateFieldValue } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
-export interface SpinField extends DefinitionPropertyField {
-  defaultValue: number;
-  min?: number; // will default to 0
-  max?: number; // will default to 100
-  step?: number; // will default to 1
-}
-
-export type SpinInputProps = BaseInputProps<number, SpinField>;
+export type SpinInputProps = BaseInputProps<number, DefinitionPropertyField>;
 
 // add optional onError for sync error reporting
 
@@ -121,7 +114,7 @@ const SpinInput: React.FC<SpinInputProps> = ({
 
   const handleStepChange = (delta: number) => {
     const currentValue = isNaN(value)
-      ? Math.round(field.defaultValue ?? minVal)
+      ? Math.round(Number(field.defaultValue ?? minVal))
       : value;
     let newValue = currentValue + delta;
 

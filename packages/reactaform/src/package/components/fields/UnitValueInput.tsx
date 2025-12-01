@@ -35,17 +35,7 @@ type UnitFactors = {
   reverseLabels?: Record<string, string>;
 };
 
-export interface UnitValueField extends DefinitionPropertyField {
-  dimension: Dimension;
-  displayName: string;
-  validationHandlerName?: string;
-  required?: boolean;
-}
-
-type UnitValueInputProps = BaseInputProps<
-  [string | number, string],
-  UnitValueField
->;
+type UnitValueInputProps = BaseInputProps<[string | number, string], DefinitionPropertyField>;
 
 interface UnitOption extends PopupOption {
   label: string;
@@ -439,14 +429,13 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
 };
 
 function UnitValueInput({ field, value, onChange }: UnitValueInputProps) {
-  if (!field.dimension) {
-    return null;
-  }
-  if (!unitFactorsMap[field.dimension]) {
-    loadUnitFactorsMap(field.dimension);
+  const dimension = (field as DefinitionPropertyField & { dimension?: Dimension }).dimension;
+  if (!dimension) return null;
+  if (!unitFactorsMap[dimension]) {
+    loadUnitFactorsMap(dimension);
   }
 
-  const unitFactors = unitFactorsMap[field.dimension];
+  const unitFactors = unitFactorsMap[dimension];
   if (!unitFactors) {
     return null;
   }

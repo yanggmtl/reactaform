@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import IntegerInput, { type IntegerField } from '../../../package/components/fields/IntegerInput';
+import IntegerInput from '../../../package/components/fields/IntegerInput';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('IntegerInput', () => {
   const user = userEvent.setup();
@@ -11,7 +12,7 @@ describe('IntegerInput', () => {
   });
 
   it('renders with number input type', () => {
-    const field = createMockField<IntegerField>({ name: 'number', type: 'number' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'number', type: 'number' });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} />
     );
@@ -23,7 +24,7 @@ describe('IntegerInput', () => {
   });
 
   it('displays initial numeric value', () => {
-    const field = createMockField<IntegerField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByDisplayValue } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={42} />
     );
@@ -33,7 +34,7 @@ describe('IntegerInput', () => {
 
   it('calls onChange with numeric value when user types', async () => {
     const onChange = vi.fn();
-    const field = createMockField<IntegerField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -47,7 +48,7 @@ describe('IntegerInput', () => {
 
   it('validates minimum value', async () => {
     const onError = vi.fn();
-    const field = createMockField<IntegerField>({ min: 10 });
+    const field = createMockField<DefinitionPropertyField>({ min: 10 });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onError={onError} />
     );
@@ -63,7 +64,7 @@ describe('IntegerInput', () => {
 
   it('validates maximum value', async () => {
     const onChange = vi.fn();
-    const field = createMockField<IntegerField>({ max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ max: 100 });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -81,7 +82,7 @@ describe('IntegerInput', () => {
 
   it('shows error for required field when empty', async () => {
     const onError = vi.fn();
-    const field = createMockField<IntegerField>({ required: true });
+    const field = createMockField<DefinitionPropertyField>({ required: true });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={''} onError={onError} />
     );
@@ -96,7 +97,7 @@ describe('IntegerInput', () => {
 
   it('handles decimal step values', async () => {
     const onChange = vi.fn();
-    const field = createMockField<IntegerField>({ step: 0.1 });
+    const field = createMockField<DefinitionPropertyField>({ step: 0.1 });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -112,7 +113,7 @@ describe('IntegerInput', () => {
 
   it('validates step increments', async () => {
     const onChange = vi.fn();
-    const field = createMockField<IntegerField>({ step: 5 });
+    const field = createMockField<DefinitionPropertyField>({ step: 5 });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -129,7 +130,7 @@ describe('IntegerInput', () => {
 
   it('rejects non-numeric input', async () => {
     const onChange = vi.fn();
-    const field = createMockField<IntegerField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -146,7 +147,7 @@ describe('IntegerInput', () => {
 
   it('is disabled when disabled prop is true', async () => {
     const onChange = vi.fn();
-    const field = createMockField<IntegerField>({ disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ disabled: true });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -158,7 +159,7 @@ describe('IntegerInput', () => {
   });
 
   it('shows placeholder text', () => {
-    const field = createMockField<IntegerField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={''} placeholder="Enter a number" />
     );
@@ -169,7 +170,7 @@ describe('IntegerInput', () => {
 
   it('handles edge cases for zero and negative numbers', async () => {
     const onChange = vi.fn();
-    const field = createMockField<IntegerField>({ min: -100, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ min: -100, max: 100 });
     const { getByRole } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -190,7 +191,7 @@ describe('IntegerInput', () => {
   });
 
   it('handles tooltip display', () => {
-    const field = createMockField<IntegerField>({ tooltip: 'Enter a numeric value' });
+    const field = createMockField<DefinitionPropertyField>({ tooltip: 'Enter a numeric value' });
     const { getByTestId } = renderWithProvider(
       <IntegerInput {...baseFieldProps} field={field} value={0} />
     );

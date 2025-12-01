@@ -9,14 +9,7 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 // ------------------ Types ------------------
 
-export type TextField = DefinitionPropertyField & {
-  minLength?: number;
-  maxLength?: number;
-  pattern?: string;
-  minHeight?: string;
-};
-
-type TextInputProps = BaseInputProps<string, TextField>;
+type TextInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 // ------------------ Component ------------------
 

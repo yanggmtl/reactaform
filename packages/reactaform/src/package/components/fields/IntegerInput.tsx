@@ -30,16 +30,7 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
  * - Displays error messages inline below the input.
  * - Supports tooltips for additional user guidance.
  */
-export interface IntegerField extends DefinitionPropertyField {
-  defaultValue: number;
-  min?: number;
-  minInclusive?: boolean;
-  max?: number;
-  maxInclusive?: boolean;
-  step?: number;
-}
-
-export type IntegerInputProps = BaseInputProps<string | number, IntegerField>;
+export type IntegerInputProps = BaseInputProps<string | number, DefinitionPropertyField>;
 
 function isValidInteger(input: string) {
   // Regex to validate integer input (optional leading + or -)

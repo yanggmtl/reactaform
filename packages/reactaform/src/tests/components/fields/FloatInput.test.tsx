@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import FloatInput, { type FloatField } from '../../../package/components/fields/FloatInput';
+import FloatInput from '../../../package/components/fields/FloatInput';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('FloatInput', () => {
   const user = userEvent.setup();
@@ -11,7 +12,7 @@ describe('FloatInput', () => {
   });
 
   it('renders with text input type', () => {
-    const field = createMockField<FloatField>({ name: 'float', type: 'number' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'number' });
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} />
     );
@@ -22,7 +23,7 @@ describe('FloatInput', () => {
   });
 
   it('displays initial float value', () => {
-    const field = createMockField<FloatField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByDisplayValue } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={3.14159} />
     );
@@ -32,7 +33,7 @@ describe('FloatInput', () => {
 
   it('calls onChange with value when user types', async () => {
     const onChange = vi.fn();
-    const field = createMockField<FloatField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -46,7 +47,7 @@ describe('FloatInput', () => {
 
   it('validates minimum value', async () => {
     const onChange = vi.fn();
-    const field = createMockField<FloatField>({ min: 10.5 });
+    const field = createMockField<DefinitionPropertyField>({ min: 10.5 });
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -63,7 +64,7 @@ describe('FloatInput', () => {
 
   it('validates maximum value', async () => {
     const onChange = vi.fn();
-    const field = createMockField<FloatField>({ max: 100.0 });
+    const field = createMockField<DefinitionPropertyField>({ max: 100.0 });
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -80,7 +81,7 @@ describe('FloatInput', () => {
 
   it('shows error for required field when empty', async () => {
     const onError = vi.fn();
-    const field = createMockField<FloatField>({ required: true });
+    const field = createMockField<DefinitionPropertyField>({ required: true });
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={''} onError={onError} />
     );
@@ -95,7 +96,7 @@ describe('FloatInput', () => {
 
   it('accepts scientific notation', async () => {
     const onChange = vi.fn();
-    const field = createMockField<FloatField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -110,7 +111,7 @@ describe('FloatInput', () => {
 
   it('rejects invalid float input', async () => {
     const onChange = vi.fn();
-    const field = createMockField<FloatField>();
+    const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -127,7 +128,7 @@ describe('FloatInput', () => {
 
   it('is disabled when disabled prop is true', async () => {
     const onChange = vi.fn();
-    const field = createMockField<FloatField>({ disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ disabled: true });
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -139,7 +140,7 @@ describe('FloatInput', () => {
 
   it('handles negative numbers', async () => {
     const onChange = vi.fn();
-    const field = createMockField<FloatField>({ min: -100, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ min: -100, max: 100 });
     const { getByRole } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -153,7 +154,7 @@ describe('FloatInput', () => {
   });
 
   it('handles tooltip display', () => {
-    const field = createMockField<FloatField>({ tooltip: 'Enter a decimal number' });
+    const field = createMockField<DefinitionPropertyField>({ tooltip: 'Enter a decimal number' });
     const { getByTestId } = renderWithProvider(
       <FloatInput {...baseFieldProps} field={field} value={0} />
     );

@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
-import DateInput, { type DateField } from '../../../package/components/fields/DateInput';
+import DateInput from '../../../package/components/fields/DateInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('DateInput', () => {
   it('renders date input with label', () => {
-    const field = createMockField<DateField>({ type: "date", displayName: 'Birth Date' });
+    const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Birth Date' });
     const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByText(field.displayName)).toBeInTheDocument();
@@ -14,7 +15,7 @@ describe('DateInput', () => {
   });
 
   it('displays initial value formatted for input', () => {
-    const field = createMockField<DateField>({ displayName: 'Date' });
+    const field = createMockField<DefinitionPropertyField>({ displayName: 'Date' });
     const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="2024-03-15" />);
 
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;
@@ -28,7 +29,7 @@ describe('DateInput', () => {
 
   it('calls onChange when date is changed', () => {
     const onChange = vi.fn();
-    const field = createMockField<DateField>({ type: "date", displayName: 'Date' });
+    const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Date' });
     const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onChange={onChange} />);
 
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;
@@ -43,7 +44,7 @@ describe('DateInput', () => {
 
   it('validates required field and sets aria-invalid / calls onError', () => {
     const onError = vi.fn();
-    const field = createMockField<DateField>({ type: "date", displayName: 'Required Date', required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Required Date', required: true });
     const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onError={onError} />);
 
     const input = container.querySelector('input[type="date"]')!;
@@ -53,7 +54,7 @@ describe('DateInput', () => {
 
   it('validates minDate constraint', () => {
     const onChange = vi.fn();
-    const field = createMockField<DateField>({ type: "date", displayName: 'Date', minDate: '2024-01-01' });
+    const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Date', minDate: '2024-01-01' });
     const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onChange={onChange} />);
 
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;
@@ -65,7 +66,7 @@ describe('DateInput', () => {
 
   it('validates maxDate constraint', () => {
     const onChange = vi.fn();
-    const field = createMockField<DateField>({ type: "date", displayName: 'Date', maxDate: '2024-12-31' });
+    const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Date', maxDate: '2024-12-31' });
     const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onChange={onChange} />);
 
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;

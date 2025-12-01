@@ -3,11 +3,11 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import MultilineTextInput from '../../../package/components/fields/MultilineTextInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
-import type { TextField } from '../../../package/components/fields/TextInput';
+import type { DefinitionPropertyField } from '../../../package/core/reactaFormTypes';
 
 describe('MultilineTextInput', () => {
   it('renders textarea with label', () => {
-    const field = createMockField<TextField>({ label: 'Comments' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Comments' });
     renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
@@ -15,7 +15,7 @@ describe('MultilineTextInput', () => {
   });
 
   it('displays initial value', () => {
-    const field = createMockField<TextField>({ label: 'Bio' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Bio' });
     const value = 'This is a\nmultiline text';
     renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value={value} />);
 
@@ -26,7 +26,7 @@ describe('MultilineTextInput', () => {
   it('calls onChange when user types', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ label: 'Description' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Description' });
     renderWithProvider(
       <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -41,7 +41,7 @@ describe('MultilineTextInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ label: 'Required Text', required: true });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Required Text', required: true });
     renderWithProvider(
       <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -57,7 +57,7 @@ describe('MultilineTextInput', () => {
   it('validates minLength constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ label: 'Text', minLength: 5 });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Text', minLength: 5 });
     renderWithProvider(
       <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -73,7 +73,7 @@ describe('MultilineTextInput', () => {
   it('validates maxLength constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ label: 'Text', maxLength: 5 });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Text', maxLength: 5 });
     renderWithProvider(
       <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -89,7 +89,7 @@ describe('MultilineTextInput', () => {
   it('accepts valid text within length constraints', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ label: 'Text', minLength: 3, maxLength: 10 });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Text', minLength: 3, maxLength: 10 });
     renderWithProvider(
       <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -103,7 +103,7 @@ describe('MultilineTextInput', () => {
   });
 
   it('disables textarea when disabled prop is true', () => {
-    const field = createMockField<TextField>({ label: 'Disabled Text', disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled Text', disabled: true });
     renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value="test" />);
 
     const textarea = screen.getByRole('textbox');
@@ -113,7 +113,7 @@ describe('MultilineTextInput', () => {
   it('does not call onChange when disabled', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ label: 'Disabled', disabled: true });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled', disabled: true });
     renderWithProvider(
       <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -125,7 +125,7 @@ describe('MultilineTextInput', () => {
   });
 
   it('applies minHeight style', () => {
-    const field = createMockField<TextField>({ label: 'Tall Text', minHeight: '200px' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Tall Text', minHeight: '200px' });
     renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value="" />);
 
     const textarea = screen.getByRole('textbox');
@@ -133,7 +133,7 @@ describe('MultilineTextInput', () => {
   });
 
   it('applies default minHeight when not specified', () => {
-    const field = createMockField<TextField>({ label: 'Default Text' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Default Text' });
     renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value="" />);
 
     const textarea = screen.getByRole('textbox');
@@ -141,7 +141,7 @@ describe('MultilineTextInput', () => {
   });
 
   it('displays tooltip when provided', () => {
-    const field = createMockField<TextField>({ label: 'Text', tooltip: 'Enter your comments here' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Text', tooltip: 'Enter your comments here' });
     renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value="" />);
 
     expect(screen.getByTestId('tooltip-icon')).toBeInTheDocument();
@@ -150,7 +150,7 @@ describe('MultilineTextInput', () => {
   it('handles multiline text correctly', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<TextField>({ label: 'Multiline' });
+    const field = createMockField<DefinitionPropertyField>({ label: 'Multiline' });
     renderWithProvider(
       <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );

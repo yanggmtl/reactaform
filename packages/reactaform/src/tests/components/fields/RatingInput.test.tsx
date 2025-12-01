@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import RatingInput, { type RatingField } from '../../../package/components/fields/RatingInput';
+import RatingInput from '../../../package/components/fields/RatingInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('RatingInput', () => {
   it('renders stars with label', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating' });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={0} />);
 
     expect(screen.getByText('Rating')).toBeInTheDocument();
@@ -16,7 +17,7 @@ describe('RatingInput', () => {
   });
 
   it('displays correct number of stars based on max', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 10 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 10 });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={0} />);
 
     expect(screen.getByLabelText('Rating 1')).toBeInTheDocument();
@@ -24,7 +25,7 @@ describe('RatingInput', () => {
   });
 
   it('defaults to 5 stars when max is not provided', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating' });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={0} />);
 
     expect(screen.getByLabelText('Rating 1')).toBeInTheDocument();
@@ -32,7 +33,7 @@ describe('RatingInput', () => {
   });
 
   it('displays initial rating value with active stars', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5 });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={3} />);
 
     const star3 = screen.getByLabelText('Rating 3');
@@ -42,7 +43,7 @@ describe('RatingInput', () => {
   it('changes rating when star is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5 });
     renderWithProvider(
       <RatingInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -56,7 +57,7 @@ describe('RatingInput', () => {
   it('updates rating when different star is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5 });
     renderWithProvider(
       <RatingInput {...baseFieldProps} field={field} value={3} onChange={onChange} />
     );
@@ -69,7 +70,7 @@ describe('RatingInput', () => {
 
   it('validates required field when value is 0', () => {
     const onChange = vi.fn();
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Required Rating', max: 5, required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Required Rating', max: 5, required: true });
     renderWithProvider(
       <RatingInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -82,7 +83,7 @@ describe('RatingInput', () => {
   it('accepts valid rating for required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Required Rating', max: 5, required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Required Rating', max: 5, required: true });
     renderWithProvider(
       <RatingInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -95,7 +96,7 @@ describe('RatingInput', () => {
   });
 
   it('clamps value to max if initial value exceeds max', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5 });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={10} />);
 
     // Should clamp to max internally
@@ -104,7 +105,7 @@ describe('RatingInput', () => {
   });
 
   it('clamps value to 0 if initial value is negative', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5 });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={-3} />);
 
     // Should clamp to 0 internally
@@ -114,7 +115,7 @@ describe('RatingInput', () => {
 
   it('shows hover state on mouse enter', async () => {
     const user = userEvent.setup();
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5 });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={2} />);
 
     const star4 = screen.getByLabelText('Rating 4');
@@ -125,7 +126,7 @@ describe('RatingInput', () => {
   });
 
   it('uses custom icon when provided', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5, icon: '❤' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5, icon: '❤' });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={3} />);
 
     // Custom icon should be used instead of default star
@@ -134,7 +135,7 @@ describe('RatingInput', () => {
   });
 
   it('uses default star icon when icon is not provided', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5 });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={3} />);
 
     const star1 = screen.getByLabelText('Rating 1');
@@ -142,7 +143,7 @@ describe('RatingInput', () => {
   });
 
   it('displays tooltip icon when tooltip is provided', () => {
-    const field = createMockField<RatingField>({ type: 'rating', label: 'Rating', max: 5, tooltip: 'Rate from 1 to 5' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'rating', label: 'Rating', max: 5, tooltip: 'Rate from 1 to 5' });
     renderWithProvider(<RatingInput {...baseFieldProps} field={field} value={0} />);
 
     expect(screen.getByTestId('tooltip-icon')).toBeInTheDocument();

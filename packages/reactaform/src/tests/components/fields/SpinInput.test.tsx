@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import SpinInput, { type SpinField } from '../../../package/components/fields/SpinInput';
+import SpinInput from '../../../package/components/fields/SpinInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
+import type { DefinitionPropertyField } from '../../../package';
 
 describe('SpinInput', () => {
   it('renders text input with increment/decrement buttons', () => {
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 5 });
     renderWithProvider(<SpinInput {...baseFieldProps} field={field} value={5} />);
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
@@ -17,7 +18,7 @@ describe('SpinInput', () => {
   });
 
   it('displays initial value', () => {
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Value', defaultValue: 10 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Value', defaultValue: 10 });
     renderWithProvider(<SpinInput {...baseFieldProps} field={field} value={10} />);
 
     const input = screen.getByRole('textbox') as HTMLInputElement;
@@ -27,7 +28,7 @@ describe('SpinInput', () => {
   it('calls onChange when user types', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Number', defaultValue: 0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Number', defaultValue: 0 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -44,7 +45,7 @@ describe('SpinInput', () => {
   it('increments value when up button is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 5 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={5} onChange={onChange} />
     );
@@ -59,7 +60,7 @@ describe('SpinInput', () => {
   it('decrements value when down button is clicked', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 5 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={5} onChange={onChange} />
     );
@@ -74,7 +75,7 @@ describe('SpinInput', () => {
   it('respects step value when incrementing', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 0, step: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 0, step: 5 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -89,7 +90,7 @@ describe('SpinInput', () => {
   it('respects step value when decrementing', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 10, step: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 10, step: 5 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
     );
@@ -104,7 +105,7 @@ describe('SpinInput', () => {
   it('validates min constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Number', defaultValue: 10, min: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Number', defaultValue: 10, min: 5 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
     );
@@ -120,7 +121,7 @@ describe('SpinInput', () => {
   it('validates max constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Number', defaultValue: 10, max: 20 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Number', defaultValue: 10, max: 20 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
     );
@@ -136,7 +137,7 @@ describe('SpinInput', () => {
   it('does not increment beyond max', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 10, max: 10 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 10, max: 10 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
     );
@@ -153,7 +154,7 @@ describe('SpinInput', () => {
   it('does not decrement below min', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 5, min: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 5, min: 5 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={5} onChange={onChange} />
     );
@@ -170,7 +171,7 @@ describe('SpinInput', () => {
   it('rejects decimal values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Integer', defaultValue: 0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Integer', defaultValue: 0 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -186,7 +187,7 @@ describe('SpinInput', () => {
   it('validates invalid input', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Number', defaultValue: 0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Number', defaultValue: 0 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -202,7 +203,7 @@ describe('SpinInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Required Number', defaultValue: 0, required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Required Number', defaultValue: 0, required: true });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -215,7 +216,7 @@ describe('SpinInput', () => {
   });
 
   it('renders input and buttons when rendered', () => {
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 10 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 10 });
     renderWithProvider(<SpinInput {...baseFieldProps} field={field} value={10} />);
 
     const input = screen.getByRole('textbox');
@@ -228,7 +229,7 @@ describe('SpinInput', () => {
   it('accepts negative integers when within min/max', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 0, min: -10, max: 10 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 0, min: -10, max: 10 });
     renderWithProvider(
       <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -244,7 +245,7 @@ describe('SpinInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<SpinField>({ type: 'spin', label: 'Counter', defaultValue: 0, tooltip: 'Use buttons or type' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Counter', defaultValue: 0, tooltip: 'Use buttons or type' });
     renderWithProvider(<SpinInput {...baseFieldProps} field={field} value={0} />);
 
     const tooltips = screen.getAllByTestId('tooltip-icon');

@@ -332,18 +332,18 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     width: "var(--reactaform-unit-btn-width, 2.5em)",
     height: "var(--reactaform-unit-btn-height, 2.5em)",
     padding: "var(--reactaform-unit-btn-padding, 0)",
-    border: "var(--reactaform-unit-btn-border, 1px solid #ccc)",
-    borderRadius: "var(--reactaform-unit-btn-radius, 0.25em)",
-    background: disableConversion
-      ? "var(--reactaform-unit-btn-bg-disabled, #f0f0f0)"
-      : "var(--reactaform-unit-btn-bg, #f8f9fa)",
-    color: "var(--reactaform-unit-btn-color, #333)",
-    cursor: disableConversion ? "not-allowed" : "pointer",
-    opacity: disableConversion ? 0.5 : 1,
+    border: "none",
+    borderRadius: "var(--reactaform-button-border-radius, var(--reactaform-border-radius, 0.25em))",
+    backgroundColor: disableConversion
+      ? "var(--reactaform-button-disabled-bg, #cccccc)"
+      : "var(--reactaform-button-bg, var(--reactaform-success-color))",
+    color: "var(--reactaform-button-text, #ffffff)",
+    cursor: disableConversion ? "var(--reactaform-button-disabled-cursor, not-allowed)" : "pointer",
+    opacity: disableConversion ? Number("var(--reactaform-button-disabled-opacity, 0.6)") : 1,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-  };
+  } as const;
 
   return (
   <StandardFieldLayout field={field} error={validate(propInputForValidation, propUnitForValidation)}>
@@ -383,7 +383,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
             aria-disabled={disableConversion}
             disabled={disableConversion}
             style={convertButtonStyle}
-            className={undefined}
+            className={CSS_CLASSES.button}
           >
             <span
               style={{

@@ -56,7 +56,8 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
           width: "1.2em",
           height: "1.2em",
           verticalAlign: "middle",
-          accentColor: darkMode ? "#10b981" : "#22c55e",
+          color: "#FFFFFF",
+          accentColor: "#0000FF",
           opacity: field.disabled ? 0.6 : undefined,
         }}
       />

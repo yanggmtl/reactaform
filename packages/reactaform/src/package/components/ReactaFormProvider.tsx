@@ -142,6 +142,7 @@ export const ReactaFormProvider = ({
   defaultLanguage = 'en',
   defaultDarkMode = false,
   defaultLocalizeName = '',
+  className = 'reactaform-container',
 }: ReactaFormProviderProps) => {
   const definitionName = defaultDefinitionName;
   const localizeName = defaultLocalizeName;
@@ -232,7 +233,7 @@ export const ReactaFormProvider = ({
     <ReactaFormContext.Provider value={contextValue}>
       <div
         data-reactaform-theme={darkMode ? 'dark' : 'light'}
-        className='reactaform-container'
+        className= {className}
       >
         {children}
       </div>

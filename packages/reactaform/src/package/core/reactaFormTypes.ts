@@ -153,6 +153,7 @@ export type ReactaFormProviderProps = {
   defaultLanguage?: string;
   defaultDarkMode?: boolean;
   defaultLocalizeName?: string;
+  className?: string;
 };
 
 // Translation cache types

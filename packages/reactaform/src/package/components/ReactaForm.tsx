@@ -71,9 +71,9 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
         defaultLanguage={inputLanguage}
         defaultDarkMode={inputDarkMode}
         defaultLocalizeName={definition.localization || ""}
+        className={className}
       >
         <ReactaFormRenderer
-          className={className}
           definition={definition}
           instance={instance?? {}}
         />

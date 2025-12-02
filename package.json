@@ -20,7 +20,7 @@
   "scripts": {
     "build": "npm -w reactaform run build:lib && npm run build:apps",
     "build:lib": "npm -w reactaform run build:lib",
-    "build:apps": "npm -w reactaform-example run build && npm -w reactaform-translation-app run build",
+    "build:apps": "node ./scripts/build-apps.js",
     "build:example": "npm --workspace=reactaform-example run build",
     "build:pack": "npm -w reactaform run build:lib && npm -w reactaform run pack:staging",
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",

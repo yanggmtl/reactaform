@@ -4,7 +4,6 @@ import type {
   BaseInputProps,
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 
 type CheckboxInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
 
@@ -18,7 +17,6 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   onChange,
   disabled: propDisabled,
 }) => {
-  const { darkMode } = useReactaFormContext();
   const isDisabled = field.disabled ?? propDisabled ?? false;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

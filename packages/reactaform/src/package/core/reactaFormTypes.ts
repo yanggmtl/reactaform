@@ -11,6 +11,7 @@ export type FieldValueType =
   | string
   | Integer[]
   | Float[]
+  | string[]
   | [number, string]
   | File
   | File[];

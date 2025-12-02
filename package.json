@@ -18,8 +18,9 @@
     "react-dom": "^19.2.0"
   },
   "scripts": {
-    "build": "npm -w reactaform run build:lib && npm --workspace=reactaform-example run build",
+    "build": "npm -w reactaform run build:lib && npm run build:apps",
     "build:lib": "npm -w reactaform run build:lib",
+    "build:apps": "npm -w reactaform-example run build && npm -w reactaform-translation-app run build",
     "build:example": "npm --workspace=reactaform-example run build",
     "build:pack": "npm -w reactaform run build:lib && npm -w reactaform run pack:staging",
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
@@ -32,7 +33,8 @@
     "pack:staging:all": "node ./scripts/clean-tgz.cjs && npm -w reactaform run build:lib && npm -w reactaform run pack:staging"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "packages/apps/*"
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.1",

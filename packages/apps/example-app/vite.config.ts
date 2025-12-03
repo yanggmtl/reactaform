@@ -9,7 +9,7 @@ export default defineConfig({
   // This lets the library code fetch `/locales/...` from the example dev server
   // without duplicating files into the example package.
   // Serve this app's own `public/` folder so app-specific static assets
-  // (including `vite.svg`) are available at `/` without relying on
+  // (including `reactaform.svg`) are available at `/` without relying on
   // the repo root public directory.
   publicDir: path.resolve(__dirname, 'public'),
   resolve: {

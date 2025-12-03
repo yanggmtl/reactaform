@@ -229,11 +229,15 @@ export const ReactaFormProvider = ({
     [definitionName, language, darkMode, fieldStyle, formStyle, t]
   );
 
+  // Only apply height: 100% if the user provided a height in their style prop
+  const wrapperStyle = stableDefaultStyle?.height ? { height: '100%' } : undefined;
+
   return (
     <ReactaFormContext.Provider value={contextValue}>
       <div
         data-reactaform-theme={darkMode ? 'dark' : 'light'}
         className= {className}
+        style={wrapperStyle}
       >
         {children}
       </div>

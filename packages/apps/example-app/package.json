@@ -1,19 +1,5 @@
 {
-  "name": "reactaform-example",
-  "version": "0.0.0",
+  "name": "reactaform-example-moved",
   "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "start": "vite preview"
-  },
-  "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "reactaform": "file:../../reactaform"
-  },
-  "devDependencies": {
-    "vite": "^7.2.4",
-    "@vitejs/plugin-react": "^5.1.1"
-  }
+  "description": "Placeholder package. Example app moved to submit-handler-app."
 }

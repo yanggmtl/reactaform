@@ -1,0 +1,97 @@
+// Submit Handler App: Custom Submit Handler Demo
+// This demo shows how to register a custom `FormSubmissionHandler`
+// with `registerSubmissionHandler`. The handler is defined (typed as
+// `FormSubmissionHandler`) and registered inside `React.useEffect` so the
+// example keeps the registration local to the app while following the
+// library interface. Use this app to test submission handler behavior.
+import React, { useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  ReactaForm,
+  registerSubmissionHandler,
+} from "reactaform";
+import type { FieldValueType, FormSubmissionHandler } from "reactaform";
+import "./style.css";
+
+const exampleDefinition = {
+  name: "submit_handler_app",
+  version: "1.0.0",
+  displayName: "Submit Handler Example",
+  // name of the registered submit handler to invoke on submit
+  submitHandlerName: "exampleSubmitHandler",
+  properties: [
+    {
+      name: "firstName",
+      displayName: "First Name",
+      type: "string",
+      defaultValue: "",
+    },
+    {
+      name: "age",
+      displayName: "Age",
+      type: "int",
+      defaultValue: 30,
+    },
+    {
+      name: "subscribe",
+      displayName: "Subscribe to newsletter",
+      type: "checkbox",
+      defaultValue: false,
+    },
+  ],
+};
+
+const predefinedInstance = {
+  "firstName": "John",
+  "age": 30,
+  "subscribe": false,
+}
+
+export default function App() {
+  const [instance, setInstance] = useState<Record<string, FieldValueType>>(predefinedInstance);
+  const [serialized, setSerialized] = useState<string>("");
+
+  // Register a submission handler that stores submitted values into the local `instance` state
+  React.useEffect(() => {
+    const handler: FormSubmissionHandler = (_definition, valuesMap, _t) => {
+      void _definition;
+      void _t;
+      setInstance(valuesMap as Record<string, FieldValueType>);
+      const serializedStr = JSON.stringify(valuesMap, null, 2);
+      setSerialized(serializedStr);
+      return undefined;
+    };
+
+    registerSubmissionHandler("exampleSubmitHandler", handler);
+    // no-op cleanup: handlers are registered globally in this simple demo
+  }, [setInstance, setSerialized]);
+
+  return (
+    <div className={`app`}>
+      <h2>Reactaform Submit Handler</h2>
+
+      <div style={{ display: "flex", gap: 16, height: "100%" }}>
+        <div style={{ flex: 1, height: "100%" }}>
+          <ReactaForm
+            definitionData={exampleDefinition}
+            instance={instance}
+            style={{ maxWidth: 640, height: "100%" }}
+          />
+        </div>
+
+        <div style={{ width: 320, height: "100%", display: "flex", flexDirection: "column" }}>
+          <div>
+            <strong>Instance (JSON)</strong>
+          </div>
+          <textarea
+            style={{ flex: 1, width: "100%", boxSizing: "border-box", fontFamily: "monospace" }}
+            value={serialized || JSON.stringify(instance, null, 2)}
+            onChange={(e) => setSerialized(e.target.value)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(<App />);

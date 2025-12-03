@@ -9,10 +9,9 @@ import { ReactaForm } from "reactaform";
 import "./style.css";
 
 const darkModeDefinition = {
-  name: "example-form",
+  name: "darkForm",
   version: "1.0.0",
-  displayName: "Example Form",
-  localization: "example-form",
+  displayName: "Dark Mode Form",
   properties: [
     {
       name: "firstName",

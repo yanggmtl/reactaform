@@ -72,7 +72,7 @@ const DateInput: React.FC<DateInputProps> = ({
    */
   const validate = React.useCallback((dateValue: string): string | null => {
     if (!dateValue || dateValue.trim() === "") {
-      return required ? t("Value is required") : null;
+      return required ? t("Value required") : null;
     }
 
     if (dateValue) {

@@ -1,90 +1,87 @@
+// Translation Example App
+// The `localization` property in the form definition (e.g. `example-form`)
+// is used to select a translation JSON file placed under this app's
+// `public/locales/<lang>/` folder. For example, with
+// `localization: "example-form"` and `language = "fr"`, the form will
+// load `/locales/fr/example-form.json` from the app's `public` folder.
+// This app demonstrates switching `language` at runtime; translation files
+// should be found at `public/locales/<lang>/<localization>.json`.
+// Translation: 
+//   DisplayName, tooltip content, and option labels are translated.
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ReactaForm, registerSubmissionHandler } from "reactaform";
-import type { FieldValueType } from "reactaform";
+import { ReactaForm } from "reactaform";
 import "./style.css";
 
-const exampleDefinition = {
-  name: "example-form",
-  version: "1.0.0",
-  displayName: "Example Form",
-  // name of the registered submit handler to invoke on submit
-  submitHandlerName: "exampleSubmitHandler",
-  localization: "example-form",
-  properties: [
+const translationDefinition = {
+  "name": "personalInformation",
+  "displayName": "Personal Information",
+  "version": "1.0.0",
+  "localization": "personal_information",
+  "properties": [
     {
-      name: "firstName",
-      displayName: "First Name",
-      type: "string",
-      defaultValue: "",
+      "type": "text",
+      "name": "name",
+      "displayName": "Name",
+      "defaultValue": "",
+      "required": true
     },
     {
-      name: "age",
-      displayName: "Age",
-      type: "int",
-      defaultValue: 30,
+      "type": "date",
+      "name": "birthday",
+      "displayName": "Birth Day",
+      "defaultValue": "",
+      "required": true
     },
     {
-      name: "subscribe",
-      displayName: "Subscribe to newsletter",
-      type: "checkbox",
-      defaultValue: false,
+      "type": "int",
+      "name": "age",
+      "displayName": "Age",
+      "defaultValue": 0,
+      "min": 0,
+      "minInclusive": true
     },
     {
-      type: "unit",
-      name: "unitValue",
-      displayName: "Temperature",
-      dimension: "temperature",
-      defaultValue: 30,
-      defaultUnit: "C",
-    },
-    {
-      type: "multi-selection",
-      name: "multipleSelection",
-      displayName: "Multiple Selection",
-      options: [
-        { label: "Option 1", value: "1" },
-        { label: "Option 2", value: "2" },
-        { label: "Option 3", value: "3" },
-        { label: "Option 4", value: "4" },
-        { label: "Option 5", value: "5" },
+      "type": "dropdown",
+      "name": "gender",
+      "displayName": "Gender",
+      "options": [
+        {
+          "label": "Male",
+          "value": "male"
+        },
+        {
+          "label": "Female",
+          "value": "female"
+        }
       ],
-      defaultValue: ["2"],
+      "defaultValue": "male"
     },
-  ],
-};
-
-const predefined_instance: Record<string, FieldValueType> = {
-  firstName: "Guang",
-  age: 30,
-  subscribe: false,
-  unitValue: [30, "F"],
-  multipleSelection: ["2", "1"] as unknown as FieldValueType,
+    {
+      "type": "text",
+      "name": "email",
+      "displayName": "Email",
+      "defaultValue": ""
+    },
+    {
+      "type": "multiline",
+      "name": "introduction",
+      "displayName": "Introduction",
+      "defaultValue": "",
+      "tooltip": "Summarize your educational background and professional experience",
+      "labelLayout": "column-left" // row, column-left, column-center
+    }
+  ]
 };
 
 export default function App() {
   const [language, setLanguage] = useState("en");
-  const [instance, setInstance] =
-    useState<Record<string, FieldValueType>>(predefined_instance);
-
-  // Register a submission handler that stores submitted values into the local `instance` state
-  React.useEffect(() => {
-    registerSubmissionHandler(
-      "translationSubmitHandler",
-      (definition, valuesMap) => {
-        setInstance(valuesMap as Record<string, FieldValueType>);
-        const serializedStr = JSON.stringify(valuesMap, null, 2);
-        alert(serializedStr);
-        return undefined;
-      }
-    );
-  }, []);
 
   return (
-    <div className={`app`} style={{ width: "400px" }}>
+    <div className={`app`}>
       <h2>Reactaform Translation Example</h2>
 
-      <div className="language_panel">
+      <div style={{marginBottom: "10px" }}>
         <label>
           Language: {" "}
           <select
@@ -97,16 +94,17 @@ export default function App() {
           </select>
         </label>
       </div>
-      <div style={{ gap: 16}}>
-        <ReactaForm
-          definitionData={exampleDefinition}
+      <ReactaForm
+        definitionData={{
+          ...translationDefinition,
+          // Use the preset handler for demo purposes
+          submitHandlerName: "Preset_AlertSubmitHandler",
+        }}
           language={language}
-          instance={instance}
-          style={{ maxWidth: 640 }}
-        />
-      </div>
+      />
     </div>
   );
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const container = document.getElementById("root");
+if (container) createRoot(container).render(<App />);

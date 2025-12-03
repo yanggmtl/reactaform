@@ -33,7 +33,7 @@ const DateTimeInput: React.FC<DateTimeInputProps> = ({
 
   const validateParts = React.useCallback((isoValue: string) => {
     if (!isoValue) {
-      return field.required ? t("Value is required") : null;
+      return field.required ? t("Value required") : null;
     }
 
     if (isoValue) {

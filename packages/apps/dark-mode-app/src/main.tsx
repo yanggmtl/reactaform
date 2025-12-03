@@ -1,18 +1,17 @@
+// Dark Mode Test App
+// This minimal app is used to verify the library's dark mode styles and
+// interactions. It uses the preset submission handler named
+// `Preset_AlertSubmitHandler` which shows a browser alert on submit.
+// Keep this file simple — it's intended for visual/manual testing only.
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  ReactaForm,
-  registerSubmissionHandler,
-} from "reactaform";
-import type { FieldValueType } from "reactaform";
+import { ReactaForm } from "reactaform";
 import "./style.css";
 
-const exampleDefinition = {
+const darkModeDefinition = {
   name: "example-form",
   version: "1.0.0",
   displayName: "Example Form",
-  // name of the registered submit handler to invoke on submit
-  submitHandlerName: "exampleSubmitHandler",
   localization: "example-form",
   properties: [
     {
@@ -33,63 +32,17 @@ const exampleDefinition = {
       type: "checkbox",
       defaultValue: false,
     },
-    {
-      type: "unit",
-      name: "unitValue",
-      displayName: "unitValue",
-      dimension: "temperature",
-      defaultValue: 30,
-      defaultUnit: "C",
-    },
-    {
-      type: "multi-selection",
-      name: "multipleSelection",
-      displayName: "Multiple Selection",
-      options: [
-        {
-          label: "Option 1",
-          value: "1",
-        },
-        {
-          label: "Option 2",
-          value: "2",
-        },
-      ],
-      defaultValue: ["2"],
-    },
   ],
-};
-
-const predefined_instance: Record<string, FieldValueType> = {
-  firstName: "Guang",
-  age: 30,
-  subscribe: false,
-  unitValue: [30, "F"],
-  multipleSelection: ["2", "1"] as unknown as FieldValueType,
 };
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(false);
-  const [instance, setInstance] = useState<Record<string, FieldValueType>>(predefined_instance);
-
-  // Register a submission handler that stores submitted values into the local `instance` state
-  React.useEffect(() => {
-    registerSubmissionHandler(
-      "exampleSubmitHandler",
-      (definition, valuesMap) => {
-        setInstance(valuesMap as Record<string, FieldValueType>);
-        const serializedStr = JSON.stringify(valuesMap, null, 2);
-        alert(serializedStr);
-        return undefined;
-      }
-    );
-  }, []);
 
   return (
-    <div className={`app`} style={{ width: "400px" }}>
+    <div className={`app`}>
       <h1>Dark Mode Example</h1>
 
-      <div className="dark_mode_panel">
+      <div style={{ marginBottom: "10px" }}>
         <label>
           <input
             type="checkbox"
@@ -99,19 +52,17 @@ export default function App() {
           Dark mode
         </label>
       </div>
-
-      <div style={{ gap: 16 }}>
-        <div style={{ flex: 1 }}>
-          <ReactaForm
-            definitionData={exampleDefinition}
-            darkMode={darkMode}
-            instance={instance}
-            style={{ maxWidth: 640 }}
-          />
-        </div>
-      </div>
+      <ReactaForm
+        definitionData={{
+          ...darkModeDefinition,
+          // Use the preset handler for demo purposes
+          submitHandlerName: "Preset_AlertSubmitHandler",
+        }}
+        darkMode={darkMode}
+      />
     </div>
   );
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const container = document.getElementById("root");
+if (container) createRoot(container).render(<App />);

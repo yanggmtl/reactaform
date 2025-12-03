@@ -8,9 +8,8 @@ export default defineConfig({
   // (e.g. `public/locales/...`) are served at `/locales/...`.
   // This lets the library code fetch `/locales/...` from the example dev server
   // without duplicating files into the example package.
-  // Serve this app's own `public/` folder so app-specific static assets
-  // (including `vite.svg`) are available at `/` without relying on
-  // the repo root public directory.
+  // Serve the app's local `public` folder so app-specific static assets
+  // (like `vite.svg`) are available and avoid /favicon.ico 404 warnings.
   publicDir: path.resolve(__dirname, 'public'),
   resolve: {
     alias: {

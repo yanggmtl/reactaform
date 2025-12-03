@@ -162,7 +162,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   const validate = useCallback(
     (input: string, unit: string): string | null => {
       if (!input || input.trim() === "")
-        return field.required ? t("Value required.") : null;
+        return field.required ? t("Value required") : null;
 
       if (!validFloatRegex.test(input)) return t("Must be a valid number");
 

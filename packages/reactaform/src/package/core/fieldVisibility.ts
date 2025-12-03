@@ -34,7 +34,11 @@ const showChildrenRecursively = (
   const parentField = fieldMap[parentName];
   if (!parentField?.children) return;
 
-  const selectedValue = String(values[parentName] || '');
+  // Handle boolean false correctly - don't use || which treats false as falsy
+  const parentValue = values[parentName];
+  const selectedValue = parentValue !== undefined && parentValue !== null 
+    ? String(parentValue) 
+    : '';
   const childrenToShow = parentField.children[selectedValue] || [];
   
   childrenToShow.forEach((childName: string) => {

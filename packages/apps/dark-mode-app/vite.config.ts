@@ -8,7 +8,9 @@ export default defineConfig({
   // (e.g. `public/locales/...`) are served at `/locales/...`.
   // This lets the library code fetch `/locales/...` from the example dev server
   // without duplicating files into the example package.
-  publicDir: path.resolve(__dirname, '..', '..', '..', 'public'),
+  // Serve this app's local `public/` folder during dev so app-specific
+  // static assets are resolved locally (avoids relying on the repo root).
+  publicDir: path.resolve(__dirname, 'public'),
   resolve: {
     alias: {
       // During development, import reactaform directly from source so

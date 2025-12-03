@@ -58,6 +58,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     height: '100%',
     margin: 0,
     cursor: 'pointer',
+    pointerEvents: 'none', // Make hidden input non-interactive to avoid event conflicts
     ...styleFrom(fs, 'switch', 'hiddenInput'),
     ...styleFrom(ffs, undefined, 'hiddenInput'),
   }), [fs, ffs]);
@@ -72,7 +73,13 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     backgroundColor: 'var(--reactaform-switch-off-bg, #ccc)',
     transition: '0.3s',
     borderRadius: 24,
-    border: '2px solid transparent',
+    // Use individual border properties to avoid mixing shorthand and
+    // non-shorthand style updates (React warns when `border` and
+    // `borderColor` are toggled separately). Setting these separately
+    // lets us update `borderColor` without replacing the whole shorthand.
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderColor: 'transparent',
     ...styleFrom(fs, 'switch', 'slider'),
     ...styleFrom(ffs, undefined, 'slider'),
   }), [fs, ffs]);
@@ -131,12 +138,11 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
           id={field.name}
           type="checkbox"
           checked={isOn}
-          onChange={() => handleToggle()}
           disabled={isDisabled}
-          readOnly={field.readOnly}
+          readOnly={true}
           aria-label={t(field.displayName)}
-          aria-hidden={true}
           style={hiddenInputStyle}
+          tabIndex={-1}
         />
         <span
           role="switch"

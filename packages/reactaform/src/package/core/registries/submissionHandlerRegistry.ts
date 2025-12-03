@@ -11,4 +11,13 @@ export function getFormSubmissionHandler(submitterName: string): FormSubmissionH
   return registry.get(submitterName);
 }
 
+registerSubmissionHandler(
+  "Preset_AlertSubmitHandler",
+  (_definition, valuesMap) => {
+    const serializedStr = JSON.stringify(valuesMap, null, 2);
+    alert(serializedStr);
+    return undefined;
+  }
+);
+
 export default registry;

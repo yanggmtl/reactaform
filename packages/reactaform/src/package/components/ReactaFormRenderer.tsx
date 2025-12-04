@@ -54,6 +54,8 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   const [visibility, setVisibility] = useState<Record<string, boolean>>({});
   const [groupState, setGroupState] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submissionMessage, setSubmissionMessage] = useState<string | null>(null);
+  const [submissionSuccess, setSubmissionSuccess] = useState<boolean | null>(null);
 
   const [loadedCount, setLoadedCount] = useState(0); // how many fields are loaded so far
   const [initDone, setInitDone] = useState(false);
@@ -192,6 +194,9 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
    */
   const handleChange = useCallback(
     (name: string, value: FieldValueType, error: ErrorType) => {
+      // Clear any previous submission message when the user changes a value
+      setSubmissionMessage(null);
+      setSubmissionSuccess(null);
       // Update values map using functional update to ensure we operate on latest state
       // For integer, integer array, float and float array, the value is string
       // integer array value: a string which joins integers with commas
@@ -236,7 +241,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
         return rest;
       });
     },
-    [fieldMap]
+    [fieldMap, setSubmissionMessage, setSubmissionSuccess]
   );
 
   // handleError: used by input components to report validation-only updates
@@ -256,9 +261,10 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   const handleSubmit = () => {
     const result = submitForm(definition, instance, valuesMap, t, errors);
-    if (!result.success) {
-      alert(result.message);
-    }
+    // Display result message in the UI instead of using alert
+    const msg = typeof result.message === 'string' ? result.message : String(result.message);
+    setSubmissionMessage(msg);
+    setSubmissionSuccess(result.success);
   };
 
   const toggleGroup = (groupName: string) => {
@@ -306,6 +312,41 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   return (
     <div style={formStyle.container}>
       {displayName && <h2 style={formStyle.titleStyle}>{t(displayName)}</h2>}
+      {submissionMessage && (
+        <div
+          role="status"
+          style={{
+            marginBottom: 12,
+            padding: 12,
+            borderRadius: 6,
+            backgroundColor: submissionSuccess
+              ? 'rgba(76, 175, 80, 0.12)'
+              : 'rgba(225, 29, 72, 0.06)',
+            border: `1px solid ${submissionSuccess ? 'rgba(76,175,80,0.3)' : 'rgba(225,29,72,0.12)'}`,
+            color: submissionSuccess ? 'var(--reactaform-success-color, #4CAF50)' : 'var(--reactaform-error-color, #e11d48)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}
+        >
+          <div style={{ whiteSpace: 'pre-wrap', flex: 1 }}>{submissionMessage}</div>
+          <button
+            onClick={() => { setSubmissionMessage(null); setSubmissionSuccess(null); }}
+            aria-label={t('Dismiss')}
+            style={{
+              marginLeft: 12,
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'inherit',
+              fontSize: 16,
+              lineHeight: 1
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
       {shouldUseVirtualization ? (
         <VirtualizedFieldList
           fields={updatedProperties}

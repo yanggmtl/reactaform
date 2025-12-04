@@ -393,7 +393,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 💡 Examples
 
-Check the `packages/example-app` directory for complete working examples including:
+Check the `packages/apps` directory for complete working examples including:
 - Contact forms
 - Survey forms with conditional logic
 - Multi-step wizards

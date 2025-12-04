@@ -84,10 +84,12 @@ export function submitForm(
   // Perform form-level validation
   const validationErrors = validateFormValues(definition, finalMap, t);
   if (validationErrors && validationErrors.length > 0) {
-    return { 
-      success: false, 
-      message: t("Validation errors occurred."),
-      errors: validationErrors
+    // Combine validation messages into a single string starting with a header
+    const msg = validationErrors.join("\n");
+    return {
+      success: false,
+      message: msg,
+      errors: validationErrors,
     };
   }
 

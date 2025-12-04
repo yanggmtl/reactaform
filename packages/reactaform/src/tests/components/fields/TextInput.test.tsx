@@ -72,15 +72,6 @@ describe('TextInput', () => {
     expect(onChange).toHaveBeenCalled();
   });
 
-  it('is disabled when field.disabled is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ disabled: true });
-    const { getByRole } = renderWithProvider(
-      <TextInput {...baseFieldProps} field={field} value="" />
-    );
-
-    expect(getByRole('textbox')).toBeDisabled();
-  });
-
   it('handles tooltip display when tooltip is provided', () => {
     const field = createMockField<DefinitionPropertyField>({ tooltip: 'This is a tooltip' });
     const { getByTestId } = renderWithProvider(

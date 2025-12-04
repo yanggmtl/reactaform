@@ -55,8 +55,6 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   const [inputValue, setInputValue] = useState<string>(
     Array.isArray(value) ? value.join(", ") : String(value ?? "")
   );
-  const isDisabled = field.disabled ?? false;
-
   const validate = React.useCallback(
     (inputValue: string): string | null => {
       if (inputValue.trim() === "") {
@@ -111,7 +109,6 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const input = e.target.value;
 
     const err = validate(input);
@@ -142,7 +139,6 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
         type="text"
         value={inputValue}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         style={{ flex: 1 }}
       />

@@ -94,31 +94,6 @@ describe('RadioInput', () => {
     expect(wrapper).toBeTruthy();
   });
 
-  it('disables all radio buttons when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled Radio', options: mockOptions, disabled: true });
-    renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="a" />);
-
-    const radios = screen.getAllByRole('radio');
-    radios.forEach(radio => {
-      expect(radio).toBeDisabled();
-    });
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled', options: mockOptions, disabled: true });
-    renderWithProvider(
-      <RadioInput {...baseFieldProps} field={field} value="a" onChange={onChange} />
-    );
-
-    onChange.mockClear(); // Clear initial call
-    const radioB = screen.getByRole('radio', { name: /option b/i });
-    await user.click(radioB);
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('handles empty options array', () => {
     const field = createMockField<DefinitionPropertyField>({ displayName: 'Empty Radio', options: [] });
     renderWithProvider(<RadioInput {...baseFieldProps} field={field} value="" />);

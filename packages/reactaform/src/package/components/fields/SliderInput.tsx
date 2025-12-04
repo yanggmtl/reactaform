@@ -40,7 +40,6 @@ const SliderInput: React.FC<SliderInputProps> = ({
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const rangeRef = useRef<HTMLInputElement | null>(null);
-  const isDisabled = field.disabled ?? false;
 
   const validate = React.useCallback(
     (input: string): string | null => {
@@ -97,7 +96,6 @@ const SliderInput: React.FC<SliderInputProps> = ({
   const max = field.max ?? 100;
 
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const input = e.target.value;
     const err = validate(input);
     onChange?.(input, err);
@@ -111,7 +109,6 @@ const SliderInput: React.FC<SliderInputProps> = ({
           type="range"
           defaultValue={!isNaN(Number(value)) ? String(Number(value)) : String(min)}
           onChange={handleValueChange}
-          disabled={isDisabled}
           min={min}
           max={max}
           style={{
@@ -126,7 +123,6 @@ const SliderInput: React.FC<SliderInputProps> = ({
           defaultValue={String(value ?? "")}
           onChange={handleValueChange}
           required
-          disabled={isDisabled}
           style={{
             width: "40px",
             minWidth: "40px",

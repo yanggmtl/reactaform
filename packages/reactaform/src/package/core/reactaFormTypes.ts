@@ -30,8 +30,6 @@ export interface DefinitionPropertyField {
   children?: Record<string, string[]>;
   group?: string;
   tooltip?: string;
-  readOnly?: boolean;
-  disabled?: boolean;
   labelLayout?: 'row' | 'column-left' | 'column-center'; // Optional label layout: 'row' (default), 'column-left' (label left-aligned), or 'column-center' (label center-aligned)
 
   // Custom validation handler name
@@ -131,7 +129,6 @@ export interface BaseInputProps<
 > {
   field: TField;
   value: TValue;
-  disabled?: boolean;
   placeholder?: string;
   onChange?: InputOnChange<TValue>;
   onError?: (error: string | null) => void;

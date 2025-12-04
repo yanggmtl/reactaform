@@ -145,19 +145,6 @@ describe('IntegerInput', () => {
     expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
   });
 
-  it('is disabled when disabled prop is true', async () => {
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ disabled: true });
-    const { getByRole } = renderWithProvider(
-      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
-    );
-
-    const input = getByRole('textbox', { name: 'Test Field' });
-    // Disabled field should not invoke onChange when typing
-    await user.type(input, '1');
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('shows placeholder text', () => {
     const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(

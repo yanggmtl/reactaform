@@ -157,7 +157,6 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   const [menuPosition, setMenuPosition] =
     useState<PopupOptionMenuPosition | null>(null);
   const [menuOptions, setMenuOptions] = useState<UnitOption[] | []>([]);
-  const isDisabled = field.disabled ?? false;
 
   const validate = useCallback(
     (input: string, unit: string): string | null => {
@@ -248,7 +247,6 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   };
 
   const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const input = e.target.value;
     const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
     const err = validate(input, unit);
@@ -257,7 +255,6 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   };
 
   const onUnitChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    if (isDisabled) return;
     const newUnit = e.target.value;
     const valueStr = inputRef.current ? inputRef.current.value : String(value[0] ?? "");
     const err = validate(valueStr, newUnit);
@@ -325,7 +322,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   const unitForValidation = localUnit ?? propUnitForValidation;
 
   const disableConversion =
-    isDisabled || Boolean(validate(inputForValidation, unitForValidation)) || !inputForValidation.trim();
+    Boolean(validate(inputForValidation, unitForValidation)) || !inputForValidation.trim();
 
   // Dark mode aware button styling
   const convertButtonStyle = {
@@ -353,7 +350,6 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
               ref={inputRef}
               defaultValue={String(value[0] ?? "")}
           onChange={onValueChange}
-          disabled={isDisabled}
           style={{ width: "var(--reactaform-unit-input-width, 100px)" }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         />
@@ -367,7 +363,6 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
             CSS_CLASSES.input,
             CSS_CLASSES.inputSelect
           )}
-          disabled={isDisabled}
         >
           {Object.keys(unitFactors.labels).map((u) => (
             <option key={u} value={u}>

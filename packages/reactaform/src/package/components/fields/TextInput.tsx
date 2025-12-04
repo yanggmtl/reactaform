@@ -20,7 +20,6 @@ const TextInput: React.FC<TextInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const isDisabled = field.disabled ?? false;
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const prevErrorRef = React.useRef<string | null>(null);
@@ -59,7 +58,6 @@ const TextInput: React.FC<TextInputProps> = ({
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    if (isDisabled) return;
     const newValue = e.target.value;
     const err = validate(newValue);
     onChange?.(newValue, err);
@@ -85,7 +83,6 @@ const TextInput: React.FC<TextInputProps> = ({
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
       />
     </StandardFieldLayout>

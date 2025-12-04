@@ -184,29 +184,6 @@ describe('IntegerArrayInput', () => {
     expect(lastCall[1]).toBeNull(); // no error for negative integers
   });
 
-  it('disables input when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled', defaultValue: [], disabled: true });
-    renderWithProvider(<IntegerArrayInput {...baseFieldProps} field={field} value={[]} />);
-
-    const input = screen.getByRole('textbox');
-    expect(input).toBeDisabled();
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled', defaultValue: [], disabled: true });
-    renderWithProvider(
-      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
-    );
-
-    onChange.mockClear();
-    const input = screen.getByRole('textbox');
-    await user.type(input, '1, 2, 3');
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('displays tooltip icon when provided', () => {
     const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', defaultValue: [], tooltip: 'Enter comma-separated integers' });
     renderWithProvider(<IntegerArrayInput {...baseFieldProps} field={field} value={[]} />);

@@ -45,7 +45,6 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const isDisabled = field.disabled ?? false;
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Memoize parse function
@@ -142,7 +141,6 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
 
   // Handle user input change in the text box
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const input = e.target.value;
     const err = validateCb(input);
     onChange?.(input, err);
@@ -156,7 +154,6 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(
           CSS_CLASSES.input,
           CSS_CLASSES.inputNumber

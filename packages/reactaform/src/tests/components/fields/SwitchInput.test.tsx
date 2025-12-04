@@ -83,16 +83,6 @@ describe('SwitchInput', () => {
     expect(onError).toHaveBeenCalledWith(expect.stringContaining('required'));
   });
 
-  it('is disabled when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>();
-    const { container } = renderWithProvider(
-      <SwitchInput field={field} value={false} disabled={true} {...baseFieldProps} />
-    );
-
-    const switchElement = container.querySelector('[role="switch"], .switch, [data-testid="switch"]');
-    expect(switchElement).toHaveClass(/disabled/);
-  });
-
   it('has proper accessibility attributes', () => {
     const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(

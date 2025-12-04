@@ -151,29 +151,6 @@ describe('NumericStepperInput', () => {
     expect(lastCall[1]).toBeTruthy(); // error for required
   });
 
-  it('disables input when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Disabled', defaultValue: 10, disabled: true });
-    renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={10} />);
-
-    const input = screen.getByRole('spinbutton');
-    expect(input).toBeDisabled();
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Disabled', defaultValue: 10, disabled: true });
-    renderWithProvider(
-      <NumericStepperInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
-    );
-
-    onChange.mockClear();
-    const input = screen.getByRole('spinbutton');
-    await user.type(input, '5');
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('has accessible id matching field name', () => {
     const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Count', name: 'itemCount', defaultValue: 0 });
     renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={0} />);

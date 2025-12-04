@@ -44,7 +44,6 @@ const FloatInput: React.FC<FloatInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const isDisabled = field.disabled ?? false;
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   // Validate the current input value against the field constraints
@@ -113,7 +112,6 @@ const FloatInput: React.FC<FloatInputProps> = ({
 
   // Handle user input change in the text box
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const input = e.target.value;
     const err = validate(input);
     onChange?.(input, err);
@@ -127,7 +125,6 @@ const FloatInput: React.FC<FloatInputProps> = ({
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(
           CSS_CLASSES.input,
           CSS_CLASSES.inputNumber

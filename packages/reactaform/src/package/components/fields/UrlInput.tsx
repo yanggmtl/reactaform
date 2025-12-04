@@ -47,7 +47,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   // uncontrolled input: DOM holds transient user edits; use a ref
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const isDisabled = field.disabled ?? false;
 
   // Validation logic
   const validateCb = useCallback(
@@ -70,7 +69,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
 
   // Handle user typing
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const newVal = e.target.value;
 
     const err = validateCb(newVal);
@@ -105,7 +103,6 @@ const UrlInput: React.FC<UrlInputProps> = ({
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
-        disabled={isDisabled}
         style={{ alignItems: "left" }}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         placeholder="https://example.com"

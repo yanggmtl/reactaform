@@ -119,28 +119,6 @@ describe('PhoneInput', () => {
     expect(lastCall[1]).toBeNull(); // no error after trim
   });
 
-  it('disables input when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled Phone', disabled: true });
-    renderWithProvider(<PhoneInput {...baseFieldProps} field={field} value="+123456" />);
-
-    const input = screen.getByRole('textbox');
-    expect(input).toBeDisabled();
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled', disabled: true });
-    renderWithProvider(
-      <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} />
-    );
-
-    const input = screen.getByRole('textbox');
-    await user.type(input, '123');
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('displays tooltip when provided', () => {
     const field = createMockField<DefinitionPropertyField>({ label: 'Phone', tooltip: 'Enter your phone number' });
     renderWithProvider(<PhoneInput {...baseFieldProps} field={field} value="" />);

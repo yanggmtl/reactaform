@@ -18,7 +18,6 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
-  const isDisabled = field.disabled ?? false;
 
   // Use default min=0 and max=100 if undefined
   const minVal = field.min ?? undefined;
@@ -77,7 +76,6 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const newInput = e.target.value;
     const num = e.target.valueAsNumber;
     const err = validateFromString(newInput);
@@ -95,7 +93,6 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
         max={maxVal}
         step={step}
         onChange={handleChange}
-        disabled={isDisabled}
         style={{ width: "100%", height: "100%" }}
         className={CSS_CLASSES.input}
       />

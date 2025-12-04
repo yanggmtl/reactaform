@@ -16,13 +16,11 @@ export type RadioInputProps = BaseInputProps<string, DefinitionPropertyField>;
  * - Supports horizontal and vertical layouts
  * - Validates that the selected value is in the options list
  * - Auto-corrects to first option if invalid value provided
- * - Supports disabled state
  */
 const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
   const { t, definitionName } = useReactaFormContext();
   const layout =
     field.layout?.toLowerCase() === "horizontal" ? "row" : "column";
-  const isDisabled = field.disabled ?? false;
 
   const groupRef = useRef<HTMLDivElement | null>(null);
 
@@ -61,7 +59,6 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
   }, [value, validate, onChange, field.options]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const val = e.target.value;
     const err = validate(val);
     onChange?.(val, err);
@@ -96,7 +93,6 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
               value={String(opt.value)}
               defaultChecked={String(value ?? "") === String(opt.value)}
               onChange={handleChange}
-              disabled={isDisabled}
             />
             {t(opt.label)}
           </label>

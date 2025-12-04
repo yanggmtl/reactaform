@@ -153,28 +153,6 @@ describe('UrlInput', () => {
     expect(lastCall[1]).toBeNull(); // no error
   });
 
-  it('disables input when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Disabled URL', disabled: true });
-    renderWithProvider(<UrlInput {...baseFieldProps} field={field} value="https://test.com" />);
-
-    const input = screen.getByRole('textbox');
-    expect(input).toBeDisabled();
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Disabled', disabled: true });
-    renderWithProvider(
-      <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
-    );
-
-    const input = screen.getByRole('textbox');
-    await user.type(input, 'https://test.com');
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('displays tooltip icon when provided', () => {
     const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL', tooltip: 'Enter a valid website URL' });
     renderWithProvider(<UrlInput {...baseFieldProps} field={field} value="" />);

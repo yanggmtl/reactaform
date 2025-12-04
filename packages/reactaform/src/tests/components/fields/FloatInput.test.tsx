@@ -126,18 +126,6 @@ describe('FloatInput', () => {
     expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
   });
 
-  it('is disabled when disabled prop is true', async () => {
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ disabled: true });
-    const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
-    );
-
-    const input = getByRole('textbox', { name: 'Test Field' });
-    await user.type(input, '1');
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('handles negative numbers', async () => {
     const onChange = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ min: -100, max: 100 });

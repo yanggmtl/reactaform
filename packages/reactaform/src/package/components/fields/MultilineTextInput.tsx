@@ -20,7 +20,6 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const isDisabled = field.disabled ?? false;
   const height = field.minHeight ?? "80px";
   // Use an uncontrolled textarea so the DOM holds the user's transient
   // edits while we still notify parent via `onChange`. Keep a ref so
@@ -54,7 +53,6 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    if (isDisabled) return;
     const newValue = e.target.value;
     const err = validate(newValue);
     onChange?.(newValue, err);
@@ -78,7 +76,6 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
     defaultValue: String(value ?? ""),
     ref: inputRef,
     onChange: handleChange,
-    disabled: isDisabled,
     style: {
       resize: "vertical" as const,
       minHeight: height,

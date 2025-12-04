@@ -91,29 +91,6 @@ describe('DropdownInput', () => {
     expect(onChange).toHaveBeenCalledWith('opt2', null);
   });
 
-  it('disables select when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled Dropdown', options: mockOptions, disabled: true });
-    renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="opt1" />);
-
-    const select = screen.getByRole('combobox');
-    expect(select).toBeDisabled();
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Disabled', options: mockOptions, disabled: true });
-    renderWithProvider(
-      <DropdownInput {...baseFieldProps} field={field} value="opt1" onChange={onChange} />
-    );
-
-    onChange.mockClear(); // Clear initial call
-    const select = screen.getByRole('combobox');
-    await user.selectOptions(select, 'opt2');
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('handles empty options array', () => {
     const field = createMockField<DefinitionPropertyField>({ displayName: 'Empty Dropdown', options: [] });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="" />);

@@ -19,7 +19,6 @@ export type DropdownInputProps = BaseInputProps<
  * Renders a select dropdown for selecting a single value from options.
  * - Validates that the selected value is in the options list
  * - Auto-corrects to first option if invalid value provided
- * - Supports disabled state
  * - Uses custom styling from fieldStyle.optionInput
  */
 const DropdownInput: React.FC<DropdownInputProps> = ({
@@ -28,7 +27,6 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   onChange,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const isDisabled = field.disabled ?? false;
 
   const selectRef = useRef<HTMLSelectElement | null>(null);
 
@@ -63,7 +61,6 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   }, [value, validate, onChange, field.options]);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    if (isDisabled) return;
     const val = e.target.value;
     const err = validate(val);
     onChange?.(val, err);
@@ -75,7 +72,6 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
         defaultValue={String(value ?? "")}
         ref={selectRef}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(
           CSS_CLASSES.input,
           CSS_CLASSES.inputSelect

@@ -165,32 +165,6 @@ describe('SliderInput', () => {
     expect(slider).toHaveAttribute('max', '90');
   });
 
-  it('disables both inputs when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Disabled', min: 0, max: 100, disabled: true });
-    const { container } = renderWithProvider(<SliderInput {...baseFieldProps} field={field} value={50} />);
-
-    const slider = container.querySelector('input[type="range"]');
-    const textInput = container.querySelector('input[type="text"]');
-    
-    expect(slider).toBeDisabled();
-    expect(textInput).toBeDisabled();
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Disabled', min: 0, max: 100, disabled: true });
-    const { container } = renderWithProvider(
-      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
-    );
-
-    onChange.mockClear();
-    const textInput = container.querySelector('input[type="text"]')!;
-    await user.type(textInput, '60');
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('displays tooltip icon when provided', () => {
     const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100, tooltip: 'Adjust the value' });
     renderWithProvider(<SliderInput {...baseFieldProps} field={field} value={50} />);

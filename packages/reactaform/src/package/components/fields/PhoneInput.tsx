@@ -19,7 +19,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const { definitionName } = useReactaFormContext();
-  const isDisabled = field.disabled ?? false;
 
   const validateCb = useCallback(
     (val: string): string | null => {
@@ -64,7 +63,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   }, [value, validateCb]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const newVal = e.target.value;
     const trimmedInput = newVal.trim();
 
@@ -95,7 +93,6 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
       />
     </StandardFieldLayout>

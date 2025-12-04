@@ -15,12 +15,9 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   field,
   value,
   onChange,
-  disabled: propDisabled,
 }) => {
-  const isDisabled = field.disabled ?? propDisabled ?? false;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (field.readOnly || isDisabled) return;
     const checked = e.target.checked;
     onChange?.(checked, null);
   };
@@ -28,7 +25,6 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Space' || e.key === 'Enter') {
       e.preventDefault();
-      if (field.readOnly || isDisabled) return;
       onChange?.(!value, null);
     }
   };
@@ -45,18 +41,15 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         aria-checked={!!value}
-        aria-readonly={!!field.readOnly}
-        aria-disabled={!!isDisabled}
-        disabled={!!isDisabled}
         style={{
-          cursor: field.readOnly || field.disabled ? "not-allowed" : "pointer",
+          cursor: "pointer",
           margin: "8px 0 8px 0",
           width: "1.2em",
           height: "1.2em",
           verticalAlign: "middle",
           color: "#FFFFFF",
           accentColor: "#0000FF",
-          opacity: field.disabled ? 0.6 : undefined,
+          opacity: undefined,
         }}
       />
     </StandardFieldLayout>

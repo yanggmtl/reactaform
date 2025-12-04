@@ -153,17 +153,6 @@ describe('UnitValueInput', () => {
     expect(conversionButton).toBeDisabled();
   });
 
-  it('disables input when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'unitvalue', label: 'Disabled', dimension: 'length', disabled: true, defaultValue: ['10', 'm'] });
-    renderWithProvider(<UnitValueInput {...baseFieldProps} field={field} value={['10', 'm']} />);
-
-    const input = screen.getByRole('textbox');
-    const select = screen.getByRole('combobox');
-    
-    expect(input).toBeDisabled();
-    expect(select).toBeDisabled();
-  });
-
   it('displays tooltip icon when provided', () => {
     const field = createMockField<DefinitionPropertyField>({ type: 'unitvalue', label: 'Value', dimension: 'length', tooltip: 'Enter length value', defaultValue: ['10', 'm'] });
     renderWithProvider(<UnitValueInput {...baseFieldProps} field={field} value={['10', 'm']} />);

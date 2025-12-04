@@ -102,28 +102,6 @@ describe('MultilineTextInput', () => {
     expect(lastCall[1]).toBeNull(); // no error
   });
 
-  it('disables textarea when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled Text', disabled: true });
-    renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value="test" />);
-
-    const textarea = screen.getByRole('textbox');
-    expect(textarea).toBeDisabled();
-  });
-
-  it('does not call onChange when disabled', async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ label: 'Disabled', disabled: true });
-    renderWithProvider(
-      <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
-    );
-
-    const textarea = screen.getByRole('textbox');
-    await user.type(textarea, 'text');
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
   it('applies minHeight style', () => {
     const field = createMockField<DefinitionPropertyField>({ label: 'Tall Text', minHeight: '200px' });
     renderWithProvider(<MultilineTextInput {...baseFieldProps} field={field} value="" />);

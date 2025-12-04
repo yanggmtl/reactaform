@@ -104,15 +104,6 @@ describe('EmailInput', () => {
     }
   });
 
-  it('is disabled when field.disabled is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ disabled: true });
-    const { getByRole } = renderWithProvider(
-      <EmailInput {...baseFieldProps} field={field} value="" />
-    );
-
-    expect(getByRole('textbox')).toBeDisabled();
-  });
-
   it('handles tooltip display when tooltip is provided', () => {
     const field = createMockField<DefinitionPropertyField>({ tooltip: 'Enter a valid email address' });
     const { getByTestId } = renderWithProvider(

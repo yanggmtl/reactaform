@@ -20,7 +20,6 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   onError,
 }) => {
   const { definitionName, t } = useReactaFormContext();
-  const isDisabled = field.disabled ?? false;
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const validate = React.useCallback(
@@ -44,7 +43,6 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   );
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const input = e.target.value;
     const err = validate(input);
     // pass the fresh value (not the stale state) to the parent
@@ -77,7 +75,6 @@ export const EmailInput: React.FC<EmailInputProps> = ({
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
       />
     </StandardFieldLayout>

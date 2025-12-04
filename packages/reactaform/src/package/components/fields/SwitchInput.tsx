@@ -24,7 +24,6 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
   value,
   onChange,
   onError,
-  disabled: propDisabled,
 }) => {
   const { t, formStyle, fieldStyle, definitionName } = useReactaFormContext();
   const fs = formStyle as Record<string, unknown> | undefined;
@@ -109,11 +108,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     return err ?? null;
   }, [field, t, definitionName]);
 
-  const isDisabled = field.disabled ?? propDisabled ?? false;
-
   // Toggles boolean value on click
   const handleToggle = () => {
-    if (field.readOnly || isDisabled) return;
     const newVal = !isOn;
     const err = validate(newVal);
     onChange?.(newVal, err);
@@ -138,7 +134,6 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
           id={field.name}
           type="checkbox"
           checked={isOn}
-          disabled={isDisabled}
           readOnly={true}
           aria-label={t(field.displayName)}
           style={hiddenInputStyle}
@@ -156,7 +151,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
               handleToggle();
             }
           }}
-          className={`reactaform-switch ${isOn ? 'active checked on' : ''} ${isDisabled ? 'disabled' : ''}`}
+          className={`reactaform-switch ${isOn ? 'active checked on' : ''} `}
           style={isOn ? { ...sliderBaseStyle, backgroundColor: 'var(--reactaform-switch-on-bg, #22c55e)', borderColor: 'var(--reactaform-switch-on-border, #16a34a)' } : sliderBaseStyle}
         >
           <span

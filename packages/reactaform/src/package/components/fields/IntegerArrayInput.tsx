@@ -47,8 +47,6 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
   const [inputValue, setInputValue] = useState<string>(
     Array.isArray(value) ? value.join(delimiter + " ") : String(value ?? "")
   );
-  const isDisabled = field.disabled ?? false;
-
   const parseArray = (text: string): number[] => {
     if (!text || text.trim() === "") return [];
     return text
@@ -113,7 +111,6 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isDisabled) return;
     const newValue = e.target.value;
     const err = validate(newValue);
     setInputValue(newValue);
@@ -145,7 +142,6 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
         type="text"
         value={inputValue}
         onChange={handleChange}
-        disabled={isDisabled}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         style={{ flex: 1 }}
       />

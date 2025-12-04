@@ -66,15 +66,6 @@ describe('CheckboxInput', () => {
     expect(onChange).toHaveBeenCalledWith(false, null);
   });
 
-  it('is disabled when disabled prop is true', () => {
-    const field = createMockField<DefinitionPropertyField>();
-    const { getByRole } = renderWithProvider(
-      <CheckboxInput {...baseFieldProps} field={field} value={false} disabled={true} />
-    );
-
-    expect(getByRole('checkbox')).toBeDisabled();
-  });
-
   it('has proper accessibility attributes', () => {
     const field = createMockField<DefinitionPropertyField>({ tooltip: 'This is a helpful checkbox' });
     const { getByRole } = renderWithProvider(

@@ -294,17 +294,45 @@ export function isDebugMode(): boolean {
 }
 
 /**
- * Enhanced translation function with comprehensive features
+ * Interpolation text
+ */
+function interpolateText(text: string, args: unknown[]): string {
+  if (args.length === 0) {
+    return text;
+  }
+  
+  return text.replace(/\{\{(\d+)\}\}/g, (match: string, index: string) => {
+    const i = parseInt(index, 10) - 1;
+    const replacement = args[i];
+    
+    if (replacement === undefined || replacement === null) {
+      return match; // Keep original placeholder if no replacement
+    }
+    
+    // Convert to string safely
+    try {
+      return String(replacement);
+    } catch {
+      return match;
+    }
+  });
+}
+
+/**
+ * Create a translation function using provided maps
+ * @returns A translation function
+ * This function processes text using only dictionary lookups and basic string interpolation.
+ * Note: handling pluralization is not supported now
+ * @example
+ * const t = createTranslationFunction('fr', commonMap, userMap);
+ * const translated = t("Hello, {{1}}!", "world");
  */
 export const createTranslationFunction = (
   language: string,
   commonMap: TranslationMap,
   userMap: TranslationMap
 ) => {
-  return (defaultText: string, ..._args: unknown[]): string => {
-    // `_args` accepts additional caller arguments (kept for compatibility).
-    // We intentionally ignore interpolation/pluralization logic for now.
-    void _args;
+  return (defaultText: string, ...args: unknown[]): string => {
     let translateText = defaultText;
     let translated = false;
 
@@ -330,6 +358,8 @@ export const createTranslationFunction = (
         translateText = defaultText;
       }
     }
+
+    translateText = interpolateText(translateText, args);
 
     if (!translated && isDebugMode()) {
       console.debug(

@@ -64,6 +64,7 @@ export interface DefinitionPropertyField {
   // Date/Time field properties
   minDate?: string;
   maxDate?: string;
+  includeSeconds?: boolean; // for 'time' type fields
   
   // Layout properties
   layout?: 'horizontal' | 'vertical' | 'row' | 'column';

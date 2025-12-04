@@ -72,4 +72,6 @@ export default function App() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const container = document.getElementById("root");
+if (container) createRoot(container).render(<App />);
+

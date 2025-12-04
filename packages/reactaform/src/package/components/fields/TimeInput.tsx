@@ -18,6 +18,8 @@ const TimeInput: React.FC<TimeInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const prevErrorRef = useRef<string | null>(null);
   const onErrorRef = useRef<TimeInputProps["onError"] | undefined>(onError);
+  // Default to including seconds so the input supports HH:MM:SS by default
+  const includeSeconds = field.includeSeconds ?? true;
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
@@ -79,7 +81,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
         id={field.name}
         type="time"
         value={value}
-        step={1}
+        step={includeSeconds ? 1 : 60}
         onChange={handleChange}
         min={typeof field.min === 'string' ? field.min : undefined}
         max={typeof field.max === 'string' ? field.max : undefined}

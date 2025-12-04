@@ -8,6 +8,7 @@ interface SeparatorProps {
   alignment?: "left" | "center" | "right";
 }
 
+// Currently this function is not used.
 export const Separator: React.FC<SeparatorProps> = ({
   color = "#574d4dff",
   thickness = 1,
@@ -57,17 +58,16 @@ const FieldSeparator: React.FC<FieldSeparatorProps> = ({ field }) => {
     color = darkMode ? "#444444" : "#CCCCCC",
     thickness = 1,
     margin = "8px 0",
-    label = null,
-    alignment = "center",
   } = field;
 
   return (
-    <Separator
-      color={color}
-      thickness={thickness}
-      margin={margin}
-      label={label}
-      alignment={alignment}
+    <div
+      style={{
+        width: "auto",
+        height: "0", // ensures only 1 line
+        borderTop: `${thickness}px solid ${color}`,
+        margin,
+      }}
     />
   );
 };

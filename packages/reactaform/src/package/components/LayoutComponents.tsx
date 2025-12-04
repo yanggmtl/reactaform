@@ -199,6 +199,10 @@ export const ErrorDiv = memo(({ children }: { children: React.ReactNode }) => {
     fontSize: '13px',
     marginTop: '4px',
     fontWeight: 'var(--reactaform-font-weight)',
+    display: "flex",
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
   }), []);
 
   return <div style={style}>{children}</div>;

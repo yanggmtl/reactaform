@@ -7,7 +7,6 @@ import CheckboxInput from "../../components/fields/CheckboxInput";
 import SwitchInput from "../../components/fields/SwitchInput"
 import ColorInput from "../../components/fields/ColorInput";
 import DateInput from "../../components/fields/DateInput";
-import DateTimeInput from "../../components/fields/DateTimeInput";
 import EmailInput from "../../components/fields/EmailInput";
 import FloatInput from "../../components/fields/FloatInput";
 import FloatArrayInput from "../../components/fields/FloatArrayInput";
@@ -106,7 +105,6 @@ export function registerBaseComponents(): void {
     checkbox: CheckboxInput,
     color: ColorInput,
     date: DateInput,
-    "date-time": DateTimeInput,
     dropdown: DropdownInput,
     email: EmailInput,
     file: FileInput,

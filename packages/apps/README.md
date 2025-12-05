@@ -14,6 +14,7 @@ Important: during development the apps resolve the local library source using a 
 ---
 
 Available apps
+- `instance-app` — full-featured instance manager demonstrating creating new instances, loading instances from JSON, maintaining an instance list, and editing selected instances with ReactaForm. Shows complete instance lifecycle management.
 - `submit-handler-app` — demonstrates registering a custom submission handler using `registerSubmissionHandler` and calling it via the definition's `submitHandlerName`.
 - `custom-validation-app` — demonstrates a custom form-level validator registered with `registerFormValidationHandler` and referenced via `validationHandlerName` in the definition; the validator enforces `firstNumber < secondNumber`.
 - `custom-styles-app` — shows how to override `reactaform` CSS variables by applying a class that re-defines variables (example: `.custom-reactaform`).

@@ -52,86 +52,37 @@ const testDefinition = {
     {
       "type": "text",
       "name": "address",
-      "displayName": "Street Address",
+      "displayName": "Address",
       "defaultValue": "",
       "group": "Contact"
-    },
-    {
-      "type": "switch",
-      "name": "newsletter",
-      "displayName": "Subscribe to Newsletter",
-      "defaultValue": false,
-      "group": "Preferences"
-    },
-    {
-      "type": "dropdown",
-      "name": "theme",
-      "displayName": "Preferred Theme",
-      "defaultValue": "light",
-      "options": [
-        { "label": "Light", "value": "light" },
-        { "label": "Dark", "value": "dark" },
-        { "label": "Auto", "value": "auto" }
-      ],
-      "group": "Preferences"
-    },
-    {
-      "type": "multiselection",
-      "name": "interests",
-      "displayName": "Interests",
-      "defaultValue": [],
-      "options": [
-        { "label": "Technology", "value": "tech" },
-        { "label": "Sports", "value": "sports" },
-        { "label": "Music", "value": "music" },
-        { "label": "Travel", "value": "travel" },
-        { "label": "Reading", "value": "reading" }
-      ],
-      "group": "Preferences"
-    },
-    {
-      "type": "multiline",
-      "name": "bio",
-      "displayName": "Bio",
-      "defaultValue": "",
-      "group": "About",
-      "labelLayout": "column-left"
-    }
-  ],
-  "groups": [
-    {
-      "name": "personal",
-      "displayName": "Personal Information",
-      "collapsed": false
-    },
-    {
-      "name": "contact",
-      "displayName": "Contact Details",
-      "collapsed": false
-    },
-    {
-      "name": "preferences",
-      "displayName": "Preferences",
-      "collapsed": false
-    },
-    {
-      "name": "about",
-      "displayName": "About You",
-      "collapsed": false
     }
   ]
 };
 
+const predefined_instance = {
+  "name": "groupExampleInstance",
+  "version": "1.0.0",
+  "definition": "userProfile",
+  "values": {
+    "firstName": "John",
+    "lastName": "Smith",
+    "birthDate": "2000-12-08",
+    "email": "abcdefg@sample.com",
+    "phone": "",
+    "address": ""
+  }
+}
+
 export default function App() {
+  const instance = predefined_instance; 
   return (
     <div className={`app`}>
       <h2>Reactaform Group Example</h2>
       <ReactaForm
         definitionData={{
           ...testDefinition,
-          // Use the preset handler for demo purposes
-          submitHandlerName: "Preset_AlertSubmitHandler",
         }}
+        instance={instance}
         style={{ height: "100%" }}
       />
     </div>

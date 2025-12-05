@@ -3,7 +3,7 @@
 // interactions. It uses the preset submission handler named
 // `Preset_AlertSubmitHandler` which shows a browser alert on submit.
 // Keep this file simple — it's intended for visual/manual testing only.
-import React, { useState } from "react";
+import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ReactaForm } from "reactaform";
 import "./style.css";
@@ -54,8 +54,6 @@ export default function App() {
       <ReactaForm
         definitionData={{
           ...darkModeDefinition,
-          // Use the preset handler for demo purposes
-          submitHandlerName: "Preset_AlertSubmitHandler",
         }}
         darkMode={darkMode}
       />

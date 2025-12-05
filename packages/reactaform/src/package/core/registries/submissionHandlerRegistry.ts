@@ -1,4 +1,4 @@
-import type { FormSubmissionHandler } from "../reactaFormTypes";
+import type { FieldValueType, FormSubmissionHandler, ReactaInstance } from "../reactaFormTypes";
 import BaseRegistry from "./baseRegistry";
 
 const registry = new BaseRegistry<FormSubmissionHandler>();
@@ -13,9 +13,15 @@ export function getFormSubmissionHandler(submitterName: string): FormSubmissionH
 
 registerSubmissionHandler(
   "Preset_AlertSubmitHandler",
-  (_definition, valuesMap) => {
-    const serializedStr = JSON.stringify(valuesMap, null, 2);
-    alert(serializedStr);
+  (definition, instanceName, valuesMap) => {
+    const instance : ReactaInstance = {
+      name: instanceName || "Unnamed Instance",
+      version: definition.version as string,
+      definition: definition.name as string,
+      values: valuesMap as unknown as Record<string, FieldValueType>,
+    }
+    const instanceStr = JSON.stringify(instance, null, 2);
+    alert(instanceStr);
     return undefined;
   }
 );

@@ -14,7 +14,7 @@ describe('Form integration: rendering and submission', () => {
     let receivedValues: Record<string, unknown> | null = null;
 
     // register a simple submission handler that captures the valuesMap
-    registerSubmissionHandler('testSubmitHandler', (_definition, valuesMap) => {
+    registerSubmissionHandler('testSubmitHandler', (_definition, _instanceName, valuesMap) => {
       receivedValues = { ...valuesMap } as Record<string, unknown>;
       return undefined; // indicate success
     });
@@ -53,7 +53,7 @@ describe('Form integration: rendering and submission', () => {
     // Render the form renderer with immediate loading (no chunk delay)
     await act(async () => {
       renderWithProvider(
-        <ReactaFormRenderer definition={definition} instance={{}} chunkDelay={0} chunkSize={1000} />
+        <ReactaFormRenderer definition={definition} instance={null} chunkDelay={0} chunkSize={1000} />
       );
     });
 

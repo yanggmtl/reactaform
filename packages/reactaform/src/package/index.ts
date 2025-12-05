@@ -58,7 +58,7 @@ export {
 
 // Definition & Instance Management
 export {
-  loadDefinition,
+  loadJsonDefinition,
   createInstanceFromDefinition, // Create new instance with default values
   loadInstance // Load existing instance (valuesMap)
 } from './core/loadDefinition';

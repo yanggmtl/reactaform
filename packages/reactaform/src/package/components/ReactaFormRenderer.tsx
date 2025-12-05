@@ -4,6 +4,7 @@ import type {
   ErrorType,
   DefinitionPropertyField,
   ReactaDefinition,
+  ReactaInstance,
 } from "../core/reactaFormTypes";
 import useReactaFormContext from "../hooks/useReactaFormContext";
 import { renderFieldsWithGroups } from "../components/renderFields";
@@ -19,7 +20,7 @@ import { submitForm } from "../core/submitForm";
 
 export interface ReactaFormRendererProps {
   definition: ReactaDefinition;
-  instance: Record<string, FieldValueType>;
+  instance: ReactaInstance | null;
   chunkSize?: number;
   chunkDelay?: number;
   enableVirtualization?: boolean;
@@ -39,7 +40,8 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   estimatedFieldHeight = 60,
 }) => {
   const { properties, displayName } = definition;
-  const { t, formStyle } = useReactaFormContext();
+  const { t, formStyle, language } = useReactaFormContext();
+  const [ savedLanguage, setSavedLanguage] = useState("en");
 
   // Core state
   const [updatedProperties, setUpdatedProperties] = useState<
@@ -61,6 +63,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   const [initDone, setInitDone] = useState(false);
   const [btnHover, setBtnHover] = useState(false);
 
+ 
   // Step 1: Initialize basic structures immediately
   // TODO: rename group name if group name appears more than once?
 
@@ -124,9 +127,9 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
     // Use instance to override valuesMapInit
     if (instance) {
-      Object.keys(instance).forEach((key) => {
+      Object.keys(instance.values).forEach((key) => {
         if (nameToField[key] !== undefined) {
-          valuesMapInit[key] = instance[key];
+          valuesMapInit[key] = instance.values[key];
         }
       });
     }
@@ -261,6 +264,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   const handleSubmit = () => {
     const result = submitForm(definition, instance, valuesMap, t, errors);
+    console.log("Submit result:", result);
     // Display result message in the UI instead of using alert
     const msg = typeof result.message === 'string' ? result.message : String(result.message);
     setSubmissionMessage(msg);
@@ -307,6 +311,13 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   if (!initDone) {
     return <div>Initializing form...</div>;
+  }
+
+  if (language !== savedLanguage) {
+    setSavedLanguage(language || "en");
+    // When language changes, clear any existing submission message
+    setSubmissionMessage(null);
+    setSubmissionSuccess(null);
   }
 
   return (

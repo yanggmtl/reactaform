@@ -74,6 +74,17 @@ const translationDefinition = {
   ]
 };
 
+const predefined_instance = {
+  name: "instance1",
+  version: "1.0.0", 
+  definition: "personalInformation",
+  values: {
+    name: "Alice",
+    birthday: "1990-05-15",
+    age: 33,
+  }
+};
+
 export default function App() {
   const [language, setLanguage] = useState("en");
 
@@ -95,12 +106,9 @@ export default function App() {
         </label>
       </div>
       <ReactaForm
-        definitionData={{
-          ...translationDefinition,
-          // Use the preset handler for demo purposes
-          submitHandlerName: "Preset_AlertSubmitHandler",
-        }}
-          language={language}
+        definitionData={translationDefinition}
+        language={language}
+        instance={predefined_instance}
       />
     </div>
   );

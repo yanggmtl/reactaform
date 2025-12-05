@@ -89,10 +89,19 @@ export interface ReactaDefinition {
   submitHandlerName?: string;
 }
 
+export interface ReactaInstance {
+  name: string;
+  definition: string;
+  version: string;
+  values: {
+    [fieldName: string]: FieldValueType;
+  };
+}
+
 export interface ReactaFormProps {
   definitionData: string | Record<string, unknown>; // Json string or map object
   language?: string;
-  instance?: Record<string, FieldValueType>;
+  instance?: ReactaInstance;
   className?: string;
   darkMode?: boolean;
   style?: React.CSSProperties;
@@ -115,6 +124,7 @@ export type FormValidationHandler = (
 // Submission function: returns error string or undefined if valid
 export type FormSubmissionHandler = (
   definition: ReactaDefinition | Record<string, unknown>,
+  instanceName: string | null,
   valuesMap: Record<string, FieldValueType | unknown>,
   t: (key: string) => string
 ) => string[] | undefined;

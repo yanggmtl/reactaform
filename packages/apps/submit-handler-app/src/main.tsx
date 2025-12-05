@@ -6,11 +6,8 @@
 // library interface. Use this app to test submission handler behavior.
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  ReactaForm,
-  registerSubmissionHandler,
-} from "reactaform";
-import type { FieldValueType, FormSubmissionHandler } from "reactaform";
+import { ReactaForm, registerSubmissionHandler } from "reactaform";
+import type { FieldValueType, FormSubmissionHandler, ReactaInstance } from "reactaform";
 import "./style.css";
 
 const exampleDefinition = {
@@ -42,23 +39,43 @@ const exampleDefinition = {
 };
 
 const predefinedInstance = {
-  "firstName": "John",
-  "age": 30,
-  "subscribe": false,
-}
-
+  name: "exampleInstance1",
+  version: "1.0.0",
+  definition: "submit_handler_app",
+  values: {
+    firstName: "John",
+    age: 30,
+    subscribe: false,
+  },
+};
 export default function App() {
-  const [instance, setInstance] = useState<Record<string, FieldValueType>>(predefinedInstance);
+  const [instance, setInstance] = useState<ReactaInstance>(predefinedInstance);
   const [serialized, setSerialized] = useState<string>("");
 
   // Register a submission handler that stores submitted values into the local `instance` state
   React.useEffect(() => {
-    const handler: FormSubmissionHandler = (_definition, valuesMap, _t) => {
-      void _definition;
-      void _t;
-      setInstance(valuesMap as Record<string, FieldValueType>);
-      const serializedStr = JSON.stringify(valuesMap, null, 2);
-      setSerialized(serializedStr);
+    const handler: FormSubmissionHandler = (
+      definition, instanceName, valuesMap, t
+    ): string[] | undefined => {
+      void definition;
+      void t;
+      void instanceName;
+
+      // Use functional update to avoid stale closures over `instance` and ensure we always
+      // base the new instance on the latest state.
+      setInstance((prev) => {
+        const prevInst = (prev as ReactaInstance) || ({} as ReactaInstance);
+        const newInstance: ReactaInstance = {
+          ...prevInst,
+          name: instanceName || prevInst.name || "Unnamed Instance",
+          version: definition.version as string,
+          values: valuesMap as Record<string, FieldValueType>,
+        };
+        // update serialized snapshot immediately
+        setSerialized(JSON.stringify(newInstance, null, 2));
+        return newInstance;
+      });
+
       return undefined;
     };
 
@@ -79,12 +96,24 @@ export default function App() {
           />
         </div>
 
-        <div style={{ width: 320, height: "100%", display: "flex", flexDirection: "column" }}>
+        <div
+          style={{
+            width: 320,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <div>
             <strong>Instance (JSON)</strong>
           </div>
           <textarea
-            style={{ flex: 1, width: "100%", boxSizing: "border-box", fontFamily: "monospace" }}
+            style={{
+              flex: 1,
+              width: "100%",
+              boxSizing: "border-box",
+              fontFamily: "monospace",
+            }}
             value={serialized || JSON.stringify(instance, null, 2)}
             onChange={(e) => setSerialized(e.target.value)}
           />

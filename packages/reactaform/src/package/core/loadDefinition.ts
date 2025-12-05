@@ -1,8 +1,7 @@
 
-import type { ReactaDefinition } from "./reactaFormTypes";
+import type { ReactaDefinition, ReactaInstance, DefinitionPropertyField } from "./reactaFormTypes";
 
 export interface LoadDefinitionOptions {
-  timeout?: number;
   validateSchema?: boolean;
 }
 
@@ -15,137 +14,62 @@ export interface DefinitionLoadResult {
 /**
  * Validates that a definition object has the required structure
  */
-export function validateDefinitionSchema(definition: unknown): string | null {
-  if (!definition || typeof definition !== 'object') {
-    return "Definition must be a valid object";
-  }
-
-  const defObj = definition as Record<string, unknown>;
-
-  if (!defObj.name || typeof defObj.name !== 'string') {
-    return "Definition must have a valid 'name' property";
-  }
-
-  if (!defObj.version || typeof defObj.version !== 'string') {
-    return "Definition must have a valid 'version' property";
-  }
-
-  if (!defObj.displayName || typeof defObj.displayName !== 'string') {
-    return "Definition must have a valid 'displayName' property";
-  }
-
-  if (!Array.isArray(defObj.properties)) {
-    return "Definition must have a 'properties' array";
-  }
-
-  // Validate each property
-  for (let i = 0; i < (defObj.properties as unknown[]).length; i++) {
-    const prop = (defObj.properties as unknown[])[i] as Record<string, unknown>;
-    if (!prop.name || typeof prop.name !== 'string') {
-      return `Property at index ${i} must have a valid 'name'`;
-    }
-    if (!prop.displayName || typeof prop.displayName !== 'string') {
-      return `Property '${prop.name}' must have a valid 'displayName'`;
-    }
-    if (!prop.type || typeof prop.type !== 'string') {
-      return `Property '${prop.name}' must have a valid 'type'`;
+export function validateDefinitionSchema(definition: ReactaDefinition): string | null {
+  if (!definition || typeof definition !== "object") return "Definition must be an object";
+  const def = definition;
+  if (!def.name || typeof def.name !== "string") return "Definition must include a 'name' string";
+  if (!def.version || typeof def.version !== "string") return "Definition must include a 'version' string";
+  if (def.properties !== undefined && !Array.isArray(def.properties)) return "'properties' must be an array if provided";
+  if (Array.isArray(def.properties)) {
+    for (let i = 0; i < def.properties.length; i++) {
+      const p = def.properties[i];
+      if (!p || typeof p !== 'object') return `Property at index ${i} must be an object`;
+      if (!p.name || typeof p.name !== 'string') return `Property at index ${i} must have a string 'name'`;
+      if (!p.type || typeof p.type !== 'string') return `Property '${p.name}' must have a string 'type'`;
     }
   }
-
   return null;
 }
 
 /**
- * Load definition from a configuration file with comprehensive error handling
+ * Load definition from a JSON string. This intentionally does not perform any file I/O.
  */
-export async function loadDefinition(
-  configFile: string, 
+export async function loadJsonDefinition(
+  jsonData: string,
   options: LoadDefinitionOptions = {}
 ): Promise<DefinitionLoadResult> {
-  const { timeout = 10000, validateSchema = true } = options;
+  const { validateSchema = true } = options;
 
   try {
-    const ext = configFile.split(".").pop()?.toLowerCase();
-
-    if (!ext || !["json"].includes(ext)) {
-      return {
-        success: false,
-        error: `Unsupported config file type: ${ext}. Only JSON files are currently supported.`
-      };
+    if (!jsonData || typeof jsonData !== 'string') {
+      return { success: false, error: 'jsonData must be a non-empty JSON string' };
     }
 
-    // Create abort controller for timeout handling
-    const abortController = new AbortController();
-    const timeoutId = setTimeout(() => abortController.abort(), timeout);
+    const text = jsonData.trim();
+    if (!text) {
+      return { success: false, error: 'jsonData is empty' };
+    }
 
-    let response: Response;
+    let definition: ReactaDefinition;
     try {
-      response = await fetch(configFile, { 
-        signal: abortController.signal,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-    } finally {
-      clearTimeout(timeoutId);
-    }
-
-    if (!response.ok) {
+      definition = JSON.parse(text) as unknown as ReactaDefinition;
+    } catch (parseError) {
       return {
         success: false,
-        error: `Failed to fetch ${configFile}: ${response.status} ${response.statusText}`
+        error: `Invalid JSON format: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`
       };
     }
 
-    const text = await response.text();
-    if (!text.trim()) {
-      return {
-        success: false,
-        error: "Configuration file is empty"
-      };
-    }
-
-    let definition: unknown;
-    if (ext === "json") {
-      try {
-        definition = JSON.parse(text);
-      } catch (parseError) {
-        return {
-          success: false,
-          error: `Invalid JSON format: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`
-        };
-      }
-    }
-
-    // Validate schema if requested
     if (validateSchema) {
       const validationError = validateDefinitionSchema(definition);
       if (validationError) {
-        return {
-          success: false,
-          error: `Schema validation failed: ${validationError}`
-        };
+        return { success: false, error: `Schema validation failed: ${validationError}` };
       }
     }
 
-    return {
-      success: true,
-      definition: definition as ReactaDefinition
-    };
-
+    return { success: true, definition: definition as ReactaDefinition };
   } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      return {
-        success: false,
-        error: `Request timeout after ${timeout}ms`
-      };
-    }
-    
-    return {
-      success: false,
-      error: `Unexpected error loading config: ${error instanceof Error ? error.message : 'Unknown error'}`
-    };
+    return { success: false, error: `Unexpected error loading definition: ${error instanceof Error ? error.message : 'Unknown error'}` };
   }
 }
 
@@ -153,9 +77,9 @@ export async function loadDefinition(
  * Create instance from definition with validation and error handling
  */
 export function createInstanceFromDefinition(
-  definition: ReactaDefinition | Record<string, unknown>, 
+  definition: ReactaDefinition, 
   name: string
-): { success: boolean; instance?: Record<string, unknown>; error?: string } {
+): { success: boolean; instance?: ReactaInstance; error?: string } {
   try {
     if (!definition) {
       return { success: false, error: "Definition is required" };
@@ -165,13 +89,14 @@ export function createInstanceFromDefinition(
       return { success: false, error: "Instance name is required" };
     }
 
-    const instance: Record<string, unknown> = { name };
-    const defObj = definition as Record<string, unknown>;
-    instance.version = (defObj.version as string) || "1.0.0";
-    instance.definition = (defObj.name as string) || "unknown";
-    instance.values = {};
+    const instance: ReactaInstance = {
+      name,
+      definition: definition.version ?? "1.0.0",
+      version: definition.name ?? "unknown",
+      values: {}
+    };
 
-    const properties = (definition as Record<string, unknown>).properties || [];
+    const properties = definition.properties || [];
     if (Array.isArray(properties)) {
       (properties as unknown[]).forEach((prop) => {
         const p = prop as Record<string, unknown>;
@@ -195,13 +120,13 @@ export function createInstanceFromDefinition(
  */
 export function loadInstance(
   instanceData: string | Record<string, unknown>
-): { success: boolean; instance?: Record<string, unknown>; error?: string } {
+): { success: boolean; instance?: ReactaInstance; error?: string } {
   try {
     if (!instanceData) {
       return { success: false, error: "Instance data is required" };
     }
 
-    let instance: Record<string, unknown>;
+    let instance: ReactaInstance;
     
     if (typeof instanceData === "string") {
       try {
@@ -213,7 +138,7 @@ export function loadInstance(
         };
       }
     } else {
-      instance = instanceData as Record<string, unknown>;
+      instance = instanceData as unknown as ReactaInstance;
     }
 
     // Basic validation
@@ -229,3 +154,137 @@ export function loadInstance(
     };
   }
 }
+
+export function upgradeInstanceToLatestDefinition(
+  instance: ReactaInstance,
+  latestDefinition: ReactaDefinition,
+  // optional callback allowing custom upgrade logic
+  callback?: (oldInstance: ReactaInstance, newInstance: Record<string, unknown>, latestDefinition: ReactaDefinition) => void
+): { success: boolean; upgradedInstance?: Record<string, unknown>; error?: string } {
+  try {
+    if (!instance) {
+      return { success: false, error: "Instance is required" };
+    }
+    if (!latestDefinition) {
+      return { success: false, error: "Latest definition is required" };
+    }
+
+    // If the instance version and definition match the latest, no upgrade needed
+    if (instance.definition === latestDefinition.name && instance.version === latestDefinition.version) {
+      return { success: true, upgradedInstance: instance as unknown as Record<string, unknown> };
+    }
+
+    // Create a new empty instance based on the latest definition (no values copied yet)
+    const newInstance: Record<string, unknown> = {
+      name: instance.name || (latestDefinition.name + "-instance"),
+      definition: latestDefinition.name,
+      version: latestDefinition.version,
+      values: {},
+    };
+
+    const newValues = newInstance.values as Record<string, unknown>;
+
+    // Build a map of latest property definitions for quick lookup
+    const latestPropMap: Record<string, DefinitionPropertyField> = {};
+    (latestDefinition.properties || []).forEach((p) => {
+      latestPropMap[p.name] = p;
+    });
+
+    // Helper: best-effort conversion from old value to a target type string
+    const convertValueToType = (value: unknown, targetType: string, prop?: DefinitionPropertyField) => {
+      if (value === null || value === undefined) return value;
+      const t = targetType.toLowerCase();
+      try {
+        if (t === 'string') return String(value);
+        if (t === 'int' || t === 'integer' || t === 'number' || t === 'float') {
+          if (typeof value === 'number') return value;
+          if (typeof value === 'boolean') return value ? 1 : 0;
+          if (typeof value === 'string') {
+            const n = Number(value.trim());
+            return Number.isNaN(n) ? 0 : n;
+          }
+          return 0;
+        }
+        if (t === 'boolean' || t === 'bool') {
+          if (typeof value === 'boolean') return value;
+          if (typeof value === 'number') return value !== 0;
+          if (typeof value === 'string') return ['true','1','yes'].includes(value.toLowerCase());
+          return Boolean(value);
+        }
+        if (t === 'unit') {
+          // Expect [number, unit]
+          if (Array.isArray(value) && value.length >= 1) return value;
+          if (typeof value === 'number') return [value, (prop && prop.defaultUnit) || ''];
+          if (typeof value === 'string') {
+            const num = Number(value);
+            if (!Number.isNaN(num)) return [num, (prop && prop.defaultUnit) || ''];
+            return [0, (prop && prop.defaultUnit) || ''];
+          }
+          return value;
+        }
+        // array target type e.g., string[] or number[]
+        if (t.endsWith('[]') || t === 'array') {
+          if (Array.isArray(value)) return value;
+          if (typeof value === 'string') return value.split(',').map(s => s.trim()).filter(Boolean);
+          return [value];
+        }
+      } catch {
+        // fallthrough
+      }
+      // default fallback
+      return value;
+    };
+
+    // Iterate through old instance values and migrate those that still exist in latest definition
+    const oldValues = (instance.values || {}) as Record<string, unknown>;
+    Object.keys(oldValues).forEach((key) => {
+      const oldVal = oldValues[key];
+      const latestProp = latestPropMap[key];
+      if (!latestProp) {
+        // property removed in latest definition -- skip
+        return;
+      }
+
+      // Compare types naively by string equality
+      const oldType = (() => {
+        if (Array.isArray(oldVal)) return 'array';
+        if (oldVal === null) return 'null';
+        return typeof oldVal;
+      })();
+      const newType = (latestProp.type || '').toLowerCase();
+
+      if (oldType === newType || (newType === 'string' && typeof oldVal === 'string')) {
+        // same-ish type, copy as is
+        newValues[key] = oldVal;
+      } else {
+        // attempt conversion
+        newValues[key] = convertValueToType(oldVal, newType, latestProp);
+      }
+    });
+
+    // Add any new properties from the latest definition with default values if not present
+    (latestDefinition.properties || []).forEach((prop) => {
+      const propName = prop.name as string;
+      if (!(propName in newValues)) {
+        newValues[propName] = prop.defaultValue;
+      }
+    });
+
+    // Allow caller to customize the upgrade process (merge/add custom values)
+    try {
+      if (typeof callback === 'function') {
+        callback?.(instance, newInstance, latestDefinition);
+      }
+    } catch (cbErr) {
+      // swallow callback errors but report them
+      return { success: false, error: `Upgrade callback error: ${cbErr instanceof Error ? cbErr.message : String(cbErr)}` };
+    }
+
+    return { success: true, upgradedInstance: newInstance };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: `Error upgrading instance: ${error instanceof Error ? error.message : 'Unknown error'}` 
+    };
+  }
+} 

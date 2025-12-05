@@ -47,16 +47,27 @@ const testDefinition = {
   ]
 };
 
+const predefined_instance = {
+  "name": "parentsExampleInstance",
+  "version": "1.0.0",
+  "definition": "customerSurvey",
+  "values": {
+    "name": "John Doe",
+    "satisfaction": 4,
+    "satisfyWithService": false,
+    "suggestion": "Improve response time."
+  }
+};
+
 export default function App() {
   return (
     <div className={`app`}>
-      <h2>Reactaform Translation Example</h2>
+      <h2>Reactaform Parents Example</h2>
       <ReactaForm
         definitionData={{
           ...testDefinition,
-          // Use the preset handler for demo purposes
-          submitHandlerName: "Preset_AlertSubmitHandler",
         }}
+        instance={predefined_instance}
       />
     </div>
   );

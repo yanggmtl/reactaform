@@ -1,4 +1,4 @@
-import type { ReactaDefinition, FieldValueType } from "./reactaFormTypes";
+import type { ReactaDefinition, FieldValueType, ReactaInstance } from "./reactaFormTypes";
 import { validateFormValues } from "./validation";
 import { getFormSubmissionHandler } from "./registries/submissionHandlerRegistry";
 
@@ -11,7 +11,7 @@ export interface SubmitResult {
 
 export function submitForm(
   definition: ReactaDefinition,
-  instance: Record<string, unknown>,
+  instance: ReactaInstance | null,
   valuesMap: Record<string, FieldValueType | unknown>,
   t: (key: string) => string,
   errors: Record<string, string>
@@ -99,7 +99,7 @@ export function submitForm(
 
     if (submitHandler) {
       try {
-        const submitResult = submitHandler(definition, finalMap, t);
+        const submitResult = submitHandler(definition, instance?.name ?? null, finalMap, t);
         if (submitResult && submitResult.length > 0) {
           return { 
             success: false, 

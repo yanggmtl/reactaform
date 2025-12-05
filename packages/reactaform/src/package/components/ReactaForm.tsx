@@ -75,7 +75,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
       >
         <ReactaFormRenderer
           definition={definition}
-          instance={instance?? {}}
+          instance={instance?? null}
         />
       </ReactaFormProvider>
       )

@@ -20,17 +20,17 @@
   "scripts": {
     "build": "npm -w reactaform run build:lib && npm run build:apps",
     "build:lib": "npm -w reactaform run build:lib",
+    "build:app": "node ./scripts/run-workspace.js build",
     "build:apps": "node ./scripts/build-apps.js",
-    "build:example": "npm --workspace=reactaform-example run build",
-    "build:pack": "npm -w reactaform run build:lib && npm -w reactaform run pack:staging",
+    "build:pack": "npm -w reactaform run build:lib && npm pack ./packages/reactaform --pack-destination .",
     "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
+    "dev:app": "node ./scripts/run-workspace.js dev",
     "test": "npm -w reactaform run test",
     "typecheck": "npm -w reactaform run typecheck",
-    "dev": "npm --workspace=reactaform-example run dev",
     "lint": "eslint .",
-    "preview": "vite preview",
     "pack:staging": "npm -w reactaform run pack:staging",
-    "pack:staging:all": "node ./scripts/clean-tgz.cjs && npm -w reactaform run build:lib && npm -w reactaform run pack:staging"
+    "pack:staging:all": "node ./scripts/clean-tgz.cjs && npm -w reactaform run build:lib && npm -w reactaform run pack:staging",
+    "pack:root": "npm pack ./packages/reactaform --pack-destination ."
   },
   "workspaces": [
     "packages/*",

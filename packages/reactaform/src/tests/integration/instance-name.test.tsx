@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { registerSubmissionHandler } from '../../package/core/registries/submissionHandlerRegistry';
 import { submitForm } from '../../package/core/submitForm';
-import type { ReactaDefinition, ReactaInstance } from 'reactaform';
+import type { ReactaDefinition, ReactaInstance } from '../../package/core/reactaFormTypes';
 
 // Minimal definition used by test
 const def: ReactaDefinition = {

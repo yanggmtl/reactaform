@@ -10,7 +10,7 @@ body {
 }
 
 .app {
-  max-width: 1400px;
+  width: 800px;
   margin: 0 auto;
   background: white;
   padding: 24px;

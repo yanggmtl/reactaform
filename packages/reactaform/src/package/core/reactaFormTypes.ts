@@ -110,7 +110,7 @@ export interface ReactaFormProps {
 // Field validator function: returns error string or undefined if valid
 export type FieldValidationHandler = (
   value: FieldValueType | unknown,
-  t: (key: string) => string,
+  t: (defaultText: string, ...args: unknown[]) => string,
 ) => string | undefined;
 
 // Form validator function: takes entire values map,
@@ -118,7 +118,7 @@ export type FieldValidationHandler = (
 // This is used for cross-field validation
 export type FormValidationHandler = (
   valuesMap: Record<string, FieldValueType | unknown>,
-  t: (key: string) => string,
+  t: (key: string, ...args: unknown[]) => string,
 ) => string[] | undefined;
 
 // Submission function: returns error string or undefined if valid
@@ -126,7 +126,7 @@ export type FormSubmissionHandler = (
   definition: ReactaDefinition | Record<string, unknown>,
   instanceName: string | null,
   valuesMap: Record<string, FieldValueType | unknown>,
-  t: (key: string) => string
+  t: (defaultText: string, ...args: unknown[]) => string
 ) => string[] | undefined;
 
 // Generic input change callback used by input components

@@ -91,8 +91,8 @@ export function createInstanceFromDefinition(
 
     const instance: ReactaInstance = {
       name,
-      definition: definition.version ?? "1.0.0",
-      version: definition.name ?? "unknown",
+      definition: definition.name ?? "unknown",
+      version: definition.version ?? "1.0.0",
       values: {}
     };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import type {
   FieldValueType,
   ErrorType,
@@ -10,6 +10,7 @@ import useReactaFormContext from "../hooks/useReactaFormContext";
 import { renderFieldsWithGroups } from "../components/renderFields";
 import { VirtualizedFieldList } from "../components/VirtualizedFieldList";
 import { getComponent } from "../core/registries";
+import { InstanceName } from "./LayoutComponents";
 import {
   updateVisibilityMap,
   updateVisibilityBasedOnSelection,
@@ -17,6 +18,7 @@ import {
 } from "../core/fieldVisibility";
 import { renameDuplicatedGroups } from "../utils/groupingHelpers";
 import { submitForm } from "../core/submitForm";
+import { createInstanceFromDefinition } from "../core";
 
 export interface ReactaFormRendererProps {
   definition: ReactaDefinition;
@@ -62,6 +64,9 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   const [loadedCount, setLoadedCount] = useState(0); // how many fields are loaded so far
   const [initDone, setInitDone] = useState(false);
   const [btnHover, setBtnHover] = useState(false);
+  const [instanceName, setInstanceName] = useState<string>(instance?.name || '');
+  const targetInstanceRef = useRef<ReactaInstance | null>(instance);
+  const suppressClearOnNextInstanceUpdate = useRef(false);
 
  
   // Step 1: Initialize basic structures immediately
@@ -127,11 +132,15 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
     // Use instance to override valuesMapInit
     if (instance) {
+      targetInstanceRef.current = instance;
       Object.keys(instance.values).forEach((key) => {
         if (nameToField[key] !== undefined) {
           valuesMapInit[key] = instance.values[key];
         }
       });
+    } else {
+      const result = createInstanceFromDefinition(definition, definition.name);
+      targetInstanceRef.current = result.instance ?? null;
     }
 
     // Initialize visibility map
@@ -155,9 +164,15 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       );
       setGroupState(groupInit);
       setInitDone(true);
+      // Update instance name in state to sync with current instance
+      if (instance) {
+        setInstanceName(instance.name);
+      } else if (targetInstanceRef.current) {
+        setInstanceName(targetInstanceRef.current.name || '');
+      }
     });
     return () => cancelAnimationFrame(raf);
-  }, [properties, instance]);
+  }, [properties, instance, definition]);
 
   // Step 2: Load fields progressively
   useEffect(() => {
@@ -247,6 +262,40 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     [fieldMap, setSubmissionMessage, setSubmissionSuccess]
   );
 
+  // Sync language changes: update savedLanguage and clear messages
+  // Use RAF to avoid cascading renders.
+  useEffect(() => {
+    let raf = 0;
+    raf = requestAnimationFrame(() => {
+      if (language !== savedLanguage) {
+        setSavedLanguage(language || "en");
+        setSubmissionMessage(null);
+        setSubmissionSuccess(null);
+      }
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [language, savedLanguage]);
+
+  // When the active instance changes (selection switched), clear submission messages
+  // and sync the editable instance name and ref. Use RAF to avoid cascading renders.
+  useEffect(() => {
+    let raf = 0;
+    raf = requestAnimationFrame(() => {
+      // If this instance update was caused by our own successful submit,
+      // skip clearing the submission message but still sync the editable name.
+      if (suppressClearOnNextInstanceUpdate.current) {
+        suppressClearOnNextInstanceUpdate.current = false;
+        setInstanceName(instance?.name || "");
+        return;
+      }
+
+      setSubmissionMessage(null);
+      setSubmissionSuccess(null);
+      setInstanceName(instance?.name || "");
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [instance?.name]);
+
   // handleError: used by input components to report validation-only updates
   // that originate from prop sync (not user events). This keeps the error
   // map up to date when components validate on mount or when external props
@@ -263,12 +312,34 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   }, []);
 
   const handleSubmit = () => {
-    const result = submitForm(definition, instance, valuesMap, t, errors);
-    console.log("Submit result:", result);
-    // Display result message in the UI instead of using alert
+    // Temporarily apply the edited name so submission handlers receive it.
+    // Mark that we expect an instance update from this submit and we want
+    // to suppress clearing messages when that update arrives.
+    suppressClearOnNextInstanceUpdate.current = true;
+
+    const prevName = targetInstanceRef.current?.name;
+    if (targetInstanceRef.current) {
+      targetInstanceRef.current.name = instanceName;
+    }
+
+    const result = submitForm(definition, targetInstanceRef.current, valuesMap, t, errors);
+    // Display result message in the UI
     const msg = typeof result.message === 'string' ? result.message : String(result.message);
-    setSubmissionMessage(msg);
+    const errMsg = Object.values(result.errors??{}).join("\n");
+    if (errMsg) {
+      setSubmissionMessage(msg + "\n" + errMsg);
+    } else {
+      setSubmissionMessage(msg);
+    }
     setSubmissionSuccess(result.success);
+
+    if (!result.success) {
+      // Revert name if submission failed
+      if (targetInstanceRef.current) {
+        targetInstanceRef.current.name = prevName ?? targetInstanceRef.current.name;
+        setInstanceName(prevName ?? "");
+      }
+    }
   };
 
   const toggleGroup = (groupName: string) => {
@@ -313,12 +384,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     return <div>Initializing form...</div>;
   }
 
-  if (language !== savedLanguage) {
-    setSavedLanguage(language || "en");
-    // When language changes, clear any existing submission message
-    setSubmissionMessage(null);
-    setSubmissionSuccess(null);
-  }
+  
 
   return (
     <div style={formStyle.container}>
@@ -357,6 +423,18 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
             ×
           </button>
         </div>
+      )}
+      {instance && (
+        <InstanceName
+          name={instanceName}
+          onChange={(newName) => {
+            // Only update the editable local name here. The actual instance
+            // object's name will be updated only if a submit succeeds.
+            setInstanceName(newName);
+            setSubmissionMessage(null);
+            setSubmissionSuccess(null);
+          }}
+        />
       )}
       {shouldUseVirtualization ? (
         <VirtualizedFieldList
@@ -410,7 +488,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
             : "var(--reactaform-button-bg, var(--reactaform-success-color))",
           color: "var(--reactaform-button-text, #ffffff)",
           border: "none",
-          borderRadius: "var(--reactaform-button-border-radius, var(--reactaform-border-radius, 4px))",
+          borderRadius: "4px",
           cursor: isApplyDisabled ? "var(--reactaform-button-disabled-cursor, not-allowed)" : "pointer",
           fontSize: "var(--reactaform-button-font-size, 14px)",
           fontWeight: "var(--reactaform-button-font-weight, 500)",

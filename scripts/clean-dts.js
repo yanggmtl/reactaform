@@ -16,7 +16,6 @@ async function removeDts(dir) {
         const rem = await fs.readdir(full);
         if (rem.length === 0) {
           await fs.rmdir(full);
-//          console.log('Removed empty directory', full);
         }
       } catch (e) {
         // ignore
@@ -25,7 +24,6 @@ async function removeDts(dir) {
       if (full.endsWith('.d.ts') && full !== keep) {
         try {
           await fs.unlink(full);
-//          console.log('Removed', full);
         } catch (err) {
           console.error('Failed to remove', full, err && err.message ? err.message : err);
         }

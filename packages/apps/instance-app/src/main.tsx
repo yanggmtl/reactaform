@@ -6,6 +6,7 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
+  createInstanceFromDefinition,
   ReactaForm,
   registerSubmissionHandler,
 } from "reactaform";
@@ -52,7 +53,20 @@ const exampleDefinition: ReactaDefinition = {
   ],
 };
 
-let instanceCounter = 1;
+// Helper: produce a unique instance name based on the definition name.
+// Format: "user_profile (1)", "user_profile (2)", ...
+const getUniqueName = (baseName: string, instances: ReactaInstance[]) => {
+  let i = 1;
+  let candidate = `${baseName} (${i})`;
+  const exists = (name: string) => instances.some((ins) => ins.name === name);
+  while (exists(candidate)) {
+    i += 1;
+    candidate = `${baseName} (${i})`;
+  }
+  return candidate;
+};
+
+// instanceCounter removed: using name-based uniqueness instead
 
 export default function App() {
   const [instances, setInstances] = useState<ReactaInstance[]>([]);
@@ -61,24 +75,49 @@ export default function App() {
   const [loadJsonInput, setLoadJsonInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Register submission handler to update the selected instance
+  // Use refs to avoid stale closures in the registered handler and keep
+  // registration stable. We update the refs whenever state changes and
+  // register a stable wrapper that forwards to the latest refs.
+  const selectedIndexRef = React.useRef<number | null>(selectedIndex);
+  const instancesRef = React.useRef<ReactaInstance[]>(instances);
+
   React.useEffect(() => {
-    const handler = (
+    selectedIndexRef.current = selectedIndex;
+  }, [selectedIndex]);
+
+  React.useEffect(() => {
+    instancesRef.current = instances;
+  }, [instances]);
+
+  const submissionHandler = React.useCallback(
+    (
       definition: ReactaDefinition | Record<string, unknown>,
       instanceName: string | null,
       valuesMap: Record<string, unknown>,
-      t: (key: string) => string
+      t: (defaultText: string, ...args: unknown[]) => string
     ): string[] | undefined => {
       void definition;
       void t;
-      void instanceName;
 
-      // Update the currently selected instance with new values
-      if (selectedIndex !== null) {
+      // Check duplicated name and return error if duplicated (use latest instances ref)
+      if (
+        instanceName &&
+        instancesRef.current.some(
+          (ins, idx) => ins.name === instanceName && idx !== (selectedIndexRef.current ?? -1)
+        )
+      ) {
+        return [t("Instance name {{1}} has been used. Please choose another name.", `"${instanceName}"`)];
+      }
+
+      // Update the currently selected instance with new values and name
+      const idx = selectedIndexRef.current;
+      if (idx !== null && idx !== undefined) {
         setInstances((prev) => {
           const updated = [...prev];
-          updated[selectedIndex] = {
-            ...updated[selectedIndex],
+          const current = updated[idx];
+          updated[idx] = {
+            ...current,
+            name: instanceName ?? current.name,
             values: valuesMap,
           };
           return updated;
@@ -86,28 +125,31 @@ export default function App() {
       }
 
       return undefined;
-    };
+    },
+    [setInstances]
+  );
 
-    registerSubmissionHandler("instanceAppSubmitHandler", handler);
-  }, [selectedIndex]);
+  React.useEffect(() => {
+    // Register once (handler identity is stable via useCallback)
+    registerSubmissionHandler("instanceAppSubmitHandler", submissionHandler);
+    // No unregister here; registry is app-global for the demo app.
+  }, [submissionHandler]);
 
   const handleNew = () => {
-    const newInstance: ReactaInstance = {
-      name: `Instance ${instanceCounter++}`,
-      definition: exampleDefinition.name,
-      version: exampleDefinition.version,
-      values: {},
-    };
+    const uniqueName = getUniqueName(exampleDefinition.name, instances);
+    const res = createInstanceFromDefinition(exampleDefinition, uniqueName);
+    if (!res || !res.instance) {
+      setErrorMessage(res?.error || "Failed to create instance");
+      return;
+    }
 
-    // Populate with default values from definition
-    exampleDefinition.properties?.forEach((prop) => {
-      if (prop.defaultValue !== undefined) {
-        newInstance.values[prop.name] = prop.defaultValue;
-      }
+    // Normalize to local shape
+    const newInstance = res.instance as unknown as ReactaInstance;
+    setInstances((prev) => {
+      const updated = [...prev, newInstance];
+      setSelectedIndex(updated.length - 1);
+      return updated;
     });
-
-    setInstances((prev) => [...prev, newInstance]);
-    setSelectedIndex(instances.length); // Select the new instance
     setErrorMessage("");
   };
 
@@ -181,7 +223,7 @@ export default function App() {
         <div className={`editor-panel ${!selectedInstance ? "empty" : ""}`}>
           {selectedInstance ? (
             <ReactaForm
-              definitionData={exampleDefinition}
+              definitionData={exampleDefinition as unknown as Record<string, unknown>}
               instance={selectedInstance}
             />
           ) : (

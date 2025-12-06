@@ -209,3 +209,52 @@ export const ErrorDiv = memo(({ children }: { children: React.ReactNode }) => {
 });
 
 ErrorDiv.displayName = 'ErrorDiv';
+
+/**
+ * InstanceName - display and edit an instance name in a compact grid row
+ *
+ * Props:
+ * - `name`: current instance name
+ * - `onChange`: callback invoked with new name when edited
+ */
+export const InstanceName = memo(({ name, onChange }: { name: string; onChange: (n: string) => void }) => {
+  const { t } = useReactaFormContext();
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12, alignItems: 'center' }}>
+        <label
+          htmlFor="instance-name-input"
+          style={{
+            margin: 0,
+            fontSize: '0.95em',
+            fontWeight: 500,
+            color: 'var(--reactaform-text-color, #333)'
+          }}
+        >
+          {t('Instance Name')}
+        </label>
+        <input
+          id="instance-name-input"
+          type="text"
+          value={name}
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: 'var(--reactaform-input-padding, 8px 12px)',
+            fontSize: 'var(--reactaform-input-font-size, 14px)',
+            border: '1px solid var(--reactaform-input-border, #ddd)',
+            borderRadius: 'var(--reactaform-border-radius, 4px)',
+            backgroundColor: 'var(--reactaform-input-bg, #fff)',
+            color: 'var(--reactaform-text-color, #333)',
+            boxSizing: 'border-box'
+          }}
+          placeholder={t('Enter instance name')}
+        />
+      </div>
+      <div style={{ height: '1px', backgroundColor: 'var(--reactaform-separator, #e6e6e6)', marginTop: 12, marginBottom: 12 }} />
+    </div>
+  );
+});
+
+InstanceName.displayName = 'InstanceName';

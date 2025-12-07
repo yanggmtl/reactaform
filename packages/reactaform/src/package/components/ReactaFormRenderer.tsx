@@ -18,11 +18,10 @@ import {
 } from "../core/fieldVisibility";
 import { renameDuplicatedGroups } from "../utils/groupingHelpers";
 import { submitForm } from "../core/submitForm";
-import { createInstanceFromDefinition } from "../core";
 
 export interface ReactaFormRendererProps {
   definition: ReactaDefinition;
-  instance: ReactaInstance | null;
+  instance: ReactaInstance;
   chunkSize?: number;
   chunkDelay?: number;
   enableVirtualization?: boolean;
@@ -64,8 +63,8 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   const [loadedCount, setLoadedCount] = useState(0); // how many fields are loaded so far
   const [initDone, setInitDone] = useState(false);
   const [btnHover, setBtnHover] = useState(false);
-  const [instanceName, setInstanceName] = useState<string>(instance?.name || '');
-  const targetInstanceRef = useRef<ReactaInstance | null>(instance);
+  const [instanceName, setInstanceName] = useState<string>(instance.name || '');
+  const targetInstanceRef = useRef<ReactaInstance>(instance);
   const suppressClearOnNextInstanceUpdate = useRef(false);
 
  
@@ -131,17 +130,12 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     });
 
     // Use instance to override valuesMapInit
-    if (instance) {
-      targetInstanceRef.current = instance;
-      Object.keys(instance.values).forEach((key) => {
-        if (nameToField[key] !== undefined) {
-          valuesMapInit[key] = instance.values[key];
-        }
-      });
-    } else {
-      const result = createInstanceFromDefinition(definition, definition.name);
-      targetInstanceRef.current = result.instance ?? null;
-    }
+    targetInstanceRef.current = instance;
+    Object.keys(instance.values).forEach((key) => {
+      if (nameToField[key] !== undefined) {
+        valuesMapInit[key] = instance.values[key];
+      }
+    });
 
     // Initialize visibility map
     const vis = initializeVisibility(updatedProps);
@@ -165,11 +159,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       setGroupState(groupInit);
       setInitDone(true);
       // Update instance name in state to sync with current instance
-      if (instance) {
-        setInstanceName(instance.name);
-      } else if (targetInstanceRef.current) {
-        setInstanceName(targetInstanceRef.current.name || '');
-      }
+      setInstanceName(instance.name);
     });
     return () => cancelAnimationFrame(raf);
   }, [properties, instance, definition]);
@@ -285,16 +275,20 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       // skip clearing the submission message but still sync the editable name.
       if (suppressClearOnNextInstanceUpdate.current) {
         suppressClearOnNextInstanceUpdate.current = false;
-        setInstanceName(instance?.name || "");
+        // Keep ref in sync with latest instance object
+        targetInstanceRef.current = instance;
+        setInstanceName(instance.name || "");
         return;
       }
 
+      // Keep ref in sync with latest instance object
+      targetInstanceRef.current = instance;
       setSubmissionMessage(null);
       setSubmissionSuccess(null);
-      setInstanceName(instance?.name || "");
+      setInstanceName(instance.name || "");
     });
     return () => cancelAnimationFrame(raf);
-  }, [instance?.name]);
+  }, [instance, instance.name]);
 
   // handleError: used by input components to report validation-only updates
   // that originate from prop sync (not user events). This keeps the error
@@ -318,9 +312,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     suppressClearOnNextInstanceUpdate.current = true;
 
     const prevName = targetInstanceRef.current?.name;
-    if (targetInstanceRef.current) {
-      targetInstanceRef.current.name = instanceName;
-    }
+    targetInstanceRef.current.name = instanceName;
 
     const result = submitForm(definition, targetInstanceRef.current, valuesMap, t, errors);
     // Display result message in the UI
@@ -335,10 +327,8 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
     if (!result.success) {
       // Revert name if submission failed
-      if (targetInstanceRef.current) {
-        targetInstanceRef.current.name = prevName ?? targetInstanceRef.current.name;
-        setInstanceName(prevName ?? "");
-      }
+      targetInstanceRef.current.name = prevName ?? targetInstanceRef.current.name;
+      setInstanceName(prevName ?? "");
     }
   };
 

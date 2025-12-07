@@ -2,7 +2,9 @@
 import type { ReactaDefinition, ReactaFormProps } from "../core/reactaFormTypes"
 import ReactaFormRenderer from "./ReactaFormRenderer";
 import { ReactaFormProvider } from "./ReactaFormProvider";
+import type React from "react";
 import { useEffect, useMemo, useState } from "react";
+import { createInstanceFromDefinition } from "../core";
 
 function useNearestReactaformTheme(ref?: React.RefObject<HTMLElement>) {
   const [theme, setTheme] = useState<string | null>(null);
@@ -63,8 +65,18 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
       return <div style={{ color: 'red' }}>Error: No form definition provided.</div>;
     }
 
-    return(
-      definition && ( 
+    // Ensure we always have an instance to pass to the renderer. If the
+    // caller didn't provide one, create a new instance from the definition.
+    let resolvedInstance = instance;
+    if (!resolvedInstance) {
+      const created = createInstanceFromDefinition(definition, definition.name);
+      if (!created.success || !created.instance) {
+        return <div style={{ color: 'red' }}>Error: Failed to create instance from definition.</div>;
+      }
+      resolvedInstance = created.instance;
+    }
+
+    return (
       <ReactaFormProvider
         defaultDefinitionName={definition.name}
         defaultStyle={inputStyle}
@@ -75,10 +87,9 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
       >
         <ReactaFormRenderer
           definition={definition}
-          instance={instance?? null}
+          instance={resolvedInstance}
         />
       </ReactaFormProvider>
-      )
     );
 };
 

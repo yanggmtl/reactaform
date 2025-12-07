@@ -79,6 +79,7 @@ const TextInput: React.FC<TextInputProps> = ({
   return (
     <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <input
+        id={field.name}
         type="text"
         defaultValue={String(value ?? "")}
         ref={inputRef}

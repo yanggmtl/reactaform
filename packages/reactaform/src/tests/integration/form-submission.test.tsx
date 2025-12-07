@@ -4,6 +4,7 @@ import ReactaFormRenderer from '../../package/components/ReactaFormRenderer';
 import { registerSubmissionHandler } from '../../package/core/registries';
 import type { ReactaDefinition } from '../../package/core/reactaFormTypes';
 import { afterEach, describe, expect, it } from 'vitest';
+import { createInstanceFromDefinition } from '../../package';
 
 describe('Form integration: rendering and submission', () => {
   afterEach(() => {
@@ -50,15 +51,19 @@ describe('Form integration: rendering and submission', () => {
       ],
     } as unknown as ReactaDefinition;
 
+    const result = createInstanceFromDefinition(definition, 'test-instance');
+    expect(result.success).toBe(true);
+    expect(result.instance).not.toBeNull();
+    const instance = result.instance!;
     // Render the form renderer with immediate loading (no chunk delay)
     await act(async () => {
       renderWithProvider(
-        <ReactaFormRenderer definition={definition} instance={null} chunkDelay={0} chunkSize={1000} />
+        <ReactaFormRenderer definition={definition} instance={instance} chunkDelay={0} chunkSize={1000} />
       );
     });
 
-    // Ensure fields are present. Some inputs don't include `id`, so use role queries where appropriate.
-    const nameInput = await screen.findByRole('textbox');
+    // Ensure fields are present. Use label queries to select the intended inputs.
+    const nameInput = await screen.findByLabelText('Full Name');
     const dateInput = await screen.findByLabelText('Birth Date');
     const select = await screen.findByRole('combobox');
 

@@ -34,6 +34,7 @@ export type {
   ReactaFormProviderProps,
   DefinitionPropertyField,
   ReactaDefinition,
+  ReactaInstance,
   ReactaFormProps,
   FieldValueType,
   ErrorType,

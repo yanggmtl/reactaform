@@ -93,9 +93,7 @@ export interface ReactaInstance {
   name: string;
   definition: string;
   version: string;
-  values: {
-    [fieldName: string]: FieldValueType;
-  };
+  values: Record<string, FieldValueType>;
 }
 
 export interface ReactaFormProps {

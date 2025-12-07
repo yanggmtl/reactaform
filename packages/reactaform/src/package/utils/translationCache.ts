@@ -277,19 +277,30 @@ export const loadUserTranslation = async (
 
 /**
  * Return whether translation subsystem should run in debug mode.
- * Uses Vite's `import.meta.env.DEV` when available.
+ * Checks multiple env sources (Vite, webpack, Next.js, etc.) for dev/debug mode.
  */
 export function isDebugMode(): boolean {
   try {
-    const meta = import.meta as unknown as
-      | { env?: { DEV?: boolean } }
-      | undefined;
-    if (meta && meta.env && meta.env.DEV) {
+    // Try Vite's import.meta.env.DEV
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - import.meta typing is Vite-specific
+    const importMetaDev = import.meta?.env?.DEV;
+    if (importMetaDev) {
       return true;
     }
   } catch {
-    // ignore errors accessing import.meta in non-ESM environments
+    // import.meta not available in this environment
   }
+
+  try {
+    // Try webpack/CRA process.env.NODE_ENV
+    if (typeof process !== 'undefined' && process?.env?.NODE_ENV === 'development') {
+      return true;
+    }
+  } catch {
+    // process.env not available
+  }
+
   return false;
 }
 

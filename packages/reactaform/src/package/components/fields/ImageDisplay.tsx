@@ -9,6 +9,35 @@ import type {
 export type ImageProps = BaseInputProps<string, DefinitionPropertyField>;
 
 /**
+ * Safe helper to get BASE_URL from environment.
+ * Works across Vite, webpack (CRA), Next.js, and other bundlers.
+ * Falls back to '/' if no env value is available.
+ */
+function getBaseUrl(): string {
+  try {
+    // Try Vite's import.meta.env.BASE_URL
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - import.meta typing is Vite-specific
+    const importMeta = import.meta?.env?.BASE_URL;
+    if (typeof importMeta === 'string') return importMeta;
+  } catch {
+    // import.meta not available in this environment
+  }
+
+  try {
+    // Try webpack/CRA process.env.PUBLIC_URL
+    if (typeof process !== 'undefined' && process?.env?.PUBLIC_URL) {
+      return process.env.PUBLIC_URL;
+    }
+  } catch {
+    // process.env not available
+  }
+
+  // Fallback to root
+  return '/';
+}
+
+/**
  * ImageDisplay is a React component that renders an image with optional
  * localization and flexible layout/styling options.
  *
@@ -39,7 +68,9 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
     ? valueStr
     : (typeof field.defaultValue === "string" ? field.defaultValue : "");
   if (baseUrl && !baseUrl.startsWith("/")) {
-    baseUrl = `${import.meta.env.BASE_URL}${baseUrl}`;
+    // Safe cross-bundler base URL resolution
+    const envBaseUrl = getBaseUrl();
+    baseUrl = `${envBaseUrl}${baseUrl}`;
   }
   const langs = field.localized?.split(";").map((v) => v.trim());
 

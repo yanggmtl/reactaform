@@ -3,6 +3,10 @@
 // existing instances from JSON, managing a list of instances, and editing
 // selected instances using ReactaForm with immediate updates on submit.
 
+// In this app, global.d.ts is added by removing following line which is 
+// types specific to vite in tsconfig.json
+// "types": ["vite/client"]
+
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -10,7 +14,7 @@ import {
   ReactaForm,
   registerSubmissionHandler,
 } from "reactaform";
-import type { ReactaDefinition, ReactaInstance } from "reactaform";
+import type { FieldValueType, ReactaDefinition, ReactaInstance } from "reactaform";
 import "./style.css";
 
 // Example definition for creating new instances
@@ -118,7 +122,7 @@ export default function App() {
           updated[idx] = {
             ...current,
             name: instanceName ?? current.name,
-            values: valuesMap,
+            values: valuesMap as unknown as Record<string, FieldValueType>,
           };
           return updated;
         });

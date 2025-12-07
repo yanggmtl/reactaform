@@ -1,0 +1,41 @@
+# Source files
+src/
+tests/
+
+# Test files
+*.test.ts
+*.test.tsx
+**/__tests__/
+**/*.spec.ts
+**/*.spec.tsx
+
+# Config files
+tsconfig*.json
+vite*.config.ts
+vitest.config.ts
+eslint.config.js
+
+# Build scripts
+scripts/
+
+# Development files
+.github/
+.vscode/
+*.log
+*.tgz
+node_modules/
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Documentation that's not needed in package
+CONTRIBUTING.md
+.editorconfig
+
+# Temporary files
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db

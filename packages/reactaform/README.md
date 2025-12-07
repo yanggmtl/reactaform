@@ -24,10 +24,35 @@ npm install reactaform react react-dom
 - React ^19.2.0
 - React-DOM ^19.2.0
 
+## 🌐 Environment Compatibility
+
+ReactaForm is **bundler-agnostic** and works seamlessly across different build tools:
+
+✅ **Vite** - Fully supported (recommended)  
+✅ **Webpack** (Create React App) - Fully supported  
+✅ **Next.js** - Fully supported  
+✅ **Parcel, esbuild, Rollup** - Fully supported  
+
+The library gracefully handles environment-specific APIs (`import.meta.env`, `process.env`) with automatic fallbacks. No special configuration needed!
+
+### TypeScript Setup (Non-Vite Projects)
+
+If you see TypeScript errors about CSS imports in non-Vite projects, add a `global.d.ts`:
+
+```typescript
+// src/global.d.ts
+declare module '*.css';
+declare module '*.module.css' {
+  const classes: { readonly [key: string]: string };
+  export default classes;
+}
+```
+
 ## 🚀 Quick Start
 
 ```tsx
-import { ReactaForm } from 'reactaform';
+import { ReactaForm, createInstanceFromDefinition } from 'reactaform';
+import { useState } from 'react';
 
 const definition = {
   name: "contactForm",
@@ -59,17 +84,21 @@ const definition = {
 };
 
 function App() {
-  const [formData, setFormData] = useState({});
+  // Create an instance from the definition
+  const result = createInstanceFromDefinition(definition, "myForm");
+  const [instance, setInstance] = useState(result.instance);
 
   return (
     <ReactaForm
       definitionData={definition}
-      instance={formData}
+      instance={instance}
       language="en"
     />
   );
 }
 ```
+
+> **Note**: `ReactaForm` manages form state internally. If you need to programmatically update values, use `setInstance()` with a new instance object.
 
 ## 📖 Core Concepts
 
@@ -275,18 +304,43 @@ Handle form submission with custom logic:
 ```tsx
 import { registerSubmissionHandler } from 'reactaform';
 
-registerSubmissionHandler('contactForm', async (formData) => {
-  const response = await fetch('/api/contact', {
-    method: 'POST',
-    body: JSON.stringify(formData),
-  });
-  
-  if (!response.ok) {
-    throw new Error('Submission failed');
+// Register a submission handler for your form
+registerSubmissionHandler(
+  'mySubmitHandler',  // Handler name (referenced in definition.submitHandlerName)
+  (definition, instanceName, valuesMap, t) => {
+    // definition: The form definition
+    // instanceName: Current instance name
+    // valuesMap: Object with all field values { fieldName: value }
+    // t: Translation function for error messages
+
+    // Custom validation
+    if (!valuesMap.email?.includes('@')) {
+      return [t('Invalid email address')]; // Return array of error strings
+    }
+
+    // Submit to API
+    fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(valuesMap),
+    }).catch(err => {
+      console.error('Submission failed:', err);
+    });
+
+    // Return undefined for success, or array of error strings for failure
+    return undefined;
   }
-  
-  return { success: true, message: 'Form submitted!' };
-});
+);
+```
+
+**Then reference it in your definition:**
+
+```tsx
+const definition = {
+  name: "contactForm",
+  submitHandlerName: "mySubmitHandler",  // Link to registered handler
+  // ... rest of definition
+};
 ```
 
 ### Using ReactaFormProvider
@@ -319,11 +373,13 @@ function App() {
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
 | `definitionData` | `ReactaDefinition \| string` | Yes | Form definition object or JSON string |
-| `instance` | `Record<string, unknown>` | No | Current form values |
+| `instance` | `ReactaInstance` | No* | Form instance with values and metadata. If not provided, will be auto-created from definition |
 | `language` | `string` | No | Language code (default: 'en') |
-| `darkMode` | `boolean` | No | Enable dark mode |
+| `darkMode` | `boolean` | No | Enable dark mode (default: auto-detect from parent theme) |
 | `className` | `string` | No | Custom CSS class |
 | `style` | `CSSProperties` | No | Custom inline styles |
+
+*While `instance` is technically optional (auto-created if omitted), providing it is recommended for proper state management.
 
 ### Field Definition Props
 
@@ -391,14 +447,52 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - [ ] Schema migration tools
 - [ ] Performance profiling dashboard
 
+## 🔍 Troubleshooting
+
+### "Cannot find module './style.css'"
+
+**Solution**: Add a `global.d.ts` file (see Environment Compatibility section above).
+
+### Form not updating when instance changes
+
+**Solution**: Ensure you're passing a **new instance object** (immutable updates):
+
+```tsx
+// ✅ Correct - creates new object
+setInstance({ ...instance, values: { ...instance.values, name: 'John' } });
+
+// ❌ Wrong - mutates existing object
+instance.values.name = 'John';
+setInstance(instance);
+```
+
+### Submission handler not called
+
+**Solution**: Ensure `submitHandlerName` in your definition matches the registered handler name:
+
+```tsx
+registerSubmissionHandler('myHandler', ...);
+// Definition must have: submitHandlerName: "myHandler"
+```
+
+### TypeScript errors about `import.meta` or `process`
+
+**Solution**: The library handles these internally with fallbacks. If you see errors in **your** code, ensure you're not directly importing library internals. If errors persist, update to the latest version.
+
+### Dark mode not working
+
+**Solution**: Either pass `darkMode={true}` prop, or wrap your app with `[data-reactaform-theme="dark"]` attribute on a parent element.
+
 ## 💡 Examples
 
-Check the `packages/apps` directory for complete working examples including:
-- Contact forms
-- Survey forms with conditional logic
-- Multi-step wizards
-- File upload demos
-- Unit conversion examples
+Check the `packages/apps` directory for complete working examples:
+- **instance-app** - Create, load, and edit multiple form instances
+- **group-app** - Organize fields into logical groups
+- **parents-app** - Conditional field visibility based on parent values
+- **custom-validation-app** - Custom validation rules
+- **translation-app** - Multi-language forms with custom translations
+- **dark-mode-app** - Light/dark theme switching
+- **submit-handler-app** - Custom submission handlers
 
 ---
 

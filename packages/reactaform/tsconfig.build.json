@@ -16,12 +16,15 @@
     "target": "ESNext",
     "module": "ESNext",
     "jsx": "react-jsx",
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "types": []  // Don't include vite/client types in build output
     
   },
   "include": [
     "src/package/**/*",
     "src/package/locales/**/*",           // include your JSON locales
-    "src/package/@types/**/*"
+    "src/package/@types/**/*",
+    "src/types/**/*"                      // include ambient type declarations
   ]
   ,
   "exclude": [

@@ -103,7 +103,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "var(--reactaform-field-gap, 8px)",
+          gap: "var(--reactaform-inline-gap, 8px)",
           width: "100%",
         }}
       >

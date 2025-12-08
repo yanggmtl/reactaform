@@ -18,6 +18,17 @@
   --reactaform-space-lg: 12px;
   /* Hover background for light theme */
   --reactaform-hover-bg: #f5f5f5;
+
+    /* Gap variables
+      - --reactaform-field-gap: vertical gap between fields (default uses --reactaform-space)
+      - --reactaform-column-gap: horizontal gap between label and control in row layout
+      - --reactaform-inline-gap: inline horizontal gap used inside control groups
+      - --reactaform-label-gap: vertical gap between label and control in column layout
+    */
+    --reactaform-field-gap: var(--reactaform-space);
+    --reactaform-column-gap: var(--reactaform-space);
+    --reactaform-inline-gap: var(--reactaform-space);
+    --reactaform-label-gap: 4px;
   
   /* Typography */
   --reactaform-font-size: 14px;
@@ -105,15 +116,19 @@
   /* Removed internal scrolling - let parent container handle it */
 }
 
-/* Field Container */
-.reactaform-field {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  align-items: start;
-  padding: 0;
-  gap: var(--reactaform-field-gap);
-  margin-bottom: var(--reactaform-space);
-}
+  /* Field Container
+     - Uses a two-column grid: label (left) and control (right)
+     - `--reactaform-column-gap` controls the horizontal gap between label and control
+     - `--reactaform-field-gap` controls the vertical spacing between fields (margin-bottom)
+  */
+  .reactaform-field {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
+    padding: 0;
+    gap: var(--reactaform-column-gap);
+    margin-bottom: var(--reactaform-field-gap);
+  }
 
 /* Labels */
 .reactaform-label {
@@ -207,9 +222,9 @@
     padding: calc(var(--reactaform-space) * 0.8);
   }
   
-  .reactaform-field {
-    gap: calc(var(--reactaform-gap) * 0.8);
-  }
+    .reactaform-field {
+      gap: calc(var(--reactaform-column-gap) * 0.8);
+    }
 }
 
 @media (max-width: 768px) {

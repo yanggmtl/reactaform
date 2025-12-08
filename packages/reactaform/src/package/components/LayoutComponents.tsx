@@ -22,10 +22,12 @@ export const ColumnFieldLayout = memo(({
   field,
   error,
   children,
+  showLabel = true,
 }: {
   field: DefinitionPropertyField;
   error?: string | null;
   children: React.ReactNode;
+  showLabel?: boolean;
 }) => {
   const { t } = useReactaFormContext();
   
@@ -38,11 +40,11 @@ export const ColumnFieldLayout = memo(({
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: "var(--reactaform-field-gap, 8px)",
+        gap: "var(--reactaform-label-gap, 4px)",
         '--label-align': labelAlignment,
       } as React.CSSProperties & { '--label-align': string }}
     >
-      <div style={{ textAlign: labelAlignment, width: "100%" }}>
+      {showLabel && <div style={{ textAlign: labelAlignment, width: "100%" }}>
         <label
           className={CSS_CLASSES.label}
           htmlFor={field.name}
@@ -55,12 +57,12 @@ export const ColumnFieldLayout = memo(({
         >
           {t(field.displayName)}
         </label>
-      </div>
+      </div>}
       <div
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "var(--reactaform-field-gap, 8px)",
+          gap: "var(--reactaform-inline-gap, 8px)",
           width: "100%",
         }}
       >
@@ -134,7 +136,7 @@ export const RowFieldLayout = memo(({
                 flex: 1,
                 justifyContent: "flex-end",
                 alignItems: "center",
-                gap: "var(--reactaform-field-gap, 8px)",
+                gap: "var(--reactaform-inline-gap, 8px)",
               }}
             >
               {children}
@@ -179,7 +181,14 @@ export const StandardFieldLayout = ({
   // Use column layout if explicitly specified
   if (field?.labelLayout === 'column-left' || field?.labelLayout === 'column-center') {
     return (
-      <ColumnFieldLayout field={field} error={error}>
+      <ColumnFieldLayout field={field} error={error} showLabel={true}>
+        {children}
+      </ColumnFieldLayout>
+    );
+  }
+  else if (field?.type === 'checkbox' || field?.type === 'switch') {
+    return (
+      <ColumnFieldLayout field={field} error={error} showLabel={false}>
         {children}
       </ColumnFieldLayout>
     );

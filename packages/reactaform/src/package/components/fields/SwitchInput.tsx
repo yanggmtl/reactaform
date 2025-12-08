@@ -7,6 +7,7 @@ import type {
 
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
+import { CSS_CLASSES } from "../../utils";
 
 // Props expected by SwitchInput component
 type SwitchInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
@@ -127,41 +128,53 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     }
   }, [isOn, field, validate]);
 
+  const inputId = field.name;
+  
   return (
-    <StandardFieldLayout field={field} error={validate(isOn)} rightAlign={true}>
-      <label style={labelStyle}>
-        <input
-          id={field.name}
-          type="checkbox"
-          checked={isOn}
-          readOnly={true}
-          aria-label={t(field.displayName)}
-          style={hiddenInputStyle}
-          tabIndex={-1}
-        />
-        <span
-          role="switch"
-          data-testid="switch"
-          tabIndex={0}
-          aria-checked={isOn}
-          onClick={handleToggle}
-          onKeyDown={(e) => {
-            if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Space' || e.key === 'Enter') {
-              e.preventDefault();
-              handleToggle();
-            }
-          }}
-          className={`reactaform-switch ${isOn ? 'active checked on' : ''} `}
-          style={isOn ? { ...sliderBaseStyle, backgroundColor: 'var(--reactaform-switch-on-bg, #22c55e)', borderColor: 'var(--reactaform-switch-on-border, #16a34a)' } : sliderBaseStyle}
+    <StandardFieldLayout field={field} error={validate(isOn)} rightAlign={false}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+        <label 
+          className={CSS_CLASSES.label}
+          htmlFor={inputId}
+          style={{ textAlign: 'left' as const, justifyContent: 'flex-start' }}
         >
-          <span
-            style={{
-              ...knobBaseStyle,
-              transform: isOn ? 'translateX(20px)' : undefined,
-            }}
+          {t(field.displayName)}
+        </label>
+
+        <label style={labelStyle}>
+          <input
+            id={field.name}
+            type="checkbox"
+            checked={isOn}
+            readOnly={true}
+            aria-label={t(field.displayName)}
+            style={hiddenInputStyle}
+            tabIndex={-1}
           />
-        </span>
-      </label>
+          <span
+            role="switch"
+            data-testid="switch"
+            tabIndex={0}
+            aria-checked={isOn}
+            onClick={handleToggle}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Space' || e.key === 'Enter') {
+                e.preventDefault();
+                handleToggle();
+              }
+            }}
+            className={`reactaform-switch ${isOn ? 'active checked on' : ''} `}
+            style={isOn ? { ...sliderBaseStyle, backgroundColor: 'var(--reactaform-switch-on-bg, #22c55e)', borderColor: 'var(--reactaform-switch-on-border, #16a34a)' } : sliderBaseStyle}
+          >
+            <span
+              style={{
+                ...knobBaseStyle,
+                transform: isOn ? 'translateX(20px)' : undefined,
+              }}
+            />
+          </span>
+        </label>
+      </div>
     </StandardFieldLayout>
   );
 };

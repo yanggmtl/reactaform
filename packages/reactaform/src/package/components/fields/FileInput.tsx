@@ -10,12 +10,17 @@ import { CSS_CLASSES } from "../../utils/cssClasses";
 
 export type FileInputProps = BaseInputProps<File | File[] | null, DefinitionPropertyField>;
 
-const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
+const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }) => {
   const { t, definitionName } = useReactaFormContext();
   const [showMenu, setShowMenu] = useState<boolean>(false);
   const [menuPosition, setMenuPosition] = useState<PopupOptionMenuPosition | null>(null);
   const [menuOptions, setMenuOptions] = useState<PopupOption[] | []>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const onErrorRef = useRef<FileInputProps["onError"] | undefined>(onError);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   const validate = React.useCallback(
     (input: File | File[] | null): string | null => {
@@ -40,6 +45,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange }) => {
     // current validation state on mount. This mirrors previous behavior and
     // keeps test expectations stable.
     onChange?.(value, err);
+    onErrorRef.current?.(err ?? null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, validate]);
 

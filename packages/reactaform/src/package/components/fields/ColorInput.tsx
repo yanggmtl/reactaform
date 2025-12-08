@@ -6,6 +6,7 @@ import type {
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { validateFieldValue } from "../../core/validation";
 
 type ColorOption = {
   label: string; // Color name
@@ -95,13 +96,18 @@ function normalizeHexColor(color: string): string {
  * - value: currently selected color (hex string).
  * - onChange: callback to propagate changes to parent form.
  */
-const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange }) => {
-  const { t } = useReactaFormContext();
+const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError }) => {
+  const { t, definitionName } = useReactaFormContext();
 
   // Store the custom color string separately
   const [inputColor, setInputColor] = useState<string>("#000000");
   const selectRef = React.useRef<HTMLSelectElement | null>(null);
   const colorRef = React.useRef<HTMLInputElement | null>(null);
+  const onErrorRef = React.useRef<ColorInputProps["onError"] | undefined>(onError);
+
+  React.useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   useEffect(() => {
     const inputValue = value && isValidHexColor(value) ? value : "#000000";
@@ -111,6 +117,11 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange }) => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: immediate prop->state sync required by consumers/tests
     setInputColor(normColor);
   }, [value]);
+
+  React.useEffect(() => {
+    const err = validateFieldValue(definitionName, field, value ?? "#000000", t);
+    onErrorRef.current?.(err ?? null);
+  }, [value, field, definitionName, t]);
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = e.target.value;

@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
+import { validateFieldValue } from "../../core/validation";
+import useReactaFormContext from "../../hooks/useReactaFormContext";
 
 type CheckboxInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
 
@@ -15,7 +17,19 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   field,
   value,
   onChange,
+  onError,
 }) => {
+  const { definitionName, t } = useReactaFormContext();
+  const onErrorRef = useRef<CheckboxInputProps["onError"] | undefined>(onError);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  useEffect(() => {
+    const err = validateFieldValue(definitionName, field, value ?? false, t);
+    onErrorRef.current?.(err ?? null);
+  }, [value, field, definitionName, t]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;

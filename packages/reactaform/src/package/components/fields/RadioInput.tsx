@@ -17,12 +17,17 @@ export type RadioInputProps = BaseInputProps<string, DefinitionPropertyField>;
  * - Validates that the selected value is in the options list
  * - Auto-corrects to first option if invalid value provided
  */
-const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
+const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange, onError }) => {
   const { t, definitionName } = useReactaFormContext();
   const layout =
     field.layout?.toLowerCase() === "horizontal" ? "row" : "column";
 
   const groupRef = useRef<HTMLDivElement | null>(null);
+  const onErrorRef = useRef<RadioInputProps["onError"] | undefined>(onError);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   const validate = useCallback(
     (val: string): string | null => {
@@ -43,6 +48,7 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
   useEffect(() => {
     const safeVal = value != null ? String(value) : "";
     const err = validate(safeVal);
+    onErrorRef.current?.(err ?? null);
     if (groupRef.current) {
       const inputs = Array.from(
         groupRef.current.querySelectorAll<HTMLInputElement>("input[type=radio]")
@@ -61,6 +67,7 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     const err = validate(val);
+    onErrorRef.current?.(err ?? null);
     onChange?.(val, err);
   };
 

@@ -21,7 +21,13 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   field,
   value,
   onChange,
+  onError,
 }) => {
+  const onErrorRef = useRef<MultiSelectionProps["onError"] | undefined>(onError);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
   const { t, darkMode, formStyle, fieldStyle, definitionName } = useReactaFormContext();
   const styleFrom = (
     source: unknown,
@@ -71,6 +77,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
       ? selectedValues.filter((v) => v !== val)
       : [...selectedValues, val];
     const err = validate(newValues);
+    onErrorRef.current?.(err ?? null);
     onChange?.(newValues, err);
   };
 

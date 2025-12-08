@@ -25,10 +25,16 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   field,
   value,
   onChange,
+  onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
 
   const selectRef = useRef<HTMLSelectElement | null>(null);
+  const onErrorRef = useRef<DropdownInputProps["onError"] | undefined>(onError);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   const validate = useCallback(
     (val: string): string | null => {
@@ -55,8 +61,10 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
       if (selectRef.current) selectRef.current.value = first;
       // notify parent that we normalized the value
       onChange?.(first, null);
+      onErrorRef.current?.(null);
     } else {
       if (selectRef.current) selectRef.current.value = safeVal;
+      onErrorRef.current?.(err ?? null);
     }
   }, [value, validate, onChange, field.options]);
 

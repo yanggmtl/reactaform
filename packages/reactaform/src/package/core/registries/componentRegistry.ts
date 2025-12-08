@@ -4,29 +4,29 @@ import type { DefinitionPropertyField } from "../reactaFormTypes";
 import { useDebouncedCallback } from "../../hooks/useDebouncedCallback";
 
 import CheckboxInput from "../../components/fields/CheckboxInput";
-import SwitchInput from "../../components/fields/SwitchInput"
 import ColorInput from "../../components/fields/ColorInput";
 import DateInput from "../../components/fields/DateInput";
-import EmailInput from "../../components/fields/EmailInput";
-import FloatInput from "../../components/fields/FloatInput";
-import FloatArrayInput from "../../components/fields/FloatArrayInput";
-import FieldSeparator from "../../components/fields/Separator";
-import ImageDisplay from "../../components/fields/ImageDisplay";
-import IntegerInput from "../../components/fields/IntegerInput";
-import IntegerArrayInput from "../../components/fields/IntegerArrayInput";
-import MultiSelect from "../../components/fields/MultiSelection";
-import RadioInput from "../../components/fields/RadioInput";
 import DropdownInput from "../../components/fields/DropdownInput";
+import EmailInput from "../../components/fields/EmailInput";
+import FieldSeparator from "../../components/fields/Separator";
+import FileInput from "../../components/fields/FileInput";
+import FloatArrayInput from "../../components/fields/FloatArrayInput";
+import FloatInput from "../../components/fields/FloatInput";
+import ImageDisplay from "../../components/fields/ImageDisplay";
+import IntegerArrayInput from "../../components/fields/IntegerArrayInput";
+import IntegerInput from "../../components/fields/IntegerInput";
+import MultilineTextInput from "../../components/fields/MultilineTextInput";
+import MultiSelect from "../../components/fields/MultiSelection";
+import NumericStepperInput from "../../components/fields/NumericStepperInput";
 import PhoneInput from "../../components/fields/PhoneInput";
+import RadioInput from "../../components/fields/RadioInput";
+import RatingInput from "../../components/fields/RatingInput";
 import SliderInput from "../../components/fields/SliderInput";
+import SwitchInput from "../../components/fields/SwitchInput"
 import TextInput from "../../components/fields/TextInput";
 import TimeInput from "../../components/fields/TimeInput";
 import UnitValueInput from "../../components/fields/UnitValueInput";
-import RatingInput from "../../components/fields/RatingInput";
-import FileInput from "../../components/fields/FileInput";
 import UrlInput from "../../components/fields/UrlInput";
-import NumericStepperInput from "../../components/fields/NumericStepperInput";
-import MultilineTextInput from "../../components/fields/MultilineTextInput";
 
 // Registry needs to accept components with many different prop shapes.
 // Narrow typing here would make registering concrete field components
@@ -51,7 +51,43 @@ const NON_DEBOUNCED_TYPES = new Set([
   "rating",
 ]);
 
-export function registerComponent(type: string, component: ComponentType): void {
+const baseComponents: Record<string, ComponentType> = {
+  checkbox: CheckboxInput,
+  color: ColorInput,
+  date: DateInput,
+  dropdown: DropdownInput,
+  email: EmailInput,
+  file: FileInput,
+  float: FloatInput,
+  "float-array": FloatArrayInput,
+  image: ImageDisplay,
+  int: IntegerInput,
+  "int-array": IntegerArrayInput,
+  "multi-selection": MultiSelect,
+  "multiline": MultilineTextInput,
+  phone: PhoneInput,
+  radio: RadioInput,
+  rating: RatingInput,
+  separator: FieldSeparator,
+  slider: SliderInput,
+  string: TextInput,
+  stepper: NumericStepperInput,
+  switch: SwitchInput,
+  text: TextInput,
+  time: TimeInput,
+  unit: UnitValueInput,
+  url: UrlInput,
+};
+
+
+export function registerComponentInternal(type: string, component: ComponentType, isBaseComponent: boolean): void {
+
+  if (!isBaseComponent && type in baseComponents) {
+    console.warn(
+      `Can't Overwrite Base Component type "${type}".`
+    );
+    return;
+  }
 
   if (NON_DEBOUNCED_TYPES.has(type)) {
     registry.register(type, component);
@@ -89,6 +125,10 @@ export function registerComponent(type: string, component: ComponentType): void 
   registry.register(type, Wrapped);
 }
 
+export function registerComponent(type: string, component: ComponentType): void {
+  registerComponentInternal(type, component, false);
+}
+
 export function getComponent(type: string): ComponentType | undefined {
   return registry.get(type);
 }
@@ -101,36 +141,8 @@ let baseComponentRegistered = false;
 export function registerBaseComponents(): void {
   if (baseComponentRegistered) return;
 
-  const baseComponents: Record<string, ComponentType> = {
-    checkbox: CheckboxInput,
-    color: ColorInput,
-    date: DateInput,
-    dropdown: DropdownInput,
-    email: EmailInput,
-    file: FileInput,
-    float: FloatInput,
-    "float-array": FloatArrayInput,
-    image: ImageDisplay,
-    int: IntegerInput,
-    "int-array": IntegerArrayInput,
-    "multi-selection": MultiSelect,
-    "multiline": MultilineTextInput,
-    phone: PhoneInput,
-    radio: RadioInput,
-    rating: RatingInput,
-    separator: FieldSeparator,
-    slider: SliderInput,
-    string: TextInput,
-    stepper: NumericStepperInput,
-    switch: SwitchInput,
-    text: TextInput,
-    time: TimeInput,
-    unit: UnitValueInput,
-    url: UrlInput,
-  };
-
   Object.entries(baseComponents).forEach(([type, component]) => {
-    registerComponent(type, component);
+    registerComponentInternal(type, component, true);
   });
 
   baseComponentRegistered = true;

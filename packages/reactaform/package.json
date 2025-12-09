@@ -37,7 +37,13 @@
     "./style.css": "./dist/reactaform.css"
   },
   "files": [
-    "dist",
+    "dist/*.js",
+    "dist/*.mjs",
+    "dist/*.cjs.js",
+    "dist/*.es.js",
+    "dist/*.css",
+    "dist/*.map",
+    "dist/*.d.ts",
     "README.md",
     "LICENSE"
   ],

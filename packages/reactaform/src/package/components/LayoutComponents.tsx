@@ -180,6 +180,7 @@ export const StandardFieldLayout = ({
 }) => {
   // Use column layout if explicitly specified
   if (field?.labelLayout === 'column-left' || field?.labelLayout === 'column-center') {
+    // For column layout, always show label
     return (
       <ColumnFieldLayout field={field} error={error} showLabel={true}>
         {children}
@@ -187,6 +188,7 @@ export const StandardFieldLayout = ({
     );
   }
   else if (field?.type === 'checkbox' || field?.type === 'switch') {
+    // For checkbox and switch, omit label in column layout
     return (
       <ColumnFieldLayout field={field} error={error} showLabel={false}>
         {children}
@@ -194,7 +196,7 @@ export const StandardFieldLayout = ({
     );
   }
 
-  // Default to row layout
+  // Default to row layout: 2 grid columns label + value
   return (
     <RowFieldLayout field={field} error={error} rightAlign={rightAlign}>
       {children}
@@ -221,6 +223,7 @@ ErrorDiv.displayName = 'ErrorDiv';
 
 /**
  * InstanceName - display and edit an instance name in a compact grid row
+ *                on top of fields list
  *
  * Props:
  * - `name`: current instance name

@@ -137,14 +137,14 @@ const getFieldStyle = (
 
 export const ReactaFormProvider = ({
   children,
-  defaultDefinitionName = '',
+  definitionName = '',
   defaultStyle,
   defaultLanguage = 'en',
   defaultDarkMode = false,
   defaultLocalizeName = '',
   className = 'reactaform-container',
 }: ReactaFormProviderProps) => {
-  const definitionName = defaultDefinitionName;
+  const providerDefinitionName = definitionName;
   const localizeName = defaultLocalizeName;
   const darkMode = defaultDarkMode;
   const language = defaultLanguage;
@@ -219,14 +219,14 @@ export const ReactaFormProvider = ({
 
   const contextValue = useMemo(
     () => ({
-      definitionName,
+      definitionName: providerDefinitionName,
       language,
       darkMode,
       formStyle,
       fieldStyle,
       t,
     }),
-    [definitionName, language, darkMode, fieldStyle, formStyle, t]
+    [providerDefinitionName, language, darkMode, fieldStyle, formStyle, t]
   );
 
   // Only apply height: 100% if the user provided a height in their style prop

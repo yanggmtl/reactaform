@@ -78,7 +78,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
 
     return (
       <ReactaFormProvider
-        defaultDefinitionName={definition.name}
+        definitionName={definition.name}
         defaultStyle={inputStyle}
         defaultLanguage={inputLanguage}
         defaultDarkMode={inputDarkMode}

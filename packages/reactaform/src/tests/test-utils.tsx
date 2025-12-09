@@ -23,7 +23,7 @@ export function renderWithProvider(
       <ReactaFormProvider
         defaultDarkMode={darkMode}
         defaultLanguage={language}
-        defaultDefinitionName="test-form"
+        definitionName="test-form"
       >
         {children}
       </ReactaFormProvider>

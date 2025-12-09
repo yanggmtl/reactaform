@@ -6,7 +6,7 @@ import type {
   ReactaDefinition,
   ReactaInstance,
 } from "../core/reactaFormTypes";
-import useReactaFormContext from "../hooks/useReactaFormContext";
+import useReactaFormContext, { ReactaFormContext } from "../hooks/useReactaFormContext";
 import { renderFieldsWithGroups } from "../components/renderFields";
 import { VirtualizedFieldList } from "../components/VirtualizedFieldList";
 import { getComponent } from "../core/registries";
@@ -41,7 +41,12 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   estimatedFieldHeight = 60,
 }) => {
   const { properties, displayName } = definition;
-  const { t, formStyle, language } = useReactaFormContext();
+  const parentContext = useReactaFormContext();
+  const { t, formStyle, language } = parentContext;
+  const renderContext = {
+    ...parentContext,
+    definitionName: definition?.name ?? parentContext.definitionName,
+  };
   const [ savedLanguage, setSavedLanguage] = useState("en");
 
   // Core state
@@ -371,13 +376,18 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   }, [enableVirtualization, updatedProperties, visibility, virtualizationThreshold]);
 
   if (!initDone) {
-    return <div>Initializing form...</div>;
+    return (
+      <ReactaFormContext.Provider value={renderContext}>
+        <div>Initializing form...</div>
+      </ReactaFormContext.Provider>
+    );
   }
 
   
 
   return (
-    <div style={formStyle.container}>
+    <ReactaFormContext.Provider value={renderContext}>
+      <div style={formStyle.container}>
       {displayName && <h2 style={formStyle.titleStyle}>{t(displayName)}</h2>}
       {submissionMessage && (
         <div
@@ -494,7 +504,8 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       >
         {t("Submit")}
       </button>
-    </div>
+      </div>
+    </ReactaFormContext.Provider>
   );
 };
 

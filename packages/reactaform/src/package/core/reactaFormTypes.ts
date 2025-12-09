@@ -155,7 +155,7 @@ export type ReactaFormContextType = {
 // Provider props types
 export type ReactaFormProviderProps = {
   children: ReactNode;
-  defaultDefinitionName?: string;
+  definitionName?: string;
   defaultStyle?: Record<string, unknown>;
   defaultLanguage?: string;
   defaultDarkMode?: boolean;

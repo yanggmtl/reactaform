@@ -355,7 +355,7 @@ function App() {
     <ReactaFormProvider
       defaultLanguage="en"
       defaultDarkMode={false}
-      defaultDefinitionName="myForm"
+      definitionName="myForm"
     >
       <ReactaFormRenderer
         properties={definition.properties}
@@ -365,6 +365,13 @@ function App() {
   );
 }
 ```
+
+### Note: `definitionName` vs renderer-level override
+
+- `ReactaFormProvider` accepts an optional `definitionName` prop which can be used as a top-level default when you are rendering a single form or when tests/storybook rely on a global active definition.
+- `ReactaFormRenderer` injects its own `definitionName` into the React context (it wraps its output in a nested provider). This means multiple renderers with different definitions can safely coexist under the same `ReactaFormProvider`.
+- Recommendation: prefer leaving `definitionName` empty at the top-level and let each `ReactaFormRenderer` provide the definitive `definitionName` for the fields it renders. Use the provider-level `definitionName` only for special cases (tests, single-form pages) where you need a global fallback.
+
 
 ## 📚 API Reference
 
@@ -402,7 +409,7 @@ function App() {
 | `min` | `number` | No | Minimum numeric value |
 | `max` | `number` | No | Maximum numeric value |
 | `step` | `number` | No | Numeric step increment |
-| `labelLayout` | `'row' \| 'column' \| 'column-center'` | No | Label positioning |
+| `labelLayout` | `'row' \| 'column-left' \| 'column-center'` | No | Label positioning |
 
 ## 🧪 Testing
 

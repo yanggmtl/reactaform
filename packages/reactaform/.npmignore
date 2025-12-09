@@ -39,3 +39,12 @@ CONTRIBUTING.md
 *.bak
 .DS_Store
 Thumbs.db
+
+# Exclude specific dist subfolders
+dist/components/
+dist/core/
+dist/hooks/
+dist/templates/
+dist/utils/
+
+

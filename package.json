@@ -1,71 +1,83 @@
 {
   "name": "reactaform",
-  "private": true,
-  "version": "1.1.0",
+  "version": "1.1.2",
   "type": "module",
+  "description": "A powerful, type-safe React form builder library with dynamic field rendering, conditional visibility, multi-language support, and extensible validation",
+  "keywords": [
+    "react",
+    "form",
+    "form-builder",
+    "typescript",
+    "validation",
+    "dynamic-forms",
+    "i18n",
+    "react-form",
+    "form-library",
+    "conditional-fields"
+  ],
+  "author": "yanggmtl",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yanggmtl/reactaform.git",
+    "directory": "packages/reactaform"
+  },
+  "homepage": "https://github.com/yanggmtl/reactaform#readme",
+  "bugs": {
+    "url": "https://github.com/yanggmtl/reactaform/issues"
+  },
   "main": "dist/reactaform.cjs.js",
   "module": "dist/reactaform.es.js",
   "types": "dist/index.d.ts",
-  "style": "dist/reactaform.css",
-  "files": [
-    "dist"
-  ],
-  "sideEffects": [
-    "dist/reactaform.css"
-  ],
-  "peerDependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
-  },
-  "scripts": {
-    "build": "npm -w reactaform run build:lib && npm run build:apps",
-    "build:lib": "npm -w reactaform run build:lib",
-    "build:app": "node ./scripts/run-workspace.js build",
-    "build:apps": "node ./scripts/build-apps.js",
-    "build:pack": "npm -w reactaform run build:lib && npm pack ./packages/reactaform --pack-destination .",
-    "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
-    "dev:app": "node ./scripts/run-workspace.js dev",
-    "test": "npm -w reactaform run test",
-    "typecheck": "npm -w reactaform run typecheck",
-    "lint": "eslint .",
-    "pack:staging": "npm -w reactaform run pack:staging",
-    "pack:staging:all": "node ./scripts/clean-tgz.cjs && npm -w reactaform run build:lib && npm -w reactaform run pack:staging",
-    "pack:root": "npm pack ./packages/reactaform --pack-destination ."
-  },
-  "workspaces": [
-    "packages/*",
-    "packages/apps/*"
-  ],
-  "devDependencies": {
-    "@eslint/js": "^9.39.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@types/react-window": "^1.8.8",
-    "@vitejs/plugin-react": "^5.1.1",
-    "dts-bundle-generator": "^9.5.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4",
-    "vitest": "^4.0.14",
-    "jsdom": "^22.1.0"
-  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/reactaform.es.js",
       "require": "./dist/reactaform.cjs.js"
     },
-    "./package.json": "./package.json"
+    "./style.css": "./dist/reactaform.css"
   },
-  "dependencies": {
-    "react-window": "^2.2.3"
+  "files": [
+    "dist/*.js",
+    "dist/*.mjs",
+    "dist/*.cjs.js",
+    "dist/*.es.js",
+    "dist/*.css",
+    "dist/*.map",
+    "dist/*.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-window": "^2.0.0"
+  },
+  "scripts": {
+    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.build.json",
+    "test": "vitest run --config ./vitest.config.ts",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
+    "lint": "eslint . --max-warnings=0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@types/react-window": "^1.8.8",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.49.0",
+    "@vitejs/plugin-react": "^5.1.2",
+    "c8": "^10.1.3",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "jsdom": "^27.3.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.7",
+    "vitest": "^4.0.15"
   }
 }

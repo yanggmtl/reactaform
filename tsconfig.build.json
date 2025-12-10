@@ -1,0 +1,36 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "dist",
+    "declarationDir": "dist",
+    // Use the real `src` folder as the root for declarations so paths resolve
+    "rootDir": "src",
+    "noEmit": false,
+    "composite": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "types": []
+  },
+  "include": [
+    "src/**/*",
+    "src/locales/**/*",
+    "src/types/**/*"
+  ],
+  "exclude": [
+    "src/**/test/**",
+    "src/**/__tests__/**",
+    "src/tests/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "node_modules"
+  ]
+}

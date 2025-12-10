@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "types": ["vitest", "@testing-library/jest-dom", "vite/client"],
+    "noEmit": true,
+    "rootDir": "src",
+    "moduleResolution": "bundler"
+  },
+  "include": [
+    "src/tests/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ],
+  "exclude": ["node_modules"]
+}

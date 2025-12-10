@@ -14,3 +14,7 @@
 
 ## 1.1.2 - 2025-12-09
 - Use package.json "files" field to control published content
+
+## 1.1.3 - 2025-12-10
+- Remove duplicate error messages in submit validation
+- Add support for react-window 2.x

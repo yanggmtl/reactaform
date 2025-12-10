@@ -1,0 +1,20 @@
+.custom-reactaform {
+  /* Override ReactaForm CSS variables to change background and text color */
+  --reactaform-primary-bg: #a4bfeb; /* dark slate */
+  --reactaform-secondary-bg: #0b1220;
+  --reactaform-text-color: #07192b; /* near-white */
+  --reactaform-text-muted: #9ca3af;
+  --reactaform-border-color: #1f2937;
+  --reactaform-button-bg: #2563eb; /* blue */
+  --reactaform-button-text: #ffffff;
+}
+
+/* helper to make the demo container visually distinct */
+.demo-wrap {
+  font-family: system-ui, sans-serif;
+  padding: 24px;
+  width: 500px;
+  margin: 0 auto;
+  background: var(--reactaform-primary-bg);
+  color: var(--reactaform-text-color);
+}

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="reactaformTitle reactaformDesc">
+  <title id="reactaformTitle">ReactaForm logo</title>
+  <desc id="reactaformDesc">Abstract logo showing a stylized form with a checkmark inside a rounded square, using a teal–purple gradient.</desc>
+  <defs>
+    <linearGradient id="g1" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#41D1FF"/>
+      <stop offset="100%" stop-color="#BD34FE"/>
+    </linearGradient>
+    <filter id="s" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- background rounded square with subtle shadow -->
+  <rect x="16" y="16" width="224" height="224" rx="36" fill="url(#g1)" filter="url(#s)"/>
+
+  <!-- form lines: three stylized fields -->
+  <g transform="translate(56,64)">
+    <rect x="0" y="0" width="144" height="18" rx="6" fill="rgba(255,255,255,0.94)" opacity="0.98"/>
+    <rect x="0" y="34" width="110" height="18" rx="6" fill="rgba(255,255,255,0.9)"/>
+    <rect x="0" y="68" width="90" height="18" rx="6" fill="rgba(255,255,255,0.85)"/>
+  </g>
+
+  <!-- checkbox + checkmark (on the right) -->
+  <g transform="translate(168,92)">
+    <rect x="0" y="0" width="40" height="40" rx="8" fill="#FFFFFF" opacity="0.98"/>
+    <rect x="4" y="4" width="32" height="32" rx="6" fill="#F4F6FB"/>
+    <path d="M10 20 L16 26 L30 12" fill="none" stroke="url(#g1)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- small brand mark: stylized R in bottom-left -->
+  <g transform="translate(40,170) scale(0.7)">
+    <path d="M16 4h12a8 8 0 0 1 0 16H16z" fill="#FFFFFF" transform="translate(0,0)" opacity="0.95"/>
+    <circle cx="16" cy="16" r="8" fill="url(#g1)" opacity="0.95"/>
+  </g>
+</svg>

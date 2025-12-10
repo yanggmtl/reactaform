@@ -1,0 +1,14 @@
+.app {
+	font-family: system-ui, sans-serif;
+	padding: 24px;
+	width: 400px;
+	height: 600px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.app h2 {
+	margin: 0 0 16px 0;
+	flex-shrink: 0;
+}

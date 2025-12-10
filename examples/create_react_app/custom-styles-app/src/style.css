@@ -1,0 +1,18 @@
+.custom-reactaform {
+  --reactaform-primary-bg: #a4bfeb;
+  --reactaform-secondary-bg: #0b1220;
+  --reactaform-text-color: #07192b;
+  --reactaform-text-muted: #9ca3af;
+  --reactaform-border-color: #1f2937;
+  --reactaform-button-bg: #2563eb;
+  --reactaform-button-text: #ffffff;
+}
+
+.demo-wrap {
+  font-family: system-ui, sans-serif;
+  padding: 24px;
+  width: 500px;
+  margin: 0 auto;
+  background: var(--reactaform-primary-bg);
+  color: var(--reactaform-text-color);
+}

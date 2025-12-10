@@ -57,7 +57,7 @@
     "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.build.json",
     "test": "vitest run --config ./vitest.config.ts",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint -c eslint.config.js \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --max-warnings=0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

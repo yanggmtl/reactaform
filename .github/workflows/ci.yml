@@ -48,7 +48,7 @@ jobs:
         run: npm test
 
       - name: Create staged package (reactaform)
-        run: npm run pack:root
+        run: npm pack
 
       - name: Upload reactaform tarball
         uses: actions/upload-artifact@v4

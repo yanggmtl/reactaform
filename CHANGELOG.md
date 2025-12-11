@@ -18,3 +18,9 @@
 ## 1.1.3 - 2025-12-10
 - Remove duplicate error messages in submit validation
 - Add support for react-window 2.x
+
+## 1.1.4 - 2025-12-11
+- Remove react-window dependency and related virtual fields rendering.
+
+## 1.1.5 - 2025-12-11
+- Rewrite README.md to make it clean and clear.

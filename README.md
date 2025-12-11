@@ -118,7 +118,7 @@ interface ReactaDefinition {
 | `image` | Image preview |
 | `int-array`| Integer array input |
 | `int` | Integer input |
-| `multiSelection` | Multiple selection |
+| `multi-selection` | Multiple selection |
 | `phone` | Phone number input |
 | `radio` | Radio button group |
 | `rating` | Star rating |

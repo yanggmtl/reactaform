@@ -8,8 +8,6 @@ import type {
 } from "../core/reactaFormTypes";
 import useReactaFormContext, { ReactaFormContext } from "../hooks/useReactaFormContext";
 import { renderFieldsWithGroups } from "./renderFields";
-import { VirtualizedFieldList } from "./VirtualizedFieldList";
-import { getComponent } from "../core/registries";
 import { InstanceName } from "./LayoutComponents";
 import {
   updateVisibilityMap,
@@ -24,10 +22,6 @@ export interface ReactaFormRendererProps {
   instance: ReactaInstance;
   chunkSize?: number;
   chunkDelay?: number;
-  enableVirtualization?: boolean;
-  virtualizationThreshold?: number;
-  virtualContainerHeight?: number;
-  estimatedFieldHeight?: number;
 }
 
 const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
@@ -35,10 +29,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   instance,
   chunkSize = 50,
   chunkDelay = 50,
-  enableVirtualization = false,
-  virtualizationThreshold = 50,
-  virtualContainerHeight = 600,
-  estimatedFieldHeight = 60,
 }) => {
   const { properties, displayName } = definition;
   const parentContext = useReactaFormContext();
@@ -341,49 +331,11 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     setGroupState((prev) => ({ ...prev, [groupName]: !prev[groupName] }));
   };
 
-  // Memoized field renderer for virtualization
-  const renderField = useCallback(
-    (field: DefinitionPropertyField) => {
-      const Component = getComponent(field.type);
-      if (!Component) return null;
-      return (
-        <div key={field.name}>
-          <Component
-            field={field}
-            value={valuesMap[field.name]}
-            onChange={(value: FieldValueType, error: ErrorType) =>
-              handleChange(field.name, value, error)
-            }
-            onError={(err: ErrorType) => handleError(field.name, err)}
-          />
-        </div>
-      );
-    },
-    [valuesMap, handleChange, handleError]
-  );
-
   // Memoize expensive computations
   const isApplyDisabled = useMemo(
     () => Object.values(errors).some(Boolean),
     [errors]
   );
-
-  // Determine if virtualization should be used
-  const shouldUseVirtualization = useMemo(() => {
-    if (!enableVirtualization) return false;
-    const visibleFieldCount = updatedProperties.filter(f => visibility[f.name]).length;
-    return visibleFieldCount >= virtualizationThreshold;
-  }, [enableVirtualization, updatedProperties, visibility, virtualizationThreshold]);
-
-  if (!initDone) {
-    return (
-      <ReactaFormContext.Provider value={renderContext}>
-        <div>Initializing form...</div>
-      </ReactaFormContext.Provider>
-    );
-  }
-
-  
 
   return (
     <ReactaFormContext.Provider value={renderContext}>
@@ -436,21 +388,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
           }}
         />
       )}
-      {shouldUseVirtualization ? (
-        <VirtualizedFieldList
-          fields={updatedProperties}
-          valuesMap={valuesMap}
-          visibility={visibility}
-          groupState={groupState}
-          handleChange={handleChange}
-          handleError={handleError}
-          toggleGroup={toggleGroup}
-          t={t}
-          renderField={renderField}
-          containerHeight={virtualContainerHeight}
-          estimatedFieldHeight={estimatedFieldHeight}
-        />
-      ) : (
         <>
           {renderFieldsWithGroups(
             groupState,
@@ -474,7 +411,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
             </div>
           )}
         </>
-      )}
       {/* <Separator /> */}
       <button
         onClick={handleSubmit}

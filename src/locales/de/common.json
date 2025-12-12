@@ -6,6 +6,9 @@
   "Submission failed.": "Das Absenden ist fehlgeschlagen.",
   "Submission handler error occurred.": "Ein Fehler im Übermittlungshandler ist aufgetreten.",
   "Form submitted successfully.": "Formular erfolgreich übermittelt.",
+  "Dismiss": "Schließen",
+  "Instance Name": "Instanzname",
+  "Enter instance name": "Instanznamen eingeben",
   
   "Red": "Rot",
   "Blue": "Blau",
@@ -69,8 +72,13 @@
   "Show selected files": "Ausgewählte Dateien anzeigen",
   "Selected File": "Ausgewählte Datei",
   "Selected Files": "Ausgewählte Dateien",
+  "Remove file": "Datei entfernen",
+  "Drop files here": "Dateien hier ablegen",
+  "Choose Files or Drag & Drop": "Dateien auswählen oder hierher ziehen",
+  "Choose File or Drag & Drop": "Datei auswählen oder hierher ziehen",
   
   "Increment": "Erhöhen",
   "Decrement": "Verringern",
-  "Timezone": "Zeitzone"
+  "Timezone": "Zeitzone",
+  "Lower Limit must be less than Upper Limit.": "Die untere Grenze muss kleiner als die obere Grenze sein."
 }

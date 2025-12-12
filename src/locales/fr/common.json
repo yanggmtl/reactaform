@@ -6,6 +6,9 @@
   "Submission failed.": "L'envoi a échoué.",
   "Submission handler error occurred.": "Une erreur du gestionnaire d'envoi s'est produite.",
   "Form submitted successfully.": "Formulaire soumis avec succès.",
+  "Dismiss": "Fermer",
+  "Instance Name": "Nom de l'instance",
+  "Enter instance name": "Entrez le nom de l'instance",
   
   "Red": "Rouge",
   "Blue": "Bleu",
@@ -69,8 +72,13 @@
   "Show selected files": "Afficher les fichiers sélectionnés",
   "Selected File": "Fichier sélectionné",
   "Selected Files": "Fichiers sélectionnés",
+  "Remove file": "Supprimer le fichier",
+  "Drop files here": "Déposez les fichiers ici",
+  "Choose Files or Drag & Drop": "Choisir des fichiers ou glisser-déposer",
+  "Choose File or Drag & Drop": "Choisir un fichier ou glisser-déposer",
   
   "Increment": "Incrémenter",
   "Decrement": "Décrémenter",
-  "Timezone": "Fuseau horaire"
+  "Timezone": "Fuseau horaire",
+  "Lower Limit must be less than Upper Limit.": "La limite inférieure doit être inférieure à la limite supérieure."
 }

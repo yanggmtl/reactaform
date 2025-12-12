@@ -24,3 +24,8 @@
 
 ## 1.1.5 - 2025-12-11
 - Rewrite README.md to make it clean and clear.
+
+## 1.1.6 - 2025-12-12
+- Support drag/drop in FileInput
+- Add Chip(or Tag) component support for selected file display.
+- Translate new added strings.

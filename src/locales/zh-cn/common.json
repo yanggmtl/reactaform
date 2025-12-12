@@ -6,6 +6,9 @@
   "Submission failed.": "提交失败。",
   "Submission handler error occurred.": "提交处理程序错误。",
   "Form submitted successfully.": "表单提交成功。",
+  "Dismiss": "关闭",
+  "Instance Name": "实例名称",
+  "Enter instance name": "输入实例名称",
   
   "Red": "红色",
   "Blue": "蓝色",
@@ -69,8 +72,13 @@
   "Show selected files": "显示已选择的文件",
   "Selected File": "已选择的文件",
   "Selected Files": "已选择的文件",
+  "Remove file": "移除文件",
+  "Drop files here": "将文件拖放到此处",
+  "Choose Files or Drag & Drop": "选择文件或拖放",
+  "Choose File or Drag & Drop": "选择文件或拖放",
   
   "Increment": "增加",
   "Decrement": "减少",
-  "Timezone": "时区"
+  "Timezone": "时区",
+  "Lower Limit must be less than Upper Limit.": "下限必须小于上限。"
 }

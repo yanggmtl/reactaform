@@ -81,4 +81,6 @@
   "Decrement": "减少",
   "Timezone": "时区",
   "Lower Limit must be less than Upper Limit.": "下限必须小于上限。"
+  ,"Show password": "显示密码"
+  ,"Hide password": "隐藏密码"
 }

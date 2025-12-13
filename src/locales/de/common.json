@@ -81,4 +81,6 @@
   "Decrement": "Verringern",
   "Timezone": "Zeitzone",
   "Lower Limit must be less than Upper Limit.": "Die untere Grenze muss kleiner als die obere Grenze sein."
+  ,"Show password": "Passwort anzeigen"
+  ,"Hide password": "Passwort verbergen"
 }

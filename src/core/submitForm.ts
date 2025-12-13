@@ -1,4 +1,4 @@
-import type { ReactaDefinition, FieldValueType, ReactaInstance } from "./reactaFormTypes";
+import type { ReactaDefinition, FieldValueType, ReactaInstance, TranslationFunction } from "./reactaFormTypes";
 import { validateFormValues } from "./validation";
 import { getFormSubmissionHandler } from "./registries/submissionHandlerRegistry";
 
@@ -13,7 +13,7 @@ export function submitForm(
   definition: ReactaDefinition,
   instance: ReactaInstance | null,
   valuesMap: Record<string, FieldValueType | unknown>,
-  t: (key: string) => string,
+  t: TranslationFunction,
   errors: Record<string, string>
 ): SubmitResult {
   // mark `instance` as used to avoid unused parameter compile errors in some tsconfigs
@@ -41,14 +41,14 @@ export function submitForm(
       
       const schemaType = prop.type;
       try {
-        if ((schemaType === "int" || schemaType === "number" || schemaType === "float") && typeof raw === "string") {
+        if ((schemaType === "int" || schemaType === "number" || schemaType === "float")) {
           const numValue = Number(String(raw).trim());
           if (isNaN(numValue)) {
             transformationErrors.push(t(`Invalid number format for field ${prop.displayName || propName}`));
           } else {
             finalMap[propName] = numValue;
           }
-        } else if ((schemaType === "int-array" || schemaType === "float-array") && typeof raw === "string") {
+        } else if ((schemaType === "int-array" || schemaType === "float-array")) {
           const arr = String(raw)
             .split(",")
             .map((v) => v.trim())
@@ -124,6 +124,4 @@ export function submitForm(
   };
 }
 
-export default {
-  submitForm,
-};
+export default submitForm;

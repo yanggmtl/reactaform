@@ -29,3 +29,8 @@
 - Support drag/drop in FileInput
 - Add Chip(or Tag) component support for selected file display.
 - Translate new added strings.
+
+## 1.2.0 - 2025-12-12
+- Add Password input component
+- Add relative support for Url input
+- Add TranslationFunction type

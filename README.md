@@ -112,13 +112,14 @@ interface ReactaDefinition {
 | `date` | Date Picker |
 | `dropdown` | Select menu |
 | `email` | Email input |
-| `file` | Upload |
+| `file` | File selection |
 | `float` | Float input |
 | `float-array` | Float array input |
 | `image` | Image preview |
 | `int-array`| Integer array input |
 | `int` | Integer input |
 | `multi-selection` | Multiple selection |
+| `password` | Password input |
 | `phone` | Phone number input |
 | `radio` | Radio button group |
 | `rating` | Star rating |
@@ -127,7 +128,7 @@ interface ReactaDefinition {
 | `text` | Single line input |
 | `time` | Time input |
 | `unitValue` | Value + unit conversion |
-| `url` | URL validation |
+| `url` | URL input |
 
 ### 🎭 Conditional Visibility
 

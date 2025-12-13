@@ -4,6 +4,7 @@ import type {
   FormValidationHandler,
   FieldValueType,
   DefinitionPropertyField,
+  TranslationFunction,
 } from "./reactaFormTypes";
 import { getFieldValidationHandler, getFormValidationHandler } from "./registries/validationHandlerRegistry";
 
@@ -15,9 +16,9 @@ const formHandlerCache = new Map<string, FormValidationHandler | null>();
 // Returns first error string or null if valid
 export function validateFieldValue(
   definitionName: string,
-  field: Partial<DefinitionPropertyField>,
+  field: DefinitionPropertyField,
   value: FieldValueType | unknown,
-  t: (key: string) => string
+  t: TranslationFunction
 ): string | null {
   if (field && typeof field.validationHandlerName === "string") {
     const cacheKey = `${definitionName}:${field.validationHandlerName}`;

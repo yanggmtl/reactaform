@@ -21,6 +21,7 @@ import NumericStepperInput from "../../components/fields/NumericStepperInput";
 import PhoneInput from "../../components/fields/PhoneInput";
 import RadioInput from "../../components/fields/RadioInput";
 import RatingInput from "../../components/fields/RatingInput";
+import PasswordInput from "../../components/fields/PasswordInput";
 import SliderInput from "../../components/fields/SliderInput";
 import SwitchInput from "../../components/fields/SwitchInput"
 import TextInput from "../../components/fields/TextInput";
@@ -65,6 +66,7 @@ const baseComponents: Record<string, ComponentType> = {
   "int-array": IntegerArrayInput,
   "multi-selection": MultiSelect,
   "multiline": MultilineTextInput,
+  password: PasswordInput,
   phone: PhoneInput,
   radio: RadioInput,
   rating: RatingInput,

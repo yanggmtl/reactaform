@@ -48,7 +48,8 @@ export type {
   FormValidationHandler,
   FormSubmissionHandler,
   InputOnChange,
-  BaseInputProps
+  BaseInputProps,
+  TranslationFunction,
 } from './core/reactaFormTypes';
 
 // Component Registry

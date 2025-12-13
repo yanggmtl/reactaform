@@ -77,6 +77,9 @@ export interface DefinitionPropertyField {
   // File input properties
   accept?: string; // e.g. "image/*,.pdf"
   multiple?: boolean;
+
+  // Url input properties
+  allowRelative?: boolean; // for 'url' type fields
 }
 
 export interface ReactaDefinition {
@@ -105,10 +108,13 @@ export interface ReactaFormProps {
   style?: React.CSSProperties;
 }
 
+// Translation helper types
+export type TranslationFunction = (text: string, ...args: unknown[]) => string;
+
 // Field validator function: returns error string or undefined if valid
 export type FieldValidationHandler = (
   value: FieldValueType | unknown,
-  t: (defaultText: string, ...args: unknown[]) => string,
+  t: TranslationFunction,
 ) => string | undefined;
 
 // Form validator function: takes entire values map,
@@ -116,7 +122,7 @@ export type FieldValidationHandler = (
 // This is used for cross-field validation
 export type FormValidationHandler = (
   valuesMap: Record<string, FieldValueType | unknown>,
-  t: (key: string, ...args: unknown[]) => string,
+  t: TranslationFunction,
 ) => string[] | undefined;
 
 // Submission function: returns error string or undefined if valid
@@ -124,7 +130,7 @@ export type FormSubmissionHandler = (
   definition: ReactaDefinition | Record<string, unknown>,
   instanceName: string | null,
   valuesMap: Record<string, FieldValueType | unknown>,
-  t: (defaultText: string, ...args: unknown[]) => string
+  t: TranslationFunction,
 ) => string[] | undefined;
 
 // Generic input change callback used by input components
@@ -149,7 +155,7 @@ export type ReactaFormContextType = {
   darkMode: boolean;
   formStyle: { container?: React.CSSProperties; titleStyle?: React.CSSProperties };
   fieldStyle: Record<string, unknown>;
-  t: (defaultText: string, ...args: unknown[]) => string;
+  t: TranslationFunction;
 };
 
 // Provider props types

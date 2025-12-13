@@ -58,7 +58,22 @@ const UrlInput: React.FC<UrlInputProps> = ({
       }
 
       if (!urlRegex.test(trimmed) && !isValidUrl(trimmed)) {
-        return t("Must be a valid URL");
+        // Allow relative URLs when field.allowRelative is true. Use the URL
+        // constructor with a base to validate relative paths safely.
+        const allowRelative = field.allowRelative === true;
+        let valid = false;
+        if (urlRegex.test(trimmed) || isValidUrl(trimmed)) {
+          valid = true;
+        } else if (allowRelative) {
+          try {
+            new URL(trimmed, "http://example.com");
+            valid = true;
+          } catch {
+            valid = false;
+          }
+        }
+
+        if (!valid) return t("Must be a valid URL");
       }
 
       const err = validateFieldValue(definitionName, field, trimmed, t);

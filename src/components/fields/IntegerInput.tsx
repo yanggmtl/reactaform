@@ -125,10 +125,6 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
     const err = validateCb(input);
 
     // Report error changes to parent via optional onError callback.
-    // We intentionally do NOT call onChange from this sync effect to avoid
-    // creating an update loop; onChange should only be invoked from user
-    // interactions (handleChange). We also avoid setting local UI state here
-    // to satisfy the `react-hooks/set-state-in-effect` lint rule.
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       onErrorRef.current?.(err ?? null);
@@ -146,8 +142,10 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
     onChange?.(input, err);
   };
 
+  const error = validateCb(String(value ?? ""));
+
   return (
-    <StandardFieldLayout field={field} error={validateCb(String(value ?? ""))}>
+    <StandardFieldLayout field={field} error={error}>
       <input
         id={field.name}
         type="text"
@@ -158,6 +156,8 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
           CSS_CLASSES.input,
           CSS_CLASSES.inputNumber
         )}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

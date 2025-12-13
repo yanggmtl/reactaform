@@ -80,6 +80,8 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           onChange={handleChange}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
           style={{ flex: 1, minWidth: 0 }}
+          aria-invalid={!!validate(String(value ?? ""))}
+          aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
         />
         <button
           type="button"

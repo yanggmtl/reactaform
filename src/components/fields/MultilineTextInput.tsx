@@ -73,6 +73,7 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   }, [value, validate]);
 
   const commonProps = {
+    id: field.name,
     defaultValue: String(value ?? ""),
     ref: inputRef,
     onChange: handleChange,
@@ -85,9 +86,15 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
     className: combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput),
   };
 
+  const error = validate(value);
+
   return (
-    <StandardFieldLayout field={field} error={validate(value)}>
-      <textarea {...commonProps} />
+    <StandardFieldLayout field={field} error={error}>
+      <textarea
+        {...commonProps}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
+      />
     </StandardFieldLayout>
   );
 };

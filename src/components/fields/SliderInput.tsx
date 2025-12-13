@@ -106,6 +106,7 @@ const SliderInput: React.FC<SliderInputProps> = ({
       <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%" }}>
         <input
           ref={rangeRef}
+          id={`${field.name}-range`}
           type="range"
           defaultValue={!isNaN(Number(value)) ? String(Number(value)) : String(min)}
           onChange={handleValueChange}
@@ -116,8 +117,11 @@ const SliderInput: React.FC<SliderInputProps> = ({
             flex: 1,
           }}
           className={CSS_CLASSES.rangeInput}
+          aria-invalid={!!validate(String(value ?? ""))}
+          aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
         />
         <input
+          id={field.name}
           ref={inputRef}
           type="text"
           defaultValue={String(value ?? "")}
@@ -131,6 +135,8 @@ const SliderInput: React.FC<SliderInputProps> = ({
             flexShrink: 0,
           }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
+          aria-invalid={!!validate(String(value ?? ""))}
+          aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
         />
       </div>
     </StandardFieldLayout>

@@ -77,6 +77,9 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   return (
     <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <select
+        id={field.name}
+        aria-invalid={!!validate(String(value ?? ""))}
+        aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
         defaultValue={String(value ?? "")}
         ref={selectRef}
         onChange={handleChange}

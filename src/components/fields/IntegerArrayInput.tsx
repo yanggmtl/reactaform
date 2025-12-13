@@ -20,10 +20,7 @@ function isValidIntegerArray(input: string) {
 }
 
 /**
- * IntegerArrayInput component
- *
- * A controlled input component for editing an array of integer numbers represented as
- * a delimiter-separated string. It supports:
+ * IntegerArrayInput
  * - Parsing and validating each integer value.
  * - Min/max validation for the number of values.
  * - Min/Max limit constraints (inclusive or exclusive) per value.
@@ -136,14 +133,19 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
     }
   }, [value, field.required, validate, t]);
 
+  const error = validate(inputValue);
+
   return (
-    <StandardFieldLayout field={field} error={validate(inputValue)}>
+    <StandardFieldLayout field={field} error={error}>
       <input
+        id={field.name}
         type="text"
         value={inputValue}
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         style={{ flex: 1 }}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

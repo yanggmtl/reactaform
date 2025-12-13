@@ -124,29 +124,31 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     ...styleFrom(fieldStyle, undefined, 'arrow'),
   }), [formStyle, fieldStyle]);
 
+  const multiError = validate(Array.isArray(value) ? value : []);
+
   return (
     <div>
       <StandardFieldLayout field={field} error={null}>
         <div style={{ width: "100%" }}>
-          <div
-            ref={controlRef}
-            className={`reactaform-multiselection-control`}
-            style={mergedControlStyle}
-            onClick={handleControlClick}
-            tabIndex={0}
-            role="button"
-            aria-haspopup="listbox"
-            aria-expanded={menuOpen}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleControlClick();
-              }
-            }}
-          >
-            <span
-              style={{ flex: 1, color: "var(--reactaform-text-muted, #888)" }}
-            >
+              <div
+                ref={controlRef}
+                className={`reactaform-multiselection-control`}
+                style={mergedControlStyle}
+                onClick={handleControlClick}
+                tabIndex={0}
+                role="button"
+                aria-haspopup="listbox"
+                aria-expanded={menuOpen}
+                aria-invalid={!!multiError}
+                aria-describedby={multiError ? `${field.name}-error` : undefined}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleControlClick();
+                  }
+                }}
+              >
+                <span style={{ flex: 1, color: "var(--reactaform-text-muted, #888)" }}>
               {selectedValues.length} / {options.length} selected
             </span>
 

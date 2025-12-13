@@ -45,6 +45,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   };
 
   const inputId = field.name;
+  const currentError = validateFieldValue(definitionName, field, value ?? false, t);
 
   return (
     <StandardFieldLayout field={field} rightAlign={false}>
@@ -64,6 +65,8 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           aria-checked={!!value}
+          aria-invalid={!!currentError}
+          aria-describedby={currentError ? `${field.name}-error` : undefined}
           style={{
             cursor: "pointer",
             margin: "8px 0 8px 0",

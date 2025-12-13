@@ -82,8 +82,10 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
     onChange?.(num, err);
   };
 
+  const error = validateFromString(String(value ?? ""));
+
   return (
-    <StandardFieldLayout field={field} error={validateFromString(String(value ?? ""))}>
+    <StandardFieldLayout field={field} error={error}>
       <input
         ref={inputRef}
         id={field.name}
@@ -95,6 +97,8 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
         onChange={handleChange}
         style={{ width: "100%", height: "100%" }}
         className={CSS_CLASSES.input}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

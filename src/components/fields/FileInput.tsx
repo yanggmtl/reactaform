@@ -211,6 +211,16 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
             gap: '8px'
           }}
           onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ' ) {
+              e.preventDefault();
+              inputRef.current?.click();
+            }
+          }}
+          role="button"
+          aria-label={field.multiple ? t("Choose Files or Drag & Drop") : t("Choose File or Drag & Drop")}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${field.name}-error` : undefined}
         >
           <input
             id={field.name}

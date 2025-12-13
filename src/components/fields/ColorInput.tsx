@@ -123,6 +123,8 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError
     onErrorRef.current?.(err ?? null);
   }, [value, field, definitionName, t]);
 
+  const error = validateFieldValue(definitionName, field, value ?? "#000000", t);
+
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = e.target.value;
     setInputColor(newValue);
@@ -142,7 +144,7 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError
   const { r, g, b } = toRGB(inputColor) || { r: 0, g: 0, b: 0 };
 
   return (
-    <StandardFieldLayout field={field} error={null}>
+    <StandardFieldLayout field={field} error={error}>
       <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "100%" }}>
         <select
           ref={selectRef}
@@ -151,6 +153,8 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError
           onChange={handleSelectChange}
           style={{ minWidth: "120px", flex: 1 }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.inputSelect)}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${field.name}-error` : undefined}
         >
           {predefinedColors.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -177,18 +181,21 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError
           }}
         >
           <input
-            ref={colorRef}
-            type="color"
-            value={inputColor}
-            onChange={handleColorChange}
-            style={{
-              opacity: 0,
-              width: "100%",
-              height: "100%",
-              border: "none",
-              padding: 0,
-              cursor: "pointer",
-            }}
+              ref={colorRef}
+              id={`${field.name}-color`}
+              type="color"
+              value={inputColor}
+              onChange={handleColorChange}
+              style={{
+                opacity: 0,
+                width: "100%",
+                height: "100%",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+              }}
+              aria-invalid={!!error}
+              aria-describedby={error ? `${field.name}-error` : undefined}
           />
         </label>
       </div>

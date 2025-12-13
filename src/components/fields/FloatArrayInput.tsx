@@ -136,11 +136,14 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   return (
     <StandardFieldLayout field={field} error={validate(inputValue)}>
       <input
+        id={field.name}
         type="text"
         value={inputValue}
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         style={{ flex: 1 }}
+        aria-invalid={!!validate(inputValue)}
+        aria-describedby={validate(inputValue) ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

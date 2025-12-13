@@ -86,6 +86,8 @@ const TimeInput: React.FC<TimeInputProps> = ({
         min={typeof field.min === 'string' ? field.min : undefined}
         max={typeof field.max === 'string' ? field.max : undefined}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
+        aria-invalid={!!validate(value)}
+        aria-describedby={validate(value) ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

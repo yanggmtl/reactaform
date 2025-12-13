@@ -89,11 +89,14 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   return (
     <StandardFieldLayout field={field} error={validateCb(String(value ?? ""))}>
       <input
+        id={field.name}
         type="tel"
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
+        aria-invalid={!!validateCb(String(value ?? ""))}
+        aria-describedby={validateCb(String(value ?? "")) ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

@@ -46,6 +46,7 @@ export const ColumnFieldLayout = memo(({
     >
       {showLabel && <div style={{ textAlign: labelAlignment, width: "100%" }}>
         <label
+          id={`${field.name}-label`}
           className={CSS_CLASSES.label}
           htmlFor={field.name}
           style={{
@@ -53,6 +54,7 @@ export const ColumnFieldLayout = memo(({
             width: '100%',
             minWidth: 'unset',
             display: 'block',
+            marginBottom: "10px"
           }}
         >
           {t(field.displayName)}
@@ -71,7 +73,7 @@ export const ColumnFieldLayout = memo(({
         </div>
         {field.tooltip && <Tooltip content={field.tooltip} />}
       </div>
-      {error && <ErrorDiv>{error}</ErrorDiv>}
+        {error && <ErrorDiv id={`${field.name}-error`}>{error}</ErrorDiv>}
     </div>
   );
 });
@@ -121,6 +123,7 @@ export const RowFieldLayout = memo(({
   return (
     <div className={`${CSS_CLASSES.field} row-layout`}>
       <label
+        id={`${field.name}-label`}
         className={CSS_CLASSES.label}
         htmlFor={field.name}
         style={{ textAlign: 'left' as const, justifyContent: 'flex-start' }}
@@ -146,7 +149,7 @@ export const RowFieldLayout = memo(({
           )}
           {field.tooltip && <Tooltip content={field.tooltip} />}
         </div>
-        {error && <ErrorDiv>{error}</ErrorDiv>}
+        {error && <ErrorDiv id={`${field.name}-error`}>{error}</ErrorDiv>}
       </div>
     </div>
   );
@@ -179,7 +182,7 @@ export const StandardFieldLayout = ({
   rightAlign?: boolean; // For checkbox, switch, etc.
 }) => {
   // Use column layout if explicitly specified
-  if (field?.labelLayout === 'column-left' || field?.labelLayout === 'column-center') {
+  if (field.labelLayout === 'column-left' || field.labelLayout === 'column-center') {
     // For column layout, always show label
     return (
       <ColumnFieldLayout field={field} error={error} showLabel={true}>
@@ -187,7 +190,7 @@ export const StandardFieldLayout = ({
       </ColumnFieldLayout>
     );
   }
-  else if (field?.type === 'checkbox' || field?.type === 'switch') {
+  else if (field.type === 'checkbox' || field.type === 'switch') {
     // For checkbox and switch, omit label in column layout
     return (
       <ColumnFieldLayout field={field} error={error} showLabel={false}>
@@ -204,7 +207,7 @@ export const StandardFieldLayout = ({
   );
 };
 
-export const ErrorDiv = memo(({ children }: { children: React.ReactNode }) => {
+export const ErrorDiv = memo(({ children, id }: { children: React.ReactNode; id?: string }) => {
   const style = useMemo<React.CSSProperties>(() => ({
     color: 'var(--reactaform-error-color)',
     fontSize: '13px',
@@ -216,7 +219,7 @@ export const ErrorDiv = memo(({ children }: { children: React.ReactNode }) => {
     alignItems: "flex-start",
   }), []);
 
-  return <div style={style}>{children}</div>;
+  return <div id={id} style={style}>{children}</div>;
 });
 
 ErrorDiv.displayName = 'ErrorDiv';

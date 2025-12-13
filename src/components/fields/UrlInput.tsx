@@ -121,6 +121,8 @@ const UrlInput: React.FC<UrlInputProps> = ({
         style={{ alignItems: "left" }}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         placeholder="https://example.com"
+        aria-invalid={!!validateCb(String(value ?? ""))}
+        aria-describedby={validateCb(String(value ?? "")) ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

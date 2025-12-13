@@ -6,8 +6,19 @@ import tsparser from '@typescript-eslint/parser';
 
 export default [
   {
-    // Ignore build and generated folders (also ignore Next.js output)
-    ignores: ['dist/**', 'node_modules/**', '.next/**', '*.config.js', '*.config.ts', 'scripts/**']
+    // Ignore build and generated folders, editor/OS files and config outputs
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      '.next/**',
+      'out/**',
+      'package/**',
+      '.vscode/**',
+      '.DS_Store',
+      '*.config.js',
+      '*.config.ts',
+      'scripts/**'
+    ]
   },
   {
     files: ['**/*.ts', '**/*.tsx'],

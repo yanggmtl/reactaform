@@ -80,6 +80,8 @@ const TextInput: React.FC<TextInputProps> = ({
     <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <input
         id={field.name}
+        aria-invalid={!!validate(String(value ?? ""))}
+        aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
         type="text"
         defaultValue={String(value ?? "")}
         ref={inputRef}

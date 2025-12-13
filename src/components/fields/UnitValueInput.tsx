@@ -342,20 +342,26 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     justifyContent: "center",
   } as const;
 
+  const currentError = validate(propInputForValidation, propUnitForValidation);
+
   return (
-  <StandardFieldLayout field={field} error={validate(propInputForValidation, propUnitForValidation)}>
+  <StandardFieldLayout field={field} error={currentError}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--reactaform-unit-gap, 8px)", width: "100%" }}>
         <input
+          id={field.name}
           type="text"
               ref={inputRef}
               defaultValue={String(value[0] ?? "")}
           onChange={onValueChange}
           style={{ width: "var(--reactaform-unit-input-width, 100px)" }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
+          aria-invalid={!!currentError}
+          aria-describedby={currentError ? `${field.name}-error` : undefined}
         />
 
         {/* Units dropdown */}
         <select
+          id={`${field.name}-unit`}
           ref={selectRef}
           defaultValue={normalizeUnit(value[1] ?? unitFactors.default, unitFactors) || (value[1] ?? unitFactors.default)}
           onChange={onUnitChange}
@@ -363,6 +369,8 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
             CSS_CLASSES.input,
             CSS_CLASSES.inputSelect
           )}
+          aria-invalid={!!currentError}
+          aria-describedby={currentError ? `${field.name}-error` : undefined}
         >
           {Object.keys(unitFactors.labels).map((u) => (
             <option key={u} value={u}>

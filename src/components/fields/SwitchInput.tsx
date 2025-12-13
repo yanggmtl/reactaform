@@ -140,7 +140,6 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
         >
           {t(field.displayName)}
         </label>
-
         <label style={labelStyle}>
           <input
             id={field.name}
@@ -148,6 +147,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
             checked={isOn}
             readOnly={true}
             aria-label={t(field.displayName)}
+            aria-invalid={!!validate(isOn)}
+            aria-describedby={validate(isOn) ? `${field.name}-error` : undefined}
             style={hiddenInputStyle}
             tabIndex={-1}
           />
@@ -156,6 +157,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
             data-testid="switch"
             tabIndex={0}
             aria-checked={isOn}
+            aria-invalid={!!validate(isOn)}
+            aria-describedby={validate(isOn) ? `${field.name}-error` : undefined}
             onClick={handleToggle}
             onKeyDown={(e) => {
               if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Space' || e.key === 'Enter') {

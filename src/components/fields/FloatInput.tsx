@@ -129,6 +129,8 @@ const FloatInput: React.FC<FloatInputProps> = ({
           CSS_CLASSES.input,
           CSS_CLASSES.inputNumber
         )}
+        aria-invalid={!!validate(String(value ?? ""))}
+        aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

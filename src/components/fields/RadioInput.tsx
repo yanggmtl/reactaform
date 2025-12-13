@@ -5,6 +5,7 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { validateFieldValue } from "../../core/validation";
 
 export type RadioInputProps = BaseInputProps<string, DefinitionPropertyField>;
@@ -17,7 +18,12 @@ export type RadioInputProps = BaseInputProps<string, DefinitionPropertyField>;
  * - Validates that the selected value is in the options list
  * - Auto-corrects to first option if invalid value provided
  */
-const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange, onError }) => {
+const RadioInput: React.FC<RadioInputProps> = ({
+  field,
+  value,
+  onChange,
+  onError,
+}) => {
   const { t, definitionName } = useReactaFormContext();
   const layout =
     field.layout?.toLowerCase() === "horizontal" ? "row" : "column";
@@ -31,7 +37,7 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange, onError
 
   const validate = useCallback(
     (val: string): string | null => {
-      if ((val === "" || val === null || val === undefined)) {
+      if (val === "" || val === null || val === undefined) {
         return t("Value required");
       }
       // If options are not provided, we can't validate here; treat as valid.
@@ -74,24 +80,35 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange, onError
   return (
     <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
       <div
+        className={CSS_CLASSES.input}
+        role="radiogroup"
+        aria-labelledby={`${field.name}-label`}
+        aria-invalid={!!validate(String(value ?? ""))}
         style={{
           display: "flex",
           flexDirection: layout,
           flexWrap: layout === "row" ? "wrap" : "nowrap",
           gap: layout === "row" ? "12px" : "4px",
-          alignItems: layout === "row" ? "center" : "flex-start",
+          alignItems: layout === "row" ? "center" : "stretch",
           width: "100%",
+          padding: layout === "row" ? "8px" : undefined,
+          boxSizing: "border-box",
         }}
         ref={groupRef}
       >
         {(field.options ?? []).map((opt) => (
           <label
             key={String(opt.value)}
+            className={combineClasses(CSS_CLASSES.label)}
             style={{
-              display: "flex",
-              gap: "6px",
+              display: layout === "column" ? "flex" : "inline-flex",
+              gap: "8px",
               alignItems: "center",
               whiteSpace: "nowrap",
+              marginBottom: layout === "column" ? 6 : 0,
+              cursor: "pointer",
+              width: layout === "column" ? "100%" : undefined,
+              justifyContent: "flex-start",
             }}
           >
             <input
@@ -100,8 +117,18 @@ const RadioInput: React.FC<RadioInputProps> = ({ field, value, onChange, onError
               value={String(opt.value)}
               defaultChecked={String(value ?? "") === String(opt.value)}
               onChange={handleChange}
+              style={{ width: "1.1em", height: "1.1em" }}
             />
-            {t(opt.label)}
+            <span
+              style={{
+                userSelect: "none",
+                textAlign: layout === "column" ? "left" : undefined,
+                flex: layout === "column" ? 1 : undefined,
+                fontWeight: 400 // Use normal font weight for option labels
+              }}
+            >
+              {t(opt.label)}
+            </span>
           </label>
         ))}
       </div>

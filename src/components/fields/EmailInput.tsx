@@ -76,6 +76,8 @@ export const EmailInput: React.FC<EmailInputProps> = ({
         ref={inputRef}
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
+        aria-invalid={!!validate(String(value ?? ""))}
+        aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

@@ -33,6 +33,7 @@ const RatingInput: React.FC<RatingInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const starRefs = useRef<Array<HTMLSpanElement | null>>([]);
 
   const max = field.max || 5;
 
@@ -81,7 +82,13 @@ const RatingInput: React.FC<RatingInputProps> = ({
 
   return (
     <StandardFieldLayout field={field} error={validate(ratingValue)}>
-      <div style={ratingWrapperStyle}>
+      <div
+        role="radiogroup"
+        aria-labelledby={`${field.name}-label`}
+        style={ratingWrapperStyle}
+        aria-invalid={!!validate(ratingValue)}
+        aria-describedby={validate(ratingValue) ? `${field.name}-error` : undefined}
+      >
         {(() => {
           const iconProp = (field as DefinitionPropertyField & { icon?: string }).icon;
           const iconChar = iconProp && String(iconProp).trim() ? String(iconProp) : "★";
@@ -92,7 +99,25 @@ const RatingInput: React.FC<RatingInputProps> = ({
             return (
               <span
                 key={i}
+                ref={(el) => (starRefs.current[i] = el)}
+                role="radio"
+                tabIndex={ratingValue > 0 ? (i === ratingValue - 1 ? 0 : -1) : (i === 0 ? 0 : -1)}
+                aria-checked={isActive}
                 onClick={() => handleSelect(i + 1)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ' ) {
+                    e.preventDefault();
+                    handleSelect(i + 1);
+                  } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const next = Math.min(max - 1, i + 1);
+                    starRefs.current[next]?.focus();
+                  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const prev = Math.max(0, i - 1);
+                    starRefs.current[prev]?.focus();
+                  }
+                }}
                 onMouseEnter={() => setHoverIndex(i)}
                 onMouseLeave={() => setHoverIndex(null)}
                 style={{ ...starBaseStyle, color }}

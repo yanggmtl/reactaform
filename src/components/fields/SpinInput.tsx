@@ -137,7 +137,24 @@ const SpinInput: React.FC<SpinInputProps> = ({
           defaultValue={String(value ?? "")}
           ref={inputRef}
           onChange={handleChange}
+          onKeyDown={(e) => {
+            if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              handleStepChange(step);
+            } else if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              handleStepChange(-step);
+            } else if (e.key === 'PageUp') {
+              e.preventDefault();
+              handleStepChange(step * 10);
+            } else if (e.key === 'PageDown') {
+              e.preventDefault();
+              handleStepChange(-step * 10);
+            }
+          }}
           style={{ flex: 1 }}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${field.name}-error` : undefined}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         />
 

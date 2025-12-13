@@ -9,18 +9,19 @@ import TextInput from '../../src/components/fields/TextInput';
 
 describe('Accessibility smoke (axe)', () => {
   it('has no detectable a11y violations for a representative field', async () => {
-    let axe: any;
+    type AxeModule = {
+      run: (node?: HTMLElement | Element | Document, options?: unknown) => Promise<{ violations?: unknown[] }>;
+    };
+
+    let axe: AxeModule | undefined;
     try {
       // Use an indirect dynamic import via Function to avoid Vite's
       // static import analysis when the package is not installed.
       // Teams can opt-in by installing `axe-core` as a devDependency.
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      const dynImport = new Function('modulePath', 'return import(modulePath)');
-      // @ts-ignore
-      axe = await dynImport('axe-core');
-    } catch (err) {
+      const dynImport = new Function('modulePath', 'return import(modulePath)') as (modulePath: string) => Promise<unknown>;
+      axe = (await dynImport('axe-core')) as AxeModule;
+    } catch {
       // Skip the test if axe-core is not available
-      // eslint-disable-next-line no-console
       console.warn('axe-core not installed; skipping accessibility smoke test. Run `npm i -D axe-core` to enable.');
       return;
     }
@@ -34,11 +35,11 @@ describe('Accessibility smoke (axe)', () => {
     );
 
     // axe-core attaches to global window in JSDOM; run analyzer
-    const results = await (axe as any).run(container);
+    if (!axe) return;
+    const results = await axe.run(container);
 
     // If there are violations, print them to help debugging
     if (results.violations && results.violations.length > 0) {
-      // eslint-disable-next-line no-console
       console.error('Accessibility violations:', JSON.stringify(results.violations, null, 2));
     }
 

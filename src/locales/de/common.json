@@ -7,8 +7,8 @@
   "Submission handler error occurred.": "Ein Fehler im Übermittlungshandler ist aufgetreten.",
   "Form submitted successfully.": "Formular erfolgreich übermittelt.",
   "Dismiss": "Schließen",
-  "Instance Name": "Instanzname",
-  "Enter instance name": "Instanznamen eingeben",
+  "Instance Name": "Name der Instanz",
+  "Enter instance name": "Name der Instanz eingeben",
   
   "Red": "Rot",
   "Blue": "Blau",

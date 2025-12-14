@@ -30,7 +30,7 @@ describe('Accessibility smoke (axe)', () => {
 
     const { container } = renderWithProvider(
       <div>
-        <TextInput field={field} value={undefined} onChange={() => {}} />
+        <TextInput field={field} value={""} onChange={() => {}} />
       </div>
     );
 

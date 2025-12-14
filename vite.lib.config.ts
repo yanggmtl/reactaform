@@ -1,12 +1,12 @@
 import { defineConfig } from "vite";
-import path from "path";
+import { resolve } from "path";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
+      entry: resolve(process.cwd(), "src/index.ts"),
       name: "ReactaForm",
       // produce ES and CommonJS bundles
       formats: ["es", "cjs"],

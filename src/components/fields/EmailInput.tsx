@@ -31,6 +31,8 @@ export const EmailInput: React.FC<EmailInputProps> = ({
       if (!isValidEmail(trimmedInput)) return t("Must be valid email format");
 
       if (field.pattern && !new RegExp(field.pattern).test(trimmedInput)) {
+        if (field.patternErrorMessage) 
+          return t(field.patternErrorMessage);
         return t(`Email does not match pattern: {{%1}}`, {
           "%1": `${field.pattern}`,
         });

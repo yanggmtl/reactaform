@@ -46,6 +46,7 @@ export interface DefinitionPropertyField {
   minLength?: number;
   maxLength?: number;
   pattern?: string;
+  patternErrorMessage?: string;
   placeholder?: string;
   
   // Numeric field properties

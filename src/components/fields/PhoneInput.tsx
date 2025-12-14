@@ -30,7 +30,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
         try {
           const re = new RegExp(field.pattern);
           if (!re.test(raw))
-            return t(
+            return field.patternErrorMessage ? t(field.patternErrorMessage) : t(
               "Phone number does not match pattern: {{1}}",
               `${field.pattern}`
             );
@@ -74,12 +74,8 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
       return;
     }
 
-    if (
-      !err &&
-      field.pattern &&
-      !new RegExp(field.pattern).test(trimmedInput)
-    ) {
-      err = t("Phone number does not match pattern: {{1}}", `${field.pattern}`);
+    if (!err) {
+      err = validateCb(newVal);
     }
 
     // pass the fresh value to the parent (avoid stale state)

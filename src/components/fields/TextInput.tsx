@@ -48,7 +48,7 @@ const TextInput: React.FC<TextInputProps> = ({
         return t("Must be at most {{1}} characters", field.maxLength);
       }
       if (patternRegex && !patternRegex.test(val)) {
-        return t("Input does not match pattern: {{1}}", field.pattern);
+        return field.patternErrorMessage ? t(field.patternErrorMessage) : t("Input does not match pattern: {{1}}", field.pattern);
       }
       return validateFieldValue(definitionName, field, val, t);
     },

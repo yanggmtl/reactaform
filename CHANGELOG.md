@@ -34,3 +34,7 @@
 - Add Password input component
 - Add relative support for Url input
 - Add TranslationFunction type
+
+## 1.2.1 - 2025-12-14
+- Enhance ARIA-compliant support for some components
+- Fix some small issues

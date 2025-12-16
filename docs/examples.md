@@ -9,6 +9,9 @@ This folder contains small demo apps that exercise features of the `reactaform` 
 
 Each app is a minimal React app located at `<vite|next_js|create_react_app>/<app-name>` and includes a `public/reactaform.svg` used as the favicon.
 
+The file is located at [REAMDME.md](https://github.com/yanggmtl/reactaform/blob/master/examples/README.md)
+The examples are located at [Github Examples](https://github.com/yanggmtl/reactaform/tree/master/examples)
+
 ---
 
 ## 🎮 Demo Applications

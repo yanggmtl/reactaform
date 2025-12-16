@@ -68,7 +68,8 @@ export {
 export {
   loadJsonDefinition,
   createInstanceFromDefinition, // Create new instance with default values
-  loadInstance // Load existing instance (valuesMap)
+  loadInstance, // Load existing instance (valuesMap)
+  upgradeInstanceToLatestDefinition // Upgade instance to latest definition version
 } from './core/reactaFormModel';
 
 // Handler Registries

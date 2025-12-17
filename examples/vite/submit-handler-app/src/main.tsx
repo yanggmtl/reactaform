@@ -7,7 +7,7 @@
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ReactaForm, registerSubmissionHandler } from "reactaform";
-import type { FieldValueType, FormSubmissionHandler, ReactaInstance } from "reactaform";
+import type { FieldValueType, ReactaInstance, ReactaDefinition, TranslationFunction } from "reactaform";
 import "./style.css";
 
 const exampleDefinition = {
@@ -54,8 +54,11 @@ export default function App() {
 
   // Register a submission handler that stores submitted values into the local `instance` state
   React.useEffect(() => {
-    const handler: FormSubmissionHandler = (
-      definition, instanceName, valuesMap, t
+    const handler = (
+      definition: ReactaDefinition | Record<string, unknown>,
+      instanceName: string | null,
+      valuesMap: Record<string, FieldValueType | unknown>,
+      t: TranslationFunction
     ): string[] | undefined => {
       void definition;
       void t;
@@ -63,7 +66,7 @@ export default function App() {
 
       // Use functional update to avoid stale closures over `instance` and ensure we always
       // base the new instance on the latest state.
-      setInstance((prev) => {
+      setInstance((prev: ReactaInstance | undefined) => {
         const prevInst = (prev as ReactaInstance) || ({} as ReactaInstance);
         const newInstance: ReactaInstance = {
           ...prevInst,

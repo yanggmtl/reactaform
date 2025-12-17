@@ -3,19 +3,27 @@ import Point2DInput from "./Point2DInput";
 import { ReactaForm, registerComponent } from "reactaform";
 import type { ReactaDefinition } from "reactaform";
 import "./style.css";
+import Point3DInput from "./Point3DInput";
 
 const def: ReactaDefinition = {
-  name: "point2dDemo",
-  displayName: "Point2D Custom Component Demo",
+  name: "point2d3dDemo",
+  displayName: "Point 2D/3D Custom Component Demo",
   version: "1.0.0",
   properties: [
     {
       type: "point2d",
-      name: "position",
-      displayName: "Position",
+      name: "pos2d",
+      displayName: "2D Position",
       defaultValue: ['0', '0'],
       required: true,
-      // layout will place the two inputs in one row via the custom component
+    },
+    {
+      type: "point3d",
+      name: "pos3d",
+      displayName: "3D Position",
+      defaultValue: ['0', '0', '0'],
+      required: true,
+      tooltip: "Enter a 3D point as X, Y, Z coordinates",
     }
   ]
 };
@@ -25,12 +33,14 @@ const instance = {
   version: '1.0.0',
   definition: 'point2dDemo',
   values: {
-    position: ['10', '20a']
+    pos2d: ['10', '20'],
+    pos3d: ['5', '15', '25'],
   }
 };
 
 // Register the custom component under type 'point2d'
 registerComponent("point2d", Point2DInput);
+registerComponent("point3d", Point3DInput);
 
 export default function App() {
   return (

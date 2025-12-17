@@ -8,6 +8,14 @@ import type {
 } from "./reactaFormTypes";
 import { getFieldValidationHandler, getFormValidationHandler } from "./registries/validationHandlerRegistry";
 
+function isThenable<T = unknown>(v: unknown): v is PromiseLike<T> {
+  return (
+    (typeof v === "object" || typeof v === "function") &&
+    v !== null &&
+    typeof (v as PromiseLike<T>).then === "function"
+  );
+}
+
 // Cache for validation handlers to avoid repeated lookups
 const fieldHandlerCache = new Map<string, FieldValidationHandler | null>();
 const formHandlerCache = new Map<string, FormValidationHandler | null>();
@@ -31,7 +39,20 @@ export function validateFieldValue(
     
     const validationHandler = fieldHandlerCache.get(cacheKey);
     if (validationHandler) {
-      return validationHandler(value, t) || null;
+      try {
+        const res = validationHandler(value, t);
+        // If handler returned a Promise, we can't await here (API is sync),
+        // so treat as no error. Consumers that need async validation
+        // should register form-level async validators or handle async logic
+        // inside their components and call `onError` appropriately.
+        if (isThenable(res)) {
+          return null;
+        }
+        return (res as string | undefined) || null;
+      } catch (err) {
+        // If validation throws, surface as error string
+        return String(err instanceof Error ? err.message : err);
+      }
     }
   }
   return null;
@@ -39,11 +60,11 @@ export function validateFieldValue(
 
 // Validate entire form values using form-level validation handler
 // Returns array of error strings or null if valid
-export function validateFormValues(
+export async function validateFormValues(
   definition: ReactaDefinition | null,
   valuesMap: Record<string, FieldValueType | unknown>,
   t: (key: string) => string
-): string[] | null {
+): Promise<string[] | null> {
   if (definition && typeof (definition as ReactaDefinition).validationHandlerName === "string") {
     const handlerName = (definition as ReactaDefinition).validationHandlerName as string;
     
@@ -55,7 +76,15 @@ export function validateFormValues(
     
     const validationHandler = formHandlerCache.get(handlerName);
     if (validationHandler) {
-      return validationHandler(valuesMap, t) || null;
+      try {
+        const res = validationHandler(valuesMap, t);
+        if (isThenable(res)) {
+          return (await res) || null;
+        }
+        return (res as string[] | undefined) || null;
+      } catch (err) {
+        return [String(err instanceof Error ? err.message : err)];
+      }
     }
   }
   return null;

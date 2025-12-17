@@ -9,13 +9,13 @@ export interface SubmitResult {
   errors?: string[];
 }
 
-export function submitForm(
+export async function submitForm(
   definition: ReactaDefinition,
   instance: ReactaInstance | null,
   valuesMap: Record<string, FieldValueType | unknown>,
   t: TranslationFunction,
   errors: Record<string, string>
-): SubmitResult {
+): Promise<SubmitResult> {
   // mark `instance` as used to avoid unused parameter compile errors in some tsconfigs
   void instance;
 
@@ -82,7 +82,7 @@ export function submitForm(
   }
 
   // Perform form-level validation
-  const validationErrors = validateFormValues(definition, finalMap, t);
+  const validationErrors = await validateFormValues(definition, finalMap, t);
   if (validationErrors && validationErrors.length > 0) {
     // Combine validation messages into a single string starting with a header
     const msg = "Validation Fail";
@@ -99,7 +99,7 @@ export function submitForm(
 
     if (submitHandler) {
       try {
-        const submitResult = submitHandler(definition, instance?.name ?? null, finalMap, t);
+        const submitResult = await submitHandler(definition, instance?.name ?? null, finalMap, t);
         if (submitResult && submitResult.length > 0) {
           return { 
             success: false, 

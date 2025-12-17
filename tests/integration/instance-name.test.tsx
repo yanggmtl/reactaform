@@ -41,7 +41,7 @@ describe('ReactaForm instance name behavior', () => {
     // Temporarily set the name as if the user edited it
     instance.name = 'Updated';
 
-    const result = submitForm(def, instance, instance.values, (s) => s, {});
+    const result = await submitForm(def, instance, instance.values, (s) => s, {});
     expect(result.success).toBe(true);
 
     // After submit handler runs, parentInstance should have updated name

@@ -116,7 +116,7 @@ export type TranslationFunction = (text: string, ...args: unknown[]) => string;
 export type FieldValidationHandler = (
   value: FieldValueType | unknown,
   t: TranslationFunction,
-) => string | undefined;
+) => string | undefined | Promise<string | undefined>;
 
 // Form validator function: takes entire values map,
 // and returns error string or undefined if valid
@@ -124,7 +124,7 @@ export type FieldValidationHandler = (
 export type FormValidationHandler = (
   valuesMap: Record<string, FieldValueType | unknown>,
   t: TranslationFunction,
-) => string[] | undefined;
+) => string[] | undefined | Promise<string[] | undefined>;
 
 // Submission function: returns error string or undefined if valid
 export type FormSubmissionHandler = (
@@ -132,7 +132,7 @@ export type FormSubmissionHandler = (
   instanceName: string | null,
   valuesMap: Record<string, FieldValueType | unknown>,
   t: TranslationFunction,
-) => string[] | undefined;
+) => string[] | undefined | Promise<string[] | undefined>;
 
 // Generic input change callback used by input components
 export type InputOnChange<T> = (value: T | string, error: string | null) => void;

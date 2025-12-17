@@ -300,7 +300,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     });
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Temporarily apply the edited name so submission handlers receive it.
     // Mark that we expect an instance update from this submit and we want
     // to suppress clearing messages when that update arrives.
@@ -309,7 +309,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     const prevName = targetInstanceRef.current?.name;
     targetInstanceRef.current.name = instanceName;
 
-    const result = submitForm(definition, targetInstanceRef.current, valuesMap, t, errors);
+    const result = await submitForm(definition, targetInstanceRef.current, valuesMap, t, errors);
     // Display result message in the UI
     const msg = typeof result.message === 'string' ? result.message : String(result.message);
     const errMsg = Object.values(result.errors??{}).join("\n");

@@ -16,8 +16,10 @@ Purpose: explain the mental model for ReactaForm.
 - Async support: validators may return promises for server checks.
 - Field-level vs form-level: combine per-field rules with cross-field validation handlers.
 
-## Submission Flow
-- Register `onSubmit` handlers; payload mirrors definition properties.
+## Submission Registration System
+- Specify the submission handler name in form definition
+- Implement submission handler
+- Register the submission handler with ReactaForm
 - Handle success/error states; show inline errors via validation output.
 
 ## Localization

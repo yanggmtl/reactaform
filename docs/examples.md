@@ -25,11 +25,15 @@ Demonstrates instance management - create, load, edit, and save multiple form in
 - Edit instance values and names
 - Handle form submission with instance updates
 
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/instance_app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/instance_app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/instance_app)
+
 ### **group-app**
 Shows how to organize form fields into logical groups (e.g., "Personal Information", "Contact Details"). Demonstrates:
 - Field grouping for better UX
 - Collapsible sections
 - Visual organization of complex forms
+
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/group-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/group-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/group-app)
 
 ### **parents-app**
 Showcases conditional field visibility based on parent field values. Features:
@@ -38,12 +42,16 @@ Showcases conditional field visibility based on parent field values. Features:
 - Cascading dropdowns
 - Multi-level conditional rendering
 
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/parents-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/parents-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/parents-app)
+
 ### **custom-validation-app**
 Demonstrates custom validation patterns. Shows how to:
 - Register custom validators
 - Implement field-specific validation logic
 - Display custom error messages
 - Handle async validation
+
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/custom-validation-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/custom-validation-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/custom-validation-app)
 
 ### **translation-app**
 Multi-language form support with custom translations. Demonstrates:
@@ -52,12 +60,16 @@ Multi-language form support with custom translations. Demonstrates:
 - Localized field labels and messages
 - RTL support preparation
 
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/translation-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/translation-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/translation-app)
+
 ### **dark-mode-app**
 Theme customization and dark mode support. Features:
 - Light/dark theme switching
 - CSS variable customization
 - Dynamic theme changes
 - Persistent theme preferences
+
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/dark-mode-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/dark-mode-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/dark-mode-app)
 
 ### **submit-handler-app**
 Custom form submission handling. Shows how to:
@@ -66,6 +78,8 @@ Custom form submission handling. Shows how to:
 - Handle validation errors
 - Display success/error messages
 
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/submit-handler-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/submit-handler-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/submit-handler-app)
+
 ### **custom-styles-app**
 Advanced CSS customization and theming. Demonstrates:
 - Custom CSS variable overrides
@@ -73,10 +87,14 @@ Advanced CSS customization and theming. Demonstrates:
 - Brand-specific themes
 - Responsive design patterns
 
-Install
-- npm install
+  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/custom-styles-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/custom-styles-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/custom-styles-app)
 
-Run and build
+## Install
+```powershell
+- npm install
+```
+
+## Run and build
 
 - Run a single app in dev mode (hot reload):
 
@@ -87,20 +105,20 @@ Run and build
      npm run start
 ```
 
-- Build a single app for production:
+## Build a single app for production:
 
 ```powershell
   npm run build
 ```
 
-Registering custom handlers (examples in apps)
+## Registering custom handlers (examples in apps)
 
 - Form submission handler (register and reference):
 
 1. Define and register a handler with `registerSubmissionHandler(name, fn)` (usually inside a `useEffect`).
 2. Set `submitHandlerName` on your definition to the registered name.
 
-- Form-level validation handler (cross-field validation):
+## Form-level validation handler (cross-field validation):
 
 1. Register with `registerFormValidationHandler(name, fn)`.
 2. Set `validationHandlerName` on your definition.
@@ -123,7 +141,7 @@ The apps include minimal implementations you can copy into your project.
 
 ---
 
-Styling and theme customization
+## Styling and theme customization
 
 - `reactaform` uses CSS custom properties (variables) for theming (see `reracta/reactaform.css`).
 - To override the default look, create a class that redefines the variables and apply that class to the same container as the `reactaform` root element (or a parent). Example in `custom-styles-app`:

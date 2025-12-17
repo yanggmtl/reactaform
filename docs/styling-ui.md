@@ -97,8 +97,8 @@ Provider inline style for layout only:
 
 ## References
 
-- Core provider: [src/components/ReactaFormProvider.tsx](src/components/ReactaFormProvider.tsx#L1-L240)
-- Core stylesheet and variables: [src/core/reactaform.css](src/core/reactaform.css#L1-L240)
+- Core provider: [src/components/ReactaFormProvider.tsx](https://github.com/yanggmtl/reactaform/blob/master/src/components/ReactaFormProvider.tsx)
+- Core stylesheet and variables: [src/core/reactaform.css](https://github.com/yanggmtl/reactaform/blob/master/src/core/reactaform.css)
 
 
 ---

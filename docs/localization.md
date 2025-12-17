@@ -84,14 +84,4 @@ Follow these steps to provide custom, per-form localization dictionaries that th
    - When the app/provider initializes, the form renderer will attempt to load `public/locales/<currentLang>/<localizationName>.json` and merge it with the global dictionary.
    - Authors can ship multiple localizationName files per language and reference them per-form to customize labels and messages.
 
-## Supported Languages
-
-This project provides localization support for the following languages:
-
-- `en` (English)
-- `fr` (Français)
-- `de` (Deutsch)
-- `es` (Español)
-- `zh-cn` (简体中文)
-
 Place locale JSON files under `public/locales/<lang>/` (or `src/locales/<lang>/` if you prefer bundling) and ensure your app provider loads the appropriate files for the current locale.

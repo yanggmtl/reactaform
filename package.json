@@ -52,7 +52,8 @@
     "react-dom": ">=18.0.0 <20"
   },
   "scripts": {
-    "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.build.json",
+    "build:types": "tsc -p tsconfig.build.json --noEmit false",
+    "build:lib": "vite build --config vite.lib.config.ts && npm run build:types",
     "build:pack": "npm run build:lib && npm pack",
     "test": "vitest run --config ./vitest.config.ts",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",

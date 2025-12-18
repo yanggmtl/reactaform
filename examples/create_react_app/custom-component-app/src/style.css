@@ -1,0 +1,18 @@
+.app {
+  font-family: system-ui, sans-serif;
+  padding: 24px;
+  width: 480px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.point-row {
+  display: flex;
+  gap: 8px;
+}
+
+.point-row input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+}

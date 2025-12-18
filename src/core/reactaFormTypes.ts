@@ -20,6 +20,11 @@ export type ErrorType = string | null;
 
 export type ParentField = Record<string, string[] | Integer[] | boolean[]>;
 
+export type ValidationHandlerName =
+  | string
+  | [string]
+  | [string, string];
+
 export interface DefinitionPropertyField {
   name: string;
   displayName: string;
@@ -33,7 +38,7 @@ export interface DefinitionPropertyField {
   labelLayout?: 'row' | 'column-left' | 'column-center'; // Optional label layout: 'row' (default), 'column-left' (label left-aligned), or 'column-center' (label center-aligned)
 
   // Custom validation handler name
-  validationHandlerName?: string;
+  validationHandlerName?: ValidationHandlerName;
 
   // Unit field properties
   dimension?: string; // for 'unit' type fields, e.g. 'length', 'angle', etc.
@@ -116,7 +121,7 @@ export type TranslationFunction = (text: string, ...args: unknown[]) => string;
 export type FieldValidationHandler = (
   value: FieldValueType | unknown,
   t: TranslationFunction,
-) => string | undefined | Promise<string | undefined>;
+) => string | undefined;
 
 // Form validator function: takes entire values map,
 // and returns error string or undefined if valid

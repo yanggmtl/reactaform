@@ -6,7 +6,10 @@ import type {
   DefinitionPropertyField,
   TranslationFunction,
 } from "./reactaFormTypes";
-import { getFieldValidationHandler, getFormValidationHandler } from "./registries/validationHandlerRegistry";
+import {
+  getFieldValidationHandler,
+  getFormValidationHandler,
+} from "./registries/validationHandlerRegistry";
 
 function isThenable<T = unknown>(v: unknown): v is PromiseLike<T> {
   return (
@@ -28,31 +31,49 @@ export function validateFieldValue(
   value: FieldValueType | unknown,
   t: TranslationFunction
 ): string | null {
-  if (field && typeof field.validationHandlerName === "string") {
-    const cacheKey = `${definitionName}:${field.validationHandlerName}`;
-    
-    // Check cache first
-    if (!fieldHandlerCache.has(cacheKey)) {
-      const validationHandler = getFieldValidationHandler(definitionName, field.validationHandlerName);
-      fieldHandlerCache.set(cacheKey, validationHandler);
+  if (!field) {
+    return null;
+  }
+
+  let category: string | null = null;
+  let key: string | null = null;
+  if (typeof field.validationHandlerName === "string") {
+    category = definitionName;
+    key = field.validationHandlerName;
+  } else if (Array.isArray(field.validationHandlerName)) {
+    const [cat, k] = field.validationHandlerName;
+    if (k) {
+      category = cat;
+      key = k;
+    } else if (cat) {
+      category = definitionName;
+      key = cat;
     }
-    
-    const validationHandler = fieldHandlerCache.get(cacheKey);
-    if (validationHandler) {
-      try {
-        const res = validationHandler(value, t);
-        // If handler returned a Promise, we can't await here (API is sync),
-        // so treat as no error. Consumers that need async validation
-        // should register form-level async validators or handle async logic
-        // inside their components and call `onError` appropriately.
-        if (isThenable(res)) {
-          return null;
-        }
-        return (res as string | undefined) || null;
-      } catch (err) {
-        // If validation throws, surface as error string
-        return String(err instanceof Error ? err.message : err);
-      }
+  }
+
+  if (category === null || key === null) {
+    return null;
+  }
+
+  const cacheKey = `${category}:${key}`;
+
+  // Check cache first
+  if (!fieldHandlerCache.has(cacheKey)) {
+    const validationHandler = getFieldValidationHandler(
+      category,
+      cacheKey
+    );
+    fieldHandlerCache.set(cacheKey, validationHandler);
+  }
+
+  const validationHandler = fieldHandlerCache.get(cacheKey);
+  if (validationHandler) {
+    try {
+      const res = validationHandler(value, t);
+      return res || null;
+    } catch (err) {
+      // If validation throws, surface as error string
+      return String(err instanceof Error ? err.message : err);
     }
   }
   return null;
@@ -65,15 +86,19 @@ export async function validateFormValues(
   valuesMap: Record<string, FieldValueType | unknown>,
   t: (key: string) => string
 ): Promise<string[] | null> {
-  if (definition && typeof (definition as ReactaDefinition).validationHandlerName === "string") {
-    const handlerName = (definition as ReactaDefinition).validationHandlerName as string;
-    
+  if (
+    definition &&
+    typeof (definition as ReactaDefinition).validationHandlerName === "string"
+  ) {
+    const handlerName = (definition as ReactaDefinition)
+      .validationHandlerName as string;
+
     // Check cache first
     if (!formHandlerCache.has(handlerName)) {
       const validationHandler = getFormValidationHandler(handlerName);
       formHandlerCache.set(handlerName, validationHandler);
     }
-    
+
     const validationHandler = formHandlerCache.get(handlerName);
     if (validationHandler) {
       try {

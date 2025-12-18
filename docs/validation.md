@@ -43,68 +43,75 @@ Notes:
 
 ## Field-level Validation
 
-Field-level validators validate a single property. They are ideal for format checks, value ranges, and field-specific async checks (e.g. uniqueness).
+Field-level validators validate a single property. They are ideal for format checks, value ranges, and synchronous field-specific checks.
+
+**Important:** Field-level validators must be **synchronous**. For async validation (e.g., API calls to check uniqueness), use form-level validation instead.
 
 Usage:
 
 - In the field definition, set `validationHandlerName` to the registered handler name.
 - Register the handler in application code with `registerFieldValidationHandler(name, handler)`.
-- Handler signature: `(value, t) => string | null`.
+- Handler signature: `(value, t) => string | undefined`.
 
-Examples:
+Example:
 
 ```ts
 // synchronous handler
 registerFieldValidationHandler('evenNumber', (value, t) => {
-  const translate = (key: string) => t?.(key) ?? key;
   if (typeof value !== 'number' || value % 2 !== 0) {
-    return { error: ctx?.t ? ctx.t('errors.mustBeEven') : 'Value must be an even number' };
+    return t('errors.mustBeEven') || 'Value must be an even number';
   }
-  return { valid: true };
-});
-
-// asynchronous handler
-registerFieldValidationHandler('uniqueUsername', async (value, t) => {
-  const translate = (key: string) => t?.(key) ?? key;
-  const ok = await api.isUsernameAvailable(value);
-  return ok ? null : translate()'Username already taken') };
+  return undefined; // valid
 });
 
 // field definition (JSON)
 {
-  "name": "username",
-  "type": "text",
-  "validationHandlerName": "uniqueUsername"
+  "name": "count",
+  "type": "integer",
+  "validationHandlerName": "evenNumber"
 }
 ```
 
 Notes:
 
-- Triggers: field validators typically run on `blur` or `change` depending on form config. Debounce async validators to avoid excessive requests.
-- Return shape: prefer `{ valid: true }` for success and `{ error: 'message' }` for a single-field error. Adapt to your application's handler contract if different.
-- Localization: use `ctx.t` inside the handler or return i18n keys resolved by the renderer.
+- Triggers: field validators typically run on `change` depending on form config.
+- Return value: return `undefined` for valid values, or an error message string for invalid values.
+- Localization: use the `t` function to translate error messages.
+- **No async:** Field validators must be synchronous. For async checks like API calls, use form-level validation.
 
 ## Form-level Validation
 
-Form-level validators run across multiple fields and are useful for cross-field rules (e.g. password confirmation, combined constraints) or server-side checks that need full form context.
+Form-level validators run across multiple fields and are useful for:
+- Cross-field rules (e.g. password confirmation, combined constraints)
+- Server-side checks that need full form context
+- **Async validation** such as API calls (e.g., uniqueness checks, external validation services)
+
+**Important:** Form-level validation **supports both synchronous and asynchronous** handlers. This is the only place where async validation is allowed.
 
 Usage:
 
 - Register a handler with `registerFormValidationHandler(name, handler)`.
 - Reference the handler name in the form JSON using `validationHandlerName` at the top-level.
-- Handler signature: `(values, t) => null | errors`.
+- Handler signature: `(values, t) => string[] | undefined | Promise<string[] | undefined>`.
 
-Example:
+Examples:
 
 ```ts
-// app startup
-registerFormValidationHandler('uniqueEmailCheck', async (values, t) => {
-  const translate = (key: string) => t?.(key) ?? key;
-  const errors: string[];
-  if (values.email && !(await api.isEmailUnique(values.email))) {
-    errors.push(translate('Email already in use'));
+// Synchronous form validation
+registerFormValidationHandler('passwordMatch', (values, t) => {
+  if (values.password !== values.confirmPassword) {
+    return [t('errors.passwordMismatch') || 'Passwords must match'];
   }
-  return errors.length ? errors : null;
+  return undefined;
+});
+
+// Asynchronous form validation (API call)
+registerFormValidationHandler('uniqueEmailCheck', async (values, t) => {
+  const errors: string[] = [];
+  if (values.email && !(await api.isEmailUnique(values.email))) {
+    errors.push(t('errors.emailInUse') || 'Email already in use');
+  }
+  return errors.length ? errors : undefined;
 });
 
 // form definition (JSON)
@@ -118,21 +125,33 @@ registerFormValidationHandler('uniqueEmailCheck', async (values, t) => {
 Notes:
 
 - Triggering: form-level validators run on submit by default, though apps can provide hooks to run them earlier.
-- Return shape: prefer `{ valid: true }` for success and `{ errors: { [fieldName]: 'message' } }` to map messages to fields.
-- Localization: use the provided `ctx.t` helper in handlers or return i18n keys for resolution by the renderer.
+- Return value: return `undefined` for valid forms, or an array of error message strings for invalid forms.
+- Localization: use the provided `t` helper in handlers to translate error messages.
+- **Async support:** Form-level validators can be async (return a Promise). The form will wait for the Promise to resolve before proceeding.
 
 ## Async Validation
-- Both field-level and form-level handlers may be async. Ensure UI debounces and shows pending state for long-running checks.
 
-Example (async field handler):
+**Async validation is only supported at the form level, not at the field level.**
+
+For async validation needs (such as API calls to check uniqueness), use form-level validators:
 
 ```ts
-registerFieldValidationHandler('uniqueUsername', async (value, _values, ctx) => {
-  if (!value) return { valid: true };
-  const ok = await api.isUsernameAvailable(value);
-  return ok ? { valid: true } : { error: ctx?.t ? ctx.t('errors.usernameTaken') : 'Username already taken' };
+registerFormValidationHandler('uniqueUsername', async (values, t) => {
+  if (!values.username) return undefined;
+  
+  const isAvailable = await api.isUsernameAvailable(values.username);
+  if (!isAvailable) {
+    return [t('errors.usernameTaken') || 'Username already taken'];
+  }
+  return undefined;
 });
 ```
+
+Best practices for async validation:
+- Debounce user input to avoid excessive API calls
+- Show pending state in the UI during validation
+- Handle errors gracefully (network failures, timeouts)
+- Consider caching results to avoid duplicate checks
 
 ## Error Messages
 

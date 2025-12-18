@@ -11,6 +11,10 @@ export function getFormSubmissionHandler(submitterName: string): FormSubmissionH
   return registry.get(submitterName);
 }
 
+export function getSubmissionHandler(submitterName: string): FormSubmissionHandler | undefined {
+  return registry.get(submitterName);
+}
+
 registerSubmissionHandler(
   "Preset_AlertSubmitHandler",
   (definition, instanceName, valuesMap) => {

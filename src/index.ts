@@ -57,6 +57,23 @@ export {
   getComponent,
 } from './core/registries/componentRegistry';
 
+// Plugin System
+export {
+  registerPlugin,
+  unregisterPlugin,
+  getPlugin,
+  getAllPlugins,
+  hasPlugin,
+  registerComponents,
+} from './core/registries/pluginRegistry';
+
+export type { 
+  ReactaFormPlugin,
+  ConflictResolution,
+  PluginRegistrationOptions,
+  PluginConflict,
+} from './core/registries/pluginRegistry';
+
 // Validation
 export {
   validateFieldValue,

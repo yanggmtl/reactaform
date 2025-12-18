@@ -4,8 +4,7 @@
 // as a string which will be bundled into the JS output.
 import reactaformCss from './core/reactaform.css?raw';
 
-function injectReactaFormStyles() {
-  if (typeof document === 'undefined') return;
+export function injectReactaFormStyles() {
   if (document.getElementById('reactaform-styles')) return;
   try {
     const style = document.createElement('style');
@@ -17,7 +16,7 @@ function injectReactaFormStyles() {
   }
 }
 
-injectReactaFormStyles();
+if (typeof document !== 'undefined') injectReactaFormStyles();
 
 // Core Components
 export { default as ReactaForm } from './components/ReactaForm';

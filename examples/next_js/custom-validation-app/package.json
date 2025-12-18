@@ -13,7 +13,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-window": "^2.2.3",
-    "reactaform": "^1.2.1"
+    "reactaform": "^1.3.0"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -5,18 +5,17 @@
     "emitDeclarationOnly": true,
     "outDir": "dist",
     "declarationDir": "dist",
-    // Use the real `src` folder as the root for declarations so paths resolve
     "rootDir": "src",
-    "noEmit": false,
-    "composite": false,
-    "resolveJsonModule": true,
+
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+
     "esModuleInterop": true,
+    "verbatimModuleSyntax": false,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "moduleResolution": "node",
-    "target": "ESNext",
-    "module": "ESNext",
-    "jsx": "react-jsx",
+
     "typeRoots": ["./src/types", "./node_modules/@types"],
     "types": []
   },

@@ -1,3 +1,4 @@
+import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 
 interface SeparatorProps {

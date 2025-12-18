@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import * as React from "react";
 import type { ChangeEvent } from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -20,7 +20,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
 
   const { definitionName } = useReactaFormContext();
 
-  const validateCb = useCallback(
+  const validateCb = React.useCallback(
     (val: string): string | null => {
       const raw = String(val ?? "").trim();
       if (raw === "") {
@@ -43,13 +43,13 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     [definitionName, field, t]
   );
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<PhoneInputProps["onError"] | undefined>(onError);
-  useEffect(() => {
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<PhoneInputProps["onError"] | undefined>(onError);
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const v = String(value ?? "");
     const err = validateCb(v);
     if (inputRef.current && inputRef.current.value !== String(v)) {

@@ -1,5 +1,5 @@
 import type { ChangeEvent } from "react";
-import React, { useEffect, useRef } from "react";
+import * as React from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
@@ -16,11 +16,11 @@ const TimeInput: React.FC<TimeInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<TimeInputProps["onError"] | undefined>(onError);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<TimeInputProps["onError"] | undefined>(onError);
   // Default to including seconds so the input supports HH:MM:SS by default
   const includeSeconds = field.includeSeconds ?? true;
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
@@ -67,7 +67,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
     onChange?.(newVal, err);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const err = validate(value);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;

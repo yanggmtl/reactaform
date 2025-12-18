@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import * as React from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -58,7 +58,7 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
     onChange?.(newValue, err);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Validate on initial mount or when value changes; notify parent via onErrorRef
     const err = validate(value);
     if (err !== prevErrorRef.current) {

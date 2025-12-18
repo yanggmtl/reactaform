@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 export type PopupOptionMenuPosition = {
   x: number;
@@ -23,8 +23,8 @@ export function PopupOptionMenu<T extends PopupOption>({
   onClose,
   onClickOption
 }: PopupOptionMenuProps<T>) {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const isSelectingRef = useRef<boolean>(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const isSelectingRef = React.useRef<boolean>(false);
   
   // Prefer an explicit `#popup-root` if present; otherwise render into document.body
   const popupRoot =
@@ -32,7 +32,7 @@ export function PopupOptionMenu<T extends PopupOption>({
       ? document.getElementById("popup-root") || document.body
       : null;
   
-  useEffect(() => {
+  React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       // If we're in the process of selecting an option, don't close
       if (isSelectingRef.current) {

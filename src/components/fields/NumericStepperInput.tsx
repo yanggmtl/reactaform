@@ -1,5 +1,5 @@
 // components/SpinInput.tsx
-import React, { useEffect, useCallback, useRef } from "react";
+import * as React from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -24,7 +24,7 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   const maxVal = field.max ?? undefined;
   const step = Math.max(1, Math.round(field.step ?? 1)); // ensure step >= 1
 
-  const validateCb = useCallback(
+  const validateCb = React.useCallback(
     (value: number): string | null => {
       if (isNaN(value)) {
         return t("Must be a valid integer");
@@ -48,15 +48,15 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
     [definitionName, field, t, minVal, maxVal]
   );
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<NumericStepperInputProps["onError"] | undefined>(
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<NumericStepperInputProps["onError"] | undefined>(
     onError
   );
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const active = document.activeElement;
     if (active === inputRef.current) return;
     const str = String(value);

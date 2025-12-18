@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -28,14 +28,14 @@ const RadioInput: React.FC<RadioInputProps> = ({
   const layout =
     field.layout?.toLowerCase() === "horizontal" ? "row" : "column";
 
-  const groupRef = useRef<HTMLDivElement | null>(null);
-  const onErrorRef = useRef<RadioInputProps["onError"] | undefined>(onError);
+  const groupRef = React.useRef<HTMLDivElement | null>(null);
+  const onErrorRef = React.useRef<RadioInputProps["onError"] | undefined>(onError);
 
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  const validate = useCallback(
+  const validate = React.useCallback(
     (val: string): string | null => {
       if (val === "" || val === null || val === undefined) {
         return t("Value required");
@@ -51,7 +51,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
     [field, t, definitionName]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const safeVal = value != null ? String(value) : "";
     const err = validate(safeVal);
     onErrorRef.current?.(err ?? null);

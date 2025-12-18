@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import * as React from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -26,7 +26,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
-  const patternRegex = useMemo(
+  const patternRegex = React.useMemo(
     () => (field.pattern ? new RegExp(field.pattern) : null),
     [field.pattern]
   );
@@ -54,7 +54,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
     onChange?.(newVal, err);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const err = validate(value ?? "");
     if (inputRef.current && inputRef.current.value !== String(value ?? "")) {
       inputRef.current.value = String(value ?? "");

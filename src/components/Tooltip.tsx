@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useMemo } from "react";
-import ReactDOM from "react-dom";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import useReactaFormContext from "../hooks/useReactaFormContext";
 
 type TooltipProps = {
@@ -10,14 +10,14 @@ type TooltipProps = {
 
 const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation = true }) => {
   const { t, darkMode, formStyle, fieldStyle } = useReactaFormContext();
-  const [hover, setHover] = useState(false);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
-  const [positioned, setPositioned] = useState(false);
-  const ref = useRef<HTMLSpanElement | null>(null);
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
-  const iconRectRef = useRef<DOMRect | null>(null);
+  const [hover, setHover] = React.useState(false);
+  const [pos, setPos] = React.useState({ x: 0, y: 0 });
+  const [positioned, setPositioned] = React.useState(false);
+  const ref = React.useRef<HTMLSpanElement | null>(null);
+  const tooltipRef = React.useRef<HTMLDivElement | null>(null);
+  const iconRectRef = React.useRef<DOMRect | null>(null);
 
-  const tooltipStyles = useMemo(() => {
+  const tooltipStyles = React.useMemo(() => {
     const sizeConfig: Record<string, React.CSSProperties> = {
       small: { padding: "4px 8px", fontSize: "11px", maxWidth: "200px" },
       medium: { padding: "6px 10px", fontSize: "12px", maxWidth: "240px" },
@@ -86,7 +86,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
     return merged;
   }, [darkMode, size, animation, formStyle, fieldStyle]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (hover) {
       // Defer the reset of `positioned` to the next animation frame to
       // avoid synchronous setState inside the effect body which triggers
@@ -120,7 +120,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
   }, [hover]);
 
   // After the tooltip is rendered, measure and clamp so the tooltip box doesn't overflow the viewport
-  useEffect(() => {
+  React.useEffect(() => {
     if (!positioned) return;
     const frame = requestAnimationFrame(() => {
       if (!tooltipRef.current) return;

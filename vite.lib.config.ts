@@ -15,7 +15,13 @@ export default defineConfig({
     outDir: "dist",
     rollupOptions: {
       // Exclude peer dependencies from bundle
-      external: ["react", "react-dom", "react-window"],
+      external: [
+        "react",
+        "react-dom",
+        "react/jsx-runtime",
+        "react/jsx-dev-runtime",
+        "react-window",
+      ],
       output: [
         {
           // ES module

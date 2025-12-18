@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -21,13 +21,13 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   onError,
 }) => {
   const { definitionName, t } = useReactaFormContext();
-  const onErrorRef = useRef<CheckboxInputProps["onError"] | undefined>(onError);
+  const onErrorRef = React.useRef<CheckboxInputProps["onError"] | undefined>(onError);
 
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const err = validateFieldValue(definitionName, field, value ?? false, t);
     onErrorRef.current?.(err ?? null);
   }, [value, field, definitionName, t]);

@@ -1,7 +1,6 @@
 {
   "name": "reactaform",
   "version": "1.2.1",
-  "type": "module",
   "description": "A powerful, type-safe React form builder library with dynamic field rendering, conditional visibility, multi-language support, and extensible validation",
   "keywords": [
     "react",
@@ -49,8 +48,8 @@
     "LICENSE"
   ],
   "peerDependencies": {
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react": ">=18.0.0 <20",
+    "react-dom": ">=18.0.0 <20"
   },
   "scripts": {
     "build:lib": "vite build --config vite.lib.config.ts && tsc -p tsconfig.build.json",

@@ -1,6 +1,5 @@
 // components/IntegerInput.tsx
-import React, { useEffect, useRef, useCallback } from "react";
-import type { ChangeEvent } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -45,10 +44,10 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Memoize parse function
-  const parseInteger = useCallback((s: string) => {
+  const parseInteger = React.useCallback((s: string) => {
     const n = parseInt(s, 10);
     return Number.isNaN(n) ? null : n;
   }, []);
@@ -112,15 +111,15 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
     [field, definitionName, t, parseInteger]
   );
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<IntegerInputProps["onError"] | undefined>(onError);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<IntegerInputProps["onError"] | undefined>(onError);
 
   // Keep a stable ref to the latest onError to avoid adding it to the effect deps
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const input = String(value ?? "");
     const err = validateCb(input);
 
@@ -136,7 +135,7 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
   }, [value, field, validateCb, t]);
 
   // Handle user input change in the text box
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     const err = validateCb(input);
     onChange?.(input, err);

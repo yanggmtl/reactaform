@@ -14,7 +14,7 @@
   with this documented reasoning.
 */
 
-import React from "react";
+import * as React from "react";
 import useReactaFormContext from "../hooks/useReactaFormContext";
 import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../core/reactaFormTypes";
 import { getComponent } from "../core/registries";
@@ -31,7 +31,7 @@ const FieldWrapper = React.memo<{
   // Dynamic component lookup: this creates a component reference during render
   // intentionally because fields are dynamic (type -> component). The wrapper
   // is memoized to avoid unnecessary re-renders.
-  const Component = getComponent(field.type);
+  const Component = getComponent(field.type) as JSX.ElementType | undefined;
 
   const onChange = React.useCallback(
     (v: FieldValueType, err: ErrorType) => handleChange(field.name, v, err),

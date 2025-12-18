@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
@@ -38,8 +38,8 @@ const SliderInput: React.FC<SliderInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const rangeRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const rangeRef = React.useRef<HTMLInputElement | null>(null);
 
   const validate = React.useCallback(
     (input: string): string | null => {
@@ -70,13 +70,13 @@ const SliderInput: React.FC<SliderInputProps> = ({
     [definitionName, field, t]
   );
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<SliderInputProps["onError"] | undefined>(onError);
-  useEffect(() => {
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<SliderInputProps["onError"] | undefined>(onError);
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const input = String(value);
     const err = validate(input);
     if (rangeRef.current && document.activeElement !== rangeRef.current) {

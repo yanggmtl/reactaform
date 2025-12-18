@@ -1,5 +1,5 @@
 // components/RatingInput.tsx
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import * as React from "react";
 // Inlined styles (moved from RatingInput.css)
 const ratingWrapperStyle: React.CSSProperties = {
   display: 'flex',
@@ -32,12 +32,12 @@ const RatingInput: React.FC<RatingInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const starRefs = useRef<Array<HTMLSpanElement | null>>([]);
+  const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
+  const starRefs = React.useRef<Array<HTMLSpanElement | null>>([]);
 
   const max = field.max || 5;
 
-  const validate = useCallback(
+  const validate = React.useCallback(
     (val: number): string | null => {
       if (field.required && val === 0) return t("Value required");
       const err = validateFieldValue(definitionName, field, val, t);
@@ -46,13 +46,13 @@ const RatingInput: React.FC<RatingInputProps> = ({
     [field, t, definitionName]
   );
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<RatingInputProps["onError"] | undefined>(onError);
-  useEffect(() => {
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<RatingInputProps["onError"] | undefined>(onError);
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let v = value || 0;
     if (value < 0) {
       v = 0;

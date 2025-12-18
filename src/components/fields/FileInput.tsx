@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import type { ChangeEvent, DragEvent } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import { validateFieldValue } from "../../core/validation";
@@ -9,11 +8,11 @@ export type FileInputProps = BaseInputProps<File | File[] | null, DefinitionProp
 
 const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const onErrorRef = useRef<FileInputProps["onError"] | undefined>(onError);
+  const [isDragging, setIsDragging] = React.useState<boolean>(false);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const onErrorRef = React.useRef<FileInputProps["onError"] | undefined>(onError);
 
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
@@ -34,7 +33,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
 
   const error = React.useMemo(() => validate(value), [value, validate]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const err = validate(value);
     // Call onChange for initial validation so consumers/tests receive the
     // current validation state on mount. This mirrors previous behavior and
@@ -44,7 +43,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, validate]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.files;
     let selected: File | File[] | null = null;
 
@@ -62,7 +61,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     onChange?.(selected, err);
   };
 
-  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
@@ -85,13 +84,13 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     }
   };
 
-  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);

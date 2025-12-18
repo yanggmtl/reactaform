@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -60,10 +60,10 @@ const DateInput: React.FC<DateInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const { name, required } = field;
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<DateInputProps["onError"] | undefined>(onError);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<DateInputProps["onError"] | undefined>(onError);
 
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
@@ -111,7 +111,7 @@ const DateInput: React.FC<DateInputProps> = ({
   /**
    * Revalidate when external value or field rules change.
    */
-  useEffect(() => {
+  React.useEffect(() => {
     // Re-validate when external value or required constraint changes.
     const err = validate(value);
     if (err !== prevErrorRef.current) {

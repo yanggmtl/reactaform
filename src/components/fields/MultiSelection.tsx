@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
-import ReactDOM from "react-dom";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -23,9 +23,9 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   onChange,
   onError,
 }) => {
-  const onErrorRef = useRef<MultiSelectionProps["onError"] | undefined>(onError);
+  const onErrorRef = React.useRef<MultiSelectionProps["onError"] | undefined>(onError);
 
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
   const { t, darkMode, formStyle, fieldStyle, definitionName } = useReactaFormContext();
@@ -40,18 +40,18 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
     return (val ?? {}) as React.CSSProperties;
   };
-  const controlRef = useRef<HTMLDivElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [popupPos, setPopupPos] = useState<{ x: number; y: number } | null>(
+  const controlRef = React.useRef<HTMLDivElement>(null);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [popupPos, setPopupPos] = React.useState<{ x: number; y: number } | null>(
     null
   );
 
-  const options = useMemo(
+  const options = React.useMemo(
     () => field.options.map((o) => ({ value: o.value, label: t(o.label) })),
     [field.options, t]
   );
 
-  const selectedValues = useMemo(() => {
+  const selectedValues = React.useMemo(() => {
     const arr = Array.isArray(value) ? value : [];
     const allowed = new Set(options.map((o) => o.value));
     return arr.filter((v) => allowed.has(v));
@@ -81,7 +81,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     onChange?.(newValues, err);
   };
 
-  const mergedControlStyle = useMemo<React.CSSProperties>(() => ({
+  const mergedControlStyle = React.useMemo<React.CSSProperties>(() => ({
     height: "var(--reactaform-input-height, 2.5rem)",
     padding: "var(--reactaform-input-padding, 8px)",
     display: "flex",
@@ -97,7 +97,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     ...styleFrom(fieldStyle, undefined, 'control'),
   }), [formStyle, fieldStyle]);
 
-  const mergedClearButtonStyle = useMemo<React.CSSProperties>(() => ({
+  const mergedClearButtonStyle = React.useMemo<React.CSSProperties>(() => ({
     position: "absolute",
     right: "1.5em",
     top: "50%",
@@ -112,7 +112,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     ...styleFrom(fieldStyle, undefined, 'clearButton'),
   }), [formStyle, fieldStyle]);
 
-  const mergedArrowStyle = useMemo<React.CSSProperties>(() => ({
+  const mergedArrowStyle = React.useMemo<React.CSSProperties>(() => ({
     position: "absolute",
     right: "0.7em",
     top: "50%",
@@ -209,8 +209,8 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   controlRef,
   darkMode,
 }) => {
-  const popupRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState<number>(-1);
+  const popupRef = React.useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = React.useState<number>(-1);
   const { formStyle, fieldStyle } = useReactaFormContext();
 
   const styleFrom = (
@@ -225,7 +225,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     return (val ?? {}) as React.CSSProperties;
   };
 
-  const mergedPopupStyles = useMemo<React.CSSProperties>(() => ({
+  const mergedPopupStyles = React.useMemo<React.CSSProperties>(() => ({
     maxHeight: 200,
     overflowY: "auto",
     background: "var(--reactaform-secondary-bg, #fff)",
@@ -240,7 +240,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     ...styleFrom(fieldStyle, undefined, 'popup'),
   }), [formStyle, fieldStyle]);
 
-  const mergedPopupOptionStyles = useMemo<React.CSSProperties>(() => ({
+  const mergedPopupOptionStyles = React.useMemo<React.CSSProperties>(() => ({
     padding: "6px 8px",
     cursor: "pointer",
     display: "flex",
@@ -254,7 +254,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   // -----------------------
   // OUTSIDE CLICK HANDLER
   // -----------------------
-  useEffect(() => {
+  React.useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
@@ -269,7 +269,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   }, [onClose, controlRef]);
 
   // focus management for keyboard navigation: set initial active index when popup mounts
-  useEffect(() => {
+  React.useEffect(() => {
     if (!popupRef.current) return;
     // initialize active index to first option (defer state update to avoid sync setState in effect)
     if (options.length > 0) {
@@ -278,7 +278,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   }, [options.length]);
 
   // when activeIndex changes, move focus to the corresponding option element
-  useEffect(() => {
+  React.useEffect(() => {
     if (!popupRef.current || activeIndex < 0) return;
     const el = popupRef.current.querySelector(`#multi-opt-${activeIndex}`) as HTMLElement | null;
     if (el) {
@@ -293,12 +293,12 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   const baseWidth = 250;
   const maxHeight = 200;
 
-  const [livePos, setLivePos] = useState<{ left: number; top: number } | null>(
+  const [livePos, setLivePos] = React.useState<{ left: number; top: number } | null>(
     null
   );
-  const [popupWidth, setPopupWidth] = useState<number | null>(null);
+  const [popupWidth, setPopupWidth] = React.useState<number | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof window === "undefined") return;
 
     const updatePosition = () => {

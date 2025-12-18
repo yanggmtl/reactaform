@@ -1,5 +1,5 @@
 import BaseRegistry from "./baseRegistry";
-import React, { useEffect } from "react";
+import * as React from "react";
 import type { DefinitionPropertyField } from "../reactaFormTypes";
 import { useDebouncedCallback } from "../../hooks/useDebouncedCallback";
 
@@ -23,20 +23,19 @@ import RadioInput from "../../components/fields/RadioInput";
 import RatingInput from "../../components/fields/RatingInput";
 import PasswordInput from "../../components/fields/PasswordInput";
 import SliderInput from "../../components/fields/SliderInput";
-import SwitchInput from "../../components/fields/SwitchInput"
+import SwitchInput from "../../components/fields/SwitchInput";
 import TextInput from "../../components/fields/TextInput";
 import TimeInput from "../../components/fields/TimeInput";
 import UnitValueInput from "../../components/fields/UnitValueInput";
 import UrlInput from "../../components/fields/UrlInput";
 
-// Registry needs to accept components with many different prop shapes.
-// Narrow typing here would make registering concrete field components
-// (which each declare their own props) incompatible. Allow `any` for
-// the component props and document the rationale so lint stays explicit.
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any -- registry holds components with varied, specific prop types */
-type ComponentType = React.ComponentType<any>;
+// IMPORTANT: This registry is part of the public API surface.
+// Do not expose React types (e.g. `React.ComponentType`) from here, because
+// the emitted `.d.ts` can become coupled to the consumer's React typings
+// and cause friction across React 18/19 setups.
+type RegisteredComponent = unknown;
 
-const registry = new BaseRegistry<ComponentType>();
+const registry = new BaseRegistry<RegisteredComponent>();
 
 // Only apply debouncing for a subset of interactive input types where
 // rapid or repeated events are common and we want to stabilize updates.
@@ -52,7 +51,7 @@ const NON_DEBOUNCED_TYPES = new Set([
   "rating",
 ]);
 
-const baseComponents: Record<string, ComponentType> = {
+const baseComponents: Record<string, RegisteredComponent> = {
   checkbox: CheckboxInput,
   color: ColorInput,
   date: DateInput,
@@ -80,9 +79,13 @@ const baseComponents: Record<string, ComponentType> = {
   unit: UnitValueInput,
   url: UrlInput,
 };
+export function registerComponentInternal(
+  type: string,
+  component: unknown,
+  isBaseComponent: boolean
+): void {
 
-
-export function registerComponentInternal(type: string, component: ComponentType, isBaseComponent: boolean): void {
+  const typedComponent = component as RegisteredComponent;
 
   if (!isBaseComponent && type in baseComponents) {
     console.warn(
@@ -92,7 +95,7 @@ export function registerComponentInternal(type: string, component: ComponentType
   }
 
   if (NON_DEBOUNCED_TYPES.has(type)) {
-    registry.register(type, component);
+    registry.register(type, typedComponent);
     return;
   }
 
@@ -101,7 +104,7 @@ export function registerComponentInternal(type: string, component: ComponentType
     onChange?: ((...args: unknown[]) => void) | undefined;
   } & Record<string, unknown>;
 
-  const Wrapped: ComponentType = (props: WrappedProps) => {
+  const Wrapped = (props: WrappedProps) => {
     // Default debounce to 200ms
     const wait = 200;
     const { callback: debouncedOnChange, cancel } = useDebouncedCallback(
@@ -114,24 +117,28 @@ export function registerComponentInternal(type: string, component: ComponentType
       wait
     );
 
-    useEffect(() => {
+    React.useEffect(() => {
       return () => {
         // ensure we cancel pending debounced calls on unmount
         cancel();
       };
     }, [cancel]);
 
-    return React.createElement(component as React.ComponentType<Record<string, unknown>>, { ...props, onChange: debouncedOnChange });
+    return React.createElement(
+      // Registry stores arbitrary component shapes; runtime expects a valid React element type.
+      typedComponent as React.ElementType,
+      { ...props, onChange: debouncedOnChange }
+    );
   };
 
   registry.register(type, Wrapped);
 }
 
-export function registerComponent(type: string, component: ComponentType): void {
+export function registerComponent(type: string, component: unknown): void {
   registerComponentInternal(type, component, false);
 }
 
-export function getComponent(type: string): ComponentType | undefined {
+export function getComponent(type: string): unknown {
   return registry.get(type);
 }
 

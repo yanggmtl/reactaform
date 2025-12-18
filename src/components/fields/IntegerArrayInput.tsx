@@ -1,5 +1,5 @@
 // components/IntegerArrayInput.tsx
-import React, { useState, useEffect, useRef } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -41,7 +41,7 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   const delimiter = ",";
-  const [inputValue, setInputValue] = useState<string>(
+  const [inputValue, setInputValue] = React.useState<string>(
     Array.isArray(value) ? value.join(delimiter + " ") : String(value ?? "")
   );
   const parseArray = (text: string): number[] => {
@@ -114,17 +114,17 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
     onChange?.(newValue, err);
   };
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<IntegerArrayInputProps["onError"] | undefined>(
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<IntegerArrayInputProps["onError"] | undefined>(
     onError
   );
   
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
   // synchronize validation when external value or field metadata change
-  useEffect(() => {
+  React.useEffect(() => {
     const input = Array.isArray(value) ? value.join(delimiter + " ") : String(value ?? "");
     const err = validate(input);
     if (err !== prevErrorRef.current) {

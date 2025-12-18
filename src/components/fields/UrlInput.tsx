@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from "react";
+import * as React from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -46,10 +46,10 @@ const UrlInput: React.FC<UrlInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
   // uncontrolled input: DOM holds transient user edits; use a ref
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Validation logic
-  const validateCb = useCallback(
+  const validateCb = React.useCallback(
     (input: string): string | null => {
       const trimmed = input.trim();
 
@@ -91,13 +91,13 @@ const UrlInput: React.FC<UrlInputProps> = ({
   };
 
   // Sync value changes from parent
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<UrlInputProps["onError"] | undefined>(onError);
-  useEffect(() => {
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<UrlInputProps["onError"] | undefined>(onError);
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const v = value ?? "";
     const err = validateCb(v);
     if (inputRef.current && inputRef.current.value !== String(v)) {

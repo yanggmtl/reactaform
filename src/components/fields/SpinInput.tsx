@@ -1,5 +1,5 @@
 // components/SpinInput.tsx
-import React, { useEffect, useCallback, useRef } from "react";
+import * as React from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -22,7 +22,7 @@ const SpinInput: React.FC<SpinInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const deriveError = (s: string): string | null => {
     const trimmed = s.trim();
@@ -41,7 +41,7 @@ const SpinInput: React.FC<SpinInputProps> = ({
   const maxVal = field.max ?? 100;
   const step = Math.max(1, Math.round(field.step ?? 1)); // ensure step >= 1
 
-  const validateCb = useCallback(
+  const validateCb = React.useCallback(
     (/*val*/ _: string, parsedValue: number): string | null => {
       if (isNaN(parsedValue)) {
         return t("Must be a valid integer");
@@ -72,13 +72,13 @@ const SpinInput: React.FC<SpinInputProps> = ({
     return Math.round(clamped);
   };
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<SpinInputProps["onError"] | undefined>(onError);
-  useEffect(() => {
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<SpinInputProps["onError"] | undefined>(onError);
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const value1 = isNaN(value) ? "" : String(value);
     if (inputRef.current && document.activeElement !== inputRef.current) {
       inputRef.current.value = value1;

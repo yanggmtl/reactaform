@@ -1,14 +1,13 @@
 
-import type { ReactaDefinition, ReactaFormProps } from "../core/reactaFormTypes"
+import * as React from "react";
 import ReactaFormRenderer from "./ReactaFormRenderer";
 import { ReactaFormProvider } from "./ReactaFormProvider";
-import type React from "react";
-import { useEffect, useMemo, useState } from "react";
 import { createInstanceFromDefinition } from "../core";
+import type { ReactaDefinition, ReactaFormProps } from "../core/reactaFormTypes";
 
 function useNearestReactaformTheme(ref?: React.RefObject<HTMLElement>) {
-  const [theme, setTheme] = useState<string | null>(null);
-  useEffect(() => {
+  const [theme, setTheme] = React.useState<string | null>(null);
+  React.useEffect(() => {
     const startEl = ref?.current ?? document.querySelector('[data-reactaform-theme]');
     if (!startEl) return;
     const themedNode = (startEl as Element).closest('[data-reactaform-theme]') as Element | null;
@@ -37,7 +36,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
   darkMode,
   style, 
 }) => {
-    const definition = useMemo<ReactaDefinition | null>(() => {
+    const definition = React.useMemo<ReactaDefinition | null>(() => {
       try {
         return typeof definitionData === 'string' ? JSON.parse(definitionData) : (definitionData ?? null);
       } catch {
@@ -51,7 +50,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
 
     const inputLanguage = language ?? 'en';
 
-    useEffect(() => {
+    React.useEffect(() => {
       // Add popup-root div if not already present to make sure popups work
       let root = document.getElementById('popup-root');
       if (!root) {

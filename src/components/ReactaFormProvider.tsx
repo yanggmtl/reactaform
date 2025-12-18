@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import * as React from 'react';
 import type { ReactaFormProviderProps, TranslationMap } from '../core/reactaFormTypes';
 import { ReactaFormContext } from '../hooks/useReactaFormContext';
 import {
@@ -151,20 +151,20 @@ export const ReactaFormProvider = ({
 
   // Make a stable defaultStyle object so effects that depend on it don't
   // rerun every render when callers omit the prop ({} literal would be new each time)
-  const stableDefaultStyle = useMemo(
+  const stableDefaultStyle = React.useMemo(
     () => (defaultStyle ?? {}) as Record<string, unknown>,
     [defaultStyle]
   );
 
   // Keep common and user maps separate in state so updates trigger rerenders
   // and consumers pick up translations as soon as they load.
-  const [commonMapState, setCommonMapState] = useState<TranslationMap>({});
-  const [userMapState, setUserMapState] = useState<TranslationMap>({});
-  const [fieldStyle, setFieldStyle] = useState<Record<string, unknown>>({});
-  const [formStyle, setFormStyle] = useState<Record<string, unknown>>({});
+  const [commonMapState, setCommonMapState] = React.useState<TranslationMap>({});
+  const [userMapState, setUserMapState] = React.useState<TranslationMap>({});
+  const [fieldStyle, setFieldStyle] = React.useState<Record<string, unknown>>({});
+  const [formStyle, setFormStyle] = React.useState<Record<string, unknown>>({});
 
   // Initialize localization map (cancellable)
-  useEffect(() => {
+  React.useEffect(() => {
     let mounted = true;
     const loadTranslation = async () => {
       if (language === 'en') {
@@ -201,23 +201,23 @@ export const ReactaFormProvider = ({
   }, [language, localizeName]);
 
   // Initialize form and field style
-  useEffect(() => {
+  React.useEffect(() => {
     setFormStyle(getFormStyle(stableDefaultStyle, darkMode));
     setFieldStyle(getFieldStyle(stableDefaultStyle, darkMode));
   }, [stableDefaultStyle, darkMode]);
 
   // Memoize the underlying translation function so `t` is stable and cheap to call
-  const translationFn = useMemo(
+  const translationFn = React.useMemo(
     () => createTranslationFunction(language, commonMapState, userMapState),
     [language, commonMapState, userMapState]
   );
 
-  const t = useCallback(
+  const t = React.useCallback(
     (defaultText: string, ...args: unknown[]) => translationFn(defaultText, ...args),
     [translationFn]
   );
 
-  const contextValue = useMemo(
+  const contextValue = React.useMemo(
     () => ({
       definitionName: providerDefinitionName,
       language,

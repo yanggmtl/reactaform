@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -29,14 +29,14 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
 }) => {
   const { t, definitionName } = useReactaFormContext();
 
-  const selectRef = useRef<HTMLSelectElement | null>(null);
-  const onErrorRef = useRef<DropdownInputProps["onError"] | undefined>(onError);
+  const selectRef = React.useRef<HTMLSelectElement | null>(null);
+  const onErrorRef = React.useRef<DropdownInputProps["onError"] | undefined>(onError);
 
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  const validate = useCallback(
+  const validate = React.useCallback(
     (val: string): string | null => {
       if (val === "" || val === null || val === undefined) {
         return t("Value required");
@@ -52,7 +52,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     [field, t, definitionName]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const safeVal = value != null ? String(value) : "";
     // If incoming value is invalid and there is at least one option, pick the first option
     const err = validate(safeVal);

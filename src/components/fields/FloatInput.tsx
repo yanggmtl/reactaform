@@ -1,6 +1,5 @@
 // components/FloatInput.tsx
-import React, { useEffect, useRef } from "react";
-import type { ChangeEvent } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
@@ -44,7 +43,7 @@ const FloatInput: React.FC<FloatInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Validate the current input value against the field constraints
   const validate = React.useCallback(
@@ -92,13 +91,13 @@ const FloatInput: React.FC<FloatInputProps> = ({
     [field, definitionName, t]
   );
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<FloatInputProps["onError"] | undefined>(onError);
-  useEffect(() => {
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<FloatInputProps["onError"] | undefined>(onError);
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const input = String(value ?? "");
     const err = validate(input);
     if (err !== prevErrorRef.current) {
@@ -111,7 +110,7 @@ const FloatInput: React.FC<FloatInputProps> = ({
   }, [value, field, validate, t]);
 
   // Handle user input change in the text box
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     const err = validate(input);
     onChange?.(input, err);

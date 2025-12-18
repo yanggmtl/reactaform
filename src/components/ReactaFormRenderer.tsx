@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import * as React from "react";
 import type {
   FieldValueType,
   ErrorType,
@@ -37,30 +37,30 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     ...parentContext,
     definitionName: definition?.name ?? parentContext.definitionName,
   };
-  const [ savedLanguage, setSavedLanguage] = useState("en");
+  const [ savedLanguage, setSavedLanguage] = React.useState("en");
 
   // Core state
-  const [updatedProperties, setUpdatedProperties] = useState<
+  const [updatedProperties, setUpdatedProperties] = React.useState<
     DefinitionPropertyField[]
   >([]);
-  const [fieldMap, setFieldMap] = useState<
+  const [fieldMap, setFieldMap] = React.useState<
     Record<string, DefinitionPropertyField>
   >({});
-  const [valuesMap, setValuesMap] = useState<Record<string, FieldValueType>>(
+  const [valuesMap, setValuesMap] = React.useState<Record<string, FieldValueType>>(
     {}
   );
-  const [visibility, setVisibility] = useState<Record<string, boolean>>({});
-  const [groupState, setGroupState] = useState<Record<string, boolean>>({});
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [submissionMessage, setSubmissionMessage] = useState<string | null>(null);
-  const [submissionSuccess, setSubmissionSuccess] = useState<boolean | null>(null);
+  const [visibility, setVisibility] = React.useState<Record<string, boolean>>({});
+  const [groupState, setGroupState] = React.useState<Record<string, boolean>>({});
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [submissionMessage, setSubmissionMessage] = React.useState<string | null>(null);
+  const [submissionSuccess, setSubmissionSuccess] = React.useState<boolean | null>(null);
 
-  const [loadedCount, setLoadedCount] = useState(0); // how many fields are loaded so far
-  const [initDone, setInitDone] = useState(false);
-  const [btnHover, setBtnHover] = useState(false);
-  const [instanceName, setInstanceName] = useState<string>(instance.name || '');
-  const targetInstanceRef = useRef<ReactaInstance>(instance);
-  const suppressClearOnNextInstanceUpdate = useRef(false);
+  const [loadedCount, setLoadedCount] = React.useState(0); // how many fields are loaded so far
+  const [initDone, setInitDone] = React.useState(false);
+  const [btnHover, setBtnHover] = React.useState(false);
+  const [instanceName, setInstanceName] = React.useState<string>(instance.name || '');
+  const targetInstanceRef = React.useRef<ReactaInstance>(instance);
+  const suppressClearOnNextInstanceUpdate = React.useRef(false);
 
  
   // Step 1: Initialize basic structures immediately
@@ -69,7 +69,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   // Initialization effect performs synchronous state setup from the `definition`
   // and `instance` props. This is a safe prop->state initialization and will
   // not cause an infinite update loop.
-  useEffect(() => {
+  React.useEffect(() => {
     const nameToField = Object.fromEntries(
       properties.map((f) => [
         f.name,
@@ -160,7 +160,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   }, [properties, instance, definition]);
 
   // Step 2: Load fields progressively
-  useEffect(() => {
+  React.useEffect(() => {
     if (!initDone || loadedCount >= updatedProperties.length) return;
     const timer = setTimeout(() => {
       setLoadedCount((prev) =>
@@ -195,7 +195,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
    *   values to make sure visibility calculations use the up-to-date values
    *   map.
    */
-  const handleChange = useCallback(
+  const handleChange = React.useCallback(
     (name: string, value: FieldValueType, error: ErrorType) => {
       // Clear any previous submission message when the user changes a value
       setSubmissionMessage(null);
@@ -249,7 +249,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   // Sync language changes: update savedLanguage and clear messages
   // Use RAF to avoid cascading renders.
-  useEffect(() => {
+  React.useEffect(() => {
     let raf = 0;
     raf = requestAnimationFrame(() => {
       if (language !== savedLanguage) {
@@ -263,7 +263,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   // When the active instance changes (selection switched), clear submission messages
   // and sync the editable instance name and ref. Use RAF to avoid cascading renders.
-  useEffect(() => {
+  React.useEffect(() => {
     let raf = 0;
     raf = requestAnimationFrame(() => {
       // If this instance update was caused by our own successful submit,
@@ -289,7 +289,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   // that originate from prop sync (not user events). This keeps the error
   // map up to date when components validate on mount or when external props
   // change without invoking the full handleChange lifecycle.
-  const handleError = useCallback((name: string, error: ErrorType) => {
+  const handleError = React.useCallback((name: string, error: ErrorType) => {
     setErrors((prev) => {
       if (error) {
         return { ...prev, [name]: String(error) };
@@ -332,7 +332,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   };
 
   // Memoize expensive computations
-  const isApplyDisabled = useMemo(
+  const isApplyDisabled = React.useMemo(
     () => Object.values(errors).some(Boolean),
     [errors]
   );

@@ -1,5 +1,5 @@
 // components/FloatArrayInput.tsx
-import React, { useState, useEffect, useRef } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField, BaseInputProps } from "../../core/reactaFormTypes";
 import { validateFieldValue } from "../../core/validation";
@@ -52,7 +52,7 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = useState<string>(
+  const [inputValue, setInputValue] = React.useState<string>(
     Array.isArray(value) ? value.join(", ") : String(value ?? "")
   );
   const validate = React.useCallback(
@@ -117,14 +117,14 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
     onChange?.(input, err);
   };
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<FloatArrayInputProps["onError"] | undefined>(onError);
-  useEffect(() => {
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<FloatArrayInputProps["onError"] | undefined>(onError);
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
   // synchronize validation when external value or field metadata change
-  useEffect(() => {
+  React.useEffect(() => {
     const input = Array.isArray(value) ? value.join(", ") : String(value ?? "");
     const err = validate(input);
     if (err !== prevErrorRef.current) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -100,7 +100,7 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError
   const { t, definitionName } = useReactaFormContext();
 
   // Store the custom color string separately
-  const [inputColor, setInputColor] = useState<string>("#000000");
+  const [inputColor, setInputColor] = React.useState<string>("#000000");
   const selectRef = React.useRef<HTMLSelectElement | null>(null);
   const colorRef = React.useRef<HTMLInputElement | null>(null);
   const onErrorRef = React.useRef<ColorInputProps["onError"] | undefined>(onError);
@@ -109,7 +109,7 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError
     onErrorRef.current = onError;
   }, [onError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const inputValue = value && isValidHexColor(value) ? value : "#000000";
     const normColor = normalizeHexColor(inputValue);
     // Sync prop -> local state immediately. This is a safe prop->state sync

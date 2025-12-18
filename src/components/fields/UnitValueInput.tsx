@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import type { ChangeEvent, MouseEvent, FC } from "react";
+import * as React from "react";
 
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -140,7 +139,7 @@ function normalizeUnit(
 
 const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
 
-const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
+const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
   unitFactors,
   field,
   value,
@@ -148,17 +147,17 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const selectRef = useRef<HTMLSelectElement | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const [localInput, setLocalInput] = useState<string | null>(null);
-  const [localUnit, setLocalUnit] = useState<string | null>(null);
-  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const selectRef = React.useRef<HTMLSelectElement | null>(null);
+  const rafRef = React.useRef<number | null>(null);
+  const [localInput, setLocalInput] = React.useState<string | null>(null);
+  const [localUnit, setLocalUnit] = React.useState<string | null>(null);
+  const [showMenu, setShowMenu] = React.useState<boolean>(false);
   const [menuPosition, setMenuPosition] =
-    useState<PopupOptionMenuPosition | null>(null);
-  const [menuOptions, setMenuOptions] = useState<UnitOption[] | []>([]);
+    React.useState<PopupOptionMenuPosition | null>(null);
+  const [menuOptions, setMenuOptions] = React.useState<UnitOption[] | []>([]);
 
-  const validate = useCallback(
+  const validate = React.useCallback(
     (input: string, unit: string): string | null => {
       if (!input || input.trim() === "")
         return field.required ? t("Value required") : null;
@@ -178,7 +177,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
       Object.entries(unitFactors.labels).map(([label, code]) => [code, label])
     );
   })();
-  useEffect(() => {
+  React.useEffect(() => {
     const val = String(value[0]);
     let unit = value[1] ?? unitFactors.default;
     unit = normalizeUnit(unit, unitFactors) || unit;
@@ -204,7 +203,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     });
   }, [value, unitFactors]);
   // cleanup raf if unmounting
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
@@ -213,16 +212,16 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     };
   }, []);
 
-  const prevErrorRef = useRef<string | null>(null);
-  const onErrorRef = useRef<GenericUnitValueInputProps["onError"] | undefined>(
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<GenericUnitValueInputProps["onError"] | undefined>(
     onError
   );
-  useEffect(() => {
+  React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
   // separate effect to report error changes when props sync runs
-  useEffect(() => {
+  React.useEffect(() => {
     const val = String(value[0]);
     let unit = value[1] ?? unitFactors.default;
     unit = normalizeUnit(unit, unitFactors) || unit;
@@ -246,7 +245,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     onChange?.(finalValue, error);
   };
 
-  const onValueChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
     const err = validate(input, unit);
@@ -254,7 +253,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     responseParentOnChange(input, unit, err);
   };
 
-  const onUnitChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const onUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newUnit = e.target.value;
     const valueStr = inputRef.current ? inputRef.current.value : String(value[0] ?? "");
     const err = validate(valueStr, newUnit);
@@ -263,7 +262,7 @@ const GenericUnitValueInput: FC<GenericUnitValueInputProps> = ({
     responseParentOnChange(valueStr, newUnit, err);
   };
 
-  const onConvertButtonClick = (e: MouseEvent<HTMLButtonElement>) => {
+  const onConvertButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     // Guard: don't open the conversion menu when conversion is disabled
     const val = inputRef.current ? inputRef.current.value : String(value[0] ?? "");
     const parsedValue = parseFloat(val);

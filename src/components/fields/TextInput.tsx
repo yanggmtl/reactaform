@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import * as React from "react";
 import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
@@ -31,7 +31,7 @@ const TextInput: React.FC<TextInputProps> = ({
   }, [onError]);
 
   // Memoize regex pattern compilation
-  const patternRegex = useMemo(
+  const patternRegex = React.useMemo(
     () => field.pattern ? new RegExp(field.pattern) : null,
     [field.pattern]
   );
@@ -63,7 +63,7 @@ const TextInput: React.FC<TextInputProps> = ({
     onChange?.(newValue, err);
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Validate on initial mount or when value changes; notify parent via onErrorRef
     const err = validate(value);
     if (inputRef.current && inputRef.current.value !== String(value ?? "")) {

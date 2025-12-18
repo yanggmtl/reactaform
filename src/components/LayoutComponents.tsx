@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import * as React from "react";
 import useReactaFormContext from "../hooks/useReactaFormContext";
 import { CSS_CLASSES } from "../utils/cssClasses";
 import Tooltip from "./Tooltip";
@@ -18,7 +18,7 @@ import type { DefinitionPropertyField } from "../core/reactaFormTypes";
  *   <textarea ... />
  * </ColumnFieldLayout>
  */
-export const ColumnFieldLayout = memo(({
+export const ColumnFieldLayout = React.memo(({
   field,
   error,
   children,
@@ -94,7 +94,7 @@ ColumnFieldLayout.displayName = 'ColumnFieldLayout';
  *   <input ... />
  * </RowFieldLayout>
  */
-export const RowFieldLayout = memo(({
+export const RowFieldLayout = React.memo(({
   field,
   error,
   children,
@@ -107,13 +107,13 @@ export const RowFieldLayout = memo(({
 }) => {
   const { t } = useReactaFormContext();
 
-  const valueColumnStyle = useMemo<React.CSSProperties>(() => ({
+  const valueColumnStyle = React.useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'column',
     gap: 0,
   }), []);
 
-  const valueRowStyle = useMemo<React.CSSProperties>(() => ({
+  const valueRowStyle = React.useMemo<React.CSSProperties>(() => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -207,8 +207,8 @@ export const StandardFieldLayout = ({
   );
 };
 
-export const ErrorDiv = memo(({ children, id }: { children: React.ReactNode; id?: string }) => {
-  const style = useMemo<React.CSSProperties>(() => ({
+export const ErrorDiv = React.memo(({ children, id }: { children: React.ReactNode; id?: string }) => {
+  const style = React.useMemo<React.CSSProperties>(() => ({
     color: 'var(--reactaform-error-color)',
     fontSize: '13px',
     marginTop: '4px',
@@ -232,7 +232,7 @@ ErrorDiv.displayName = 'ErrorDiv';
  * - `name`: current instance name
  * - `onChange`: callback invoked with new name when edited
  */
-export const InstanceName = memo(({ name, onChange }: { name: string; onChange: (n: string) => void }) => {
+export const InstanceName = React.memo(({ name, onChange }: { name: string; onChange: (n: string) => void }) => {
   const { t } = useReactaFormContext();
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
@@ -74,15 +74,15 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
   }
   const langs = field.localized?.split(";").map((v) => v.trim());
 
-  const [imageUrl, setImageUrl] = useState<string>(baseUrl || "");
-  const lastUrlRef = useRef<string | null>(baseUrl || null);
+  const [imageUrl, setImageUrl] = React.useState<string>(baseUrl || "");
+  const lastUrlRef = React.useRef<string | null>(baseUrl || null);
 
   /**
    * Try to resolve a localized version of the image
    * based on the current language (if available).
    * Falls back to the base URL if not found.
    */
-  useEffect(() => {
+  React.useEffect(() => {
     if (!baseUrl) return;
 
     const parts = baseUrl.split("/");

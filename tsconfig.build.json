@@ -1,6 +1,11 @@
 {
-  "extends": "./tsconfig.app.json",
   "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+
     "noEmit": false,
     "declaration": true,
     "emitDeclarationOnly": true,
@@ -8,22 +13,28 @@
     "declarationDir": "dist",
     "rootDir": "src",
 
-    "moduleResolution": "Bundler",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": false,
+    "moduleDetection": "force",
     "jsx": "react-jsx",
 
     "esModuleInterop": true,
-    "verbatimModuleSyntax": false,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
 
     "typeRoots": ["./src/types", "./node_modules/@types"],
-    "types": []
+    "types": [],
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
   },
   "include": [
-    "src/**/*",
-    "src/locales/**/*",
-    "src/types/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "src/**/test/**",

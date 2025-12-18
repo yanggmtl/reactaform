@@ -114,7 +114,6 @@ const ColorInput: React.FC<ColorInputProps> = ({ field, value, onChange, onError
     const normColor = normalizeHexColor(inputValue);
     // Sync prop -> local state immediately. This is a safe prop->state sync
     // and tests/consumers expect the select to reflect the prop synchronously.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- safe: immediate prop->state sync required by consumers/tests
     setInputColor(normColor);
   }, [value]);
 

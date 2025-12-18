@@ -1,17 +1,7 @@
-/* eslint-disable react-hooks/static-components -- This module performs dynamic
-   component lookup (type -> component). Different component references may
-   be produced at render time intentionally; we memoize wrapper components
-   (`FieldWrapper`, `FieldGroup`) to avoid unnecessary re-renders. See file
-   comment below for full rationale. */
-
-/*
-  File-level rationale: this module performs dynamic component lookup for
-  field types (type -> component). The `react-hooks/static-components`
-  rule can flag these patterns because a different component reference
-  may be produced at render time; in our architecture that's intentional
-  and we explicitly memoize wrappers (`FieldWrapper`, `FieldGroup`) to
-  prevent unnecessary re-renders. Keep the rule disabled for this file
-  with this documented reasoning.
+/* Module rationale: this module performs dynamic component lookup for
+  field types (type -> component). Different component references may
+  be produced at render time intentionally; we memoize wrapper components
+  (`FieldWrapper`, `FieldGroup`) to avoid unnecessary re-renders.
 */
 
 import * as React from "react";

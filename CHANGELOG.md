@@ -38,3 +38,8 @@
 ## 1.2.1 - 2025-12-14
 - Enhance ARIA-compliant support for some components
 - Fix some small issues
+
+## 1.3.0 - 2025-12-14
+- Refactor import to make library works in React 18.
+  Remove React 19 specific import logic to avoid type conflicts with React 18. For example, using this library in CRA app.
+- Add async for submit and validation

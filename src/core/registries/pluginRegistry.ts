@@ -1,36 +1,44 @@
 /**
- * Plugin Registry for ReactaForm
- * Allows bundling and registering multiple components, validators, and handlers as a single plugin
+ * Enhanced Plugin Registry for ReactaForm
+ * Tracks installed plugins, components, validators, submission handlers
+ * Handles conflicts with customizable strategy
  */
 
-import { registerComponent, getComponent } from './componentRegistry';
-import { registerFieldValidationHandler, registerFormValidationHandler, getFieldValidationHandler, getFormValidationHandler } from './validationHandlerRegistry';
-import { registerSubmissionHandler, getSubmissionHandler } from './submissionHandlerRegistry';
-import type { FieldValidationHandler, FormValidationHandler, FormSubmissionHandler } from '../reactaFormTypes';
+import {
+  registerComponent,
+  getComponent,
+} from './componentRegistry';
+import {
+  registerFieldValidationHandler,
+  registerFormValidationHandler,
+  getFieldValidationHandler,
+  getFormValidationHandler,
+} from './validationHandlerRegistry';
+import {
+  registerSubmissionHandler,
+  getSubmissionHandler,
+} from './submissionHandlerRegistry';
 
-/**
- * Strategy for handling conflicts when registering plugins
- */
-export type ConflictResolution = 
-  | 'error'     // Throw error on conflict (default)
-  | 'warn'      // Log warning and skip conflicting items
-  | 'override'  // Override existing registrations
-  | 'skip';     // Silently skip conflicting items
+import type {
+  FieldValidationHandler,
+  FormValidationHandler,
+  FormSubmissionHandler,
+} from '../reactaFormTypes';
 
-/**
- * Options for plugin registration
- */
+/** Conflict resolution strategies */
+export type ConflictResolution =
+  | 'error'
+  | 'warn'
+  | 'override'
+  | 'skip';
+
+/** Plugin registration options */
 export interface PluginRegistrationOptions {
-  /** How to handle conflicts with existing registrations */
   conflictResolution?: ConflictResolution;
-  
-  /** Custom conflict handler - return true to proceed with registration */
   onConflict?: (conflict: PluginConflict) => boolean;
 }
 
-/**
- * Information about a registration conflict
- */
+/** Plugin conflict information */
 export interface PluginConflict {
   type: 'component' | 'fieldValidator' | 'formValidator' | 'submissionHandler' | 'plugin';
   name: string;
@@ -38,83 +46,57 @@ export interface PluginConflict {
   newPlugin: string;
 }
 
-/**
- * Plugin definition interface
- */
+/** ReactaForm plugin definition */
 export interface ReactaFormPlugin {
-  /** Unique plugin identifier */
   name: string;
-  
-  /** Plugin version */
   version: string;
-  
-  /** Optional plugin description */
   description?: string;
-  
-  /** Components to register (field type -> component mapping) */
-  components?: Record<string, unknown>;
-  
-  /** Field validation handlers to register (category -> {name -> handler} mapping) */
+  components?: Record<string, React.ComponentType<unknown>>;
   fieldValidators?: Record<string, Record<string, FieldValidationHandler>>;
-  
-  /** Form validation handlers to register */
   formValidators?: Record<string, FormValidationHandler>;
-  
-  /** Submission handlers to register */
   submissionHandlers?: Record<string, FormSubmissionHandler>;
-  
-  /** Optional setup function called when plugin is registered */
   setup?: () => void;
-  
-  /** Optional cleanup function */
   cleanup?: () => void;
 }
 
-/**
- * Registry to track installed plugins
- */
+/** Installed plugins registry */
 const installedPlugins = new Map<string, ReactaFormPlugin>();
 
-/**
- * Track which plugin registered what
- */
+/** Track which plugin registered which items */
 const registrationOwnership = {
   components: new Map<string, string>(),
-  fieldValidators: new Map<string, string>(),
+  fieldValidators: new Map<string, Map<string, string>>(), // category -> name -> plugin
   formValidators: new Map<string, string>(),
   submissionHandlers: new Map<string, string>(),
 };
 
-/**
- * Determine if an item should be registered based on conflict resolution strategy
- */
+/** Decide whether to register based on conflict resolution */
 function shouldRegister(
   conflict: PluginConflict | null,
   strategy: ConflictResolution,
-  onConflict?: (conflict: PluginConflict) => void
+  onConflict?: (conflict: PluginConflict) => boolean
 ): boolean {
   if (!conflict) return true;
 
+  // Custom conflict handler can override
   if (onConflict) {
-    onConflict(conflict);
+    const proceed = onConflict(conflict);
+    if (!proceed) return false;
   }
 
   switch (strategy) {
     case 'error':
       throw new Error(
-        `Plugin conflict: "${conflict.newPlugin}" tried to register ${conflict.type} "${conflict.name}" ` +
-        `already registered by "${conflict.existingPlugin}"`
+        `Plugin conflict: "${conflict.newPlugin}" tried to register ${conflict.type} "${conflict.name}" already registered by "${conflict.existingPlugin}"`
       );
     case 'warn':
       console.warn(
-        `Plugin conflict: "${conflict.newPlugin}" tried to register ${conflict.type} "${conflict.name}" ` +
-        `already registered by "${conflict.existingPlugin}". Skipping registration.`
+        `Plugin conflict: "${conflict.newPlugin}" tried to register ${conflict.type} "${conflict.name}" already registered by "${conflict.existingPlugin}". Skipping.`
       );
       return false;
     case 'override':
       console.info(
-        `Plugin "${conflict.newPlugin}" is overriding ${conflict.type} "${conflict.name}" ` +
-        `previously registered by "${conflict.existingPlugin}"`
+        `Plugin "${conflict.newPlugin}" is overriding ${conflict.type} "${conflict.name}" previously registered by "${conflict.existingPlugin}"`
       );
       return true;
     case 'skip':
@@ -122,20 +104,15 @@ function shouldRegister(
   }
 }
 
-/**
- * Handle conflicts for plugin registrations
- */
-function handleConflicts(
-  plugin: ReactaFormPlugin,
-): PluginConflict[] {
+/** Detect conflicts for a plugin */
+function handleConflicts(plugin: ReactaFormPlugin): PluginConflict[] {
   const conflicts: PluginConflict[] = [];
 
-  // Check component conflicts
+  // Components
   if (plugin.components) {
-    for (const [type, _component] of Object.entries(plugin.components)) {
-      void _component;
-      const existingComponent = getComponent(type);
-      if (existingComponent) {
+    for (const type of Object.keys(plugin.components)) {
+      const existing = getComponent(type);
+      if (existing) {
         const existingPlugin = registrationOwnership.components.get(type);
         if (existingPlugin && existingPlugin !== plugin.name) {
           conflicts.push({
@@ -149,122 +126,20 @@ function handleConflicts(
     }
   }
 
-  // Check field validator conflicts
-  if (plugin.fieldValidators) {
-    for (const [category, validators] of Object.entries(plugin.fieldValidators)) {
-      for (const [name, _handler] of Object.entries(validators)) {
-        void _handler;
-        const existingHandler = getFieldValidationHandler(category, name);
-        if (existingHandler) {
-          const key = `${category}:${name}`;
-          const existingPlugin = registrationOwnership.fieldValidators.get(key);
-          if (existingPlugin && existingPlugin !== plugin.name) {
-            conflicts.push({
-              type: 'fieldValidator',
-              name: key,
-              existingPlugin,
-              newPlugin: plugin.name,
-            });
-          }
-        }
-      }
-    }
-  }
-
-  // Check form validator conflicts
-  if (plugin.formValidators) {
-    for (const [name, _handler] of Object.entries(plugin.formValidators)) {
-      void _handler;
-      const existingHandler = getFormValidationHandler(name);
-      if (existingHandler) {
-        const existingPlugin = registrationOwnership.formValidators.get(name);
-        if (existingPlugin && existingPlugin !== plugin.name) {
-          conflicts.push({
-            type: 'formValidator',
-            name,
-            existingPlugin,
-            newPlugin: plugin.name,
-          });
-        }
-      }
-    }
-  }
-
-  // Check submission handler conflicts
-  if (plugin.submissionHandlers) {
-    for (const [name, _handler] of Object.entries(plugin.submissionHandlers)) {
-      void _handler;
-      const existingHandler = getSubmissionHandler(name);
-      if (existingHandler) {
-        const existingPlugin = registrationOwnership.submissionHandlers.get(name);
-        if (existingPlugin && existingPlugin !== plugin.name) {
-          conflicts.push({
-            type: 'submissionHandler',
-            name,
-            existingPlugin,
-            newPlugin: plugin.name,
-          });
-        }
-      }
-    }
-  }
-
-  return conflicts;
-}
-
-/**
- * Register a ReactaForm plugin
- * @param plugin - Plugin definition
- * @param options - Registration options including conflict resolution strategy
- * @throws Error if plugin with same name is already registered (when conflictResolution is 'error')
- */
-export function registerPlugin(
-  plugin: ReactaFormPlugin,
-  options?: PluginRegistrationOptions
-): void {
-  const strategy = options?.conflictResolution || 'error';
-
-  // Check if plugin already installed
-  if (installedPlugins.has(plugin.name)) {
-    const conflict: PluginConflict = {
-      type: 'plugin',
-      name: plugin.name,
-      existingPlugin: plugin.name,
-      newPlugin: plugin.name,
-    };
-    
-    if (!shouldRegister(conflict, strategy, options?.onConflict)) {
-      return;
-    }
-  }
-
-  // Detect all conflicts first
-  const conflicts = handleConflicts(plugin);
-
-  // Process each conflict and decide what to register
-  const componentsToRegister = new Set<string>();
-  const fieldValidatorsToRegister = new Map<string, string>();
-  const formValidatorsToRegister = new Set<string>();
-  const submissionHandlersToRegister = new Set<string>();
-
-  // Components
-  if (plugin.components) {
-    for (const type of Object.keys(plugin.components)) {
-      const conflict = conflicts.find(c => c.type === 'component' && c.name === type);
-      if (shouldRegister(conflict || null, strategy, options?.onConflict)) {
-        componentsToRegister.add(type);
-      }
-    }
-  }
-
   // Field validators
   if (plugin.fieldValidators) {
     for (const [category, validators] of Object.entries(plugin.fieldValidators)) {
       for (const name of Object.keys(validators)) {
-        const key = `${category}:${name}`;
-        const conflict = conflicts.find(c => c.type === 'fieldValidator' && c.name === key);
-        if (shouldRegister(conflict || null, strategy, options?.onConflict)) {
-          fieldValidatorsToRegister.set(key, category);
+        const categoryMap = registrationOwnership.fieldValidators.get(category);
+        const existingPlugin = categoryMap?.get(name);
+        const existingHandler = getFieldValidationHandler(category, name);
+        if (existingHandler && existingPlugin && existingPlugin !== plugin.name) {
+          conflicts.push({
+            type: 'fieldValidator',
+            name: `${category}:${name}`,
+            existingPlugin,
+            newPlugin: plugin.name,
+          });
         }
       }
     }
@@ -273,9 +148,15 @@ export function registerPlugin(
   // Form validators
   if (plugin.formValidators) {
     for (const name of Object.keys(plugin.formValidators)) {
-      const conflict = conflicts.find(c => c.type === 'formValidator' && c.name === name);
-      if (shouldRegister(conflict || null, strategy, options?.onConflict)) {
-        formValidatorsToRegister.add(name);
+      const existingHandler = getFormValidationHandler(name);
+      const existingPlugin = registrationOwnership.formValidators.get(name);
+      if (existingHandler && existingPlugin && existingPlugin !== plugin.name) {
+        conflicts.push({
+          type: 'formValidator',
+          name,
+          existingPlugin,
+          newPlugin: plugin.name,
+        });
       }
     }
   }
@@ -283,106 +164,201 @@ export function registerPlugin(
   // Submission handlers
   if (plugin.submissionHandlers) {
     for (const name of Object.keys(plugin.submissionHandlers)) {
-      const conflict = conflicts.find(c => c.type === 'submissionHandler' && c.name === name);
-      if (shouldRegister(conflict || null, strategy, options?.onConflict)) {
-        submissionHandlersToRegister.add(name);
+      const existingHandler = getSubmissionHandler(name);
+      const existingPlugin = registrationOwnership.submissionHandlers.get(name);
+      if (existingHandler && existingPlugin && existingPlugin !== plugin.name) {
+        conflicts.push({
+          type: 'submissionHandler',
+          name,
+          existingPlugin,
+          newPlugin: plugin.name,
+        });
       }
     }
   }
 
-  // Register components that passed conflict resolution
+  return conflicts;
+}
+
+/** Generic item registration helper */
+function registerItems<T>(
+  items: Record<string, T>,
+  ownershipMap: Map<string, string> | Map<string, Map<string, string>>,
+  registerFn: (key: string, value: T) => void,
+  plugin: ReactaFormPlugin,
+  conflicts: PluginConflict[],
+  strategy: ConflictResolution,
+  onConflict?: (conflict: PluginConflict) => boolean,
+  category?: string
+) {
+  for (const key of Object.keys(items)) {
+    let conflict: PluginConflict | undefined;
+    if (category) {
+      conflict = conflicts.find(c => c.type === 'fieldValidator' && c.name === `${category}:${key}`);
+    } else if (items === plugin.components) {
+      conflict = conflicts.find(c => c.type === 'component' && c.name === key);
+    } else if (items === plugin.formValidators) {
+      conflict = conflicts.find(c => c.type === 'formValidator' && c.name === key);
+    } else if (items === plugin.submissionHandlers) {
+      conflict = conflicts.find(c => c.type === 'submissionHandler' && c.name === key);
+    }
+
+    if (shouldRegister(conflict || null, strategy, onConflict)) {
+      if (category) {
+        const categoryMap = (ownershipMap as Map<string, Map<string, string>>).get(category) || new Map();
+        categoryMap.set(key, plugin.name);
+        (ownershipMap as Map<string, Map<string, string>>).set(category, categoryMap);
+        registerFn(key, (items as Record<string, Record<string, T>>)[category][key]);
+      } else {
+        (ownershipMap as Map<string, string>).set(key, plugin.name);
+        registerFn(key, items[key]);
+      }
+    }
+  }
+}
+
+/** Register a plugin */
+export function registerPlugin(plugin: ReactaFormPlugin, options?: PluginRegistrationOptions): void {
+  const strategy = options?.conflictResolution || 'error';
+
+  // Check plugin itself
+  if (installedPlugins.has(plugin.name)) {
+    const conflict: PluginConflict = {
+      type: 'plugin',
+      name: plugin.name,
+      existingPlugin: plugin.name,
+      newPlugin: plugin.name,
+    };
+    if (!shouldRegister(conflict, strategy, options?.onConflict)) return;
+  }
+
+  // Detect conflicts
+  const conflicts = handleConflicts(plugin);
+
+  // Register components
   if (plugin.components) {
-    for (const type of componentsToRegister) {
-      registerComponent(type, plugin.components[type]);
-      registrationOwnership.components.set(type, plugin.name);
-    }
+    registerItems(
+      plugin.components,
+      registrationOwnership.components,
+      registerComponent,
+      plugin,
+      conflicts,
+      strategy,
+      options?.onConflict
+    );
   }
 
-  // Register field validators that passed conflict resolution
+  // Register field validators
   if (plugin.fieldValidators) {
-    for (const [key, category] of fieldValidatorsToRegister) {
-      const name = key.split(':')[1];
-      registerFieldValidationHandler(category, name, plugin.fieldValidators[category][name]);
-      registrationOwnership.fieldValidators.set(key, plugin.name);
+    for (const [category, validators] of Object.entries(plugin.fieldValidators)) {
+      registerItems(
+        validators,
+        registrationOwnership.fieldValidators,
+        (name, handler) => registerFieldValidationHandler(category, name, handler),
+        plugin,
+        conflicts,
+        strategy,
+        options?.onConflict,
+        category
+      );
     }
   }
 
-  // Register form validators that passed conflict resolution
+  // Register form validators
   if (plugin.formValidators) {
-    for (const name of formValidatorsToRegister) {
-      registerFormValidationHandler(name, plugin.formValidators[name]);
-      registrationOwnership.formValidators.set(name, plugin.name);
-    }
+    registerItems(
+      plugin.formValidators,
+      registrationOwnership.formValidators,
+      registerFormValidationHandler,
+      plugin,
+      conflicts,
+      strategy,
+      options?.onConflict
+    );
   }
 
-  // Register submission handlers that passed conflict resolution
+  // Register submission handlers
   if (plugin.submissionHandlers) {
-    for (const name of submissionHandlersToRegister) {
-      registerSubmissionHandler(name, plugin.submissionHandlers[name]);
-      registrationOwnership.submissionHandlers.set(name, plugin.name);
-    }
+    registerItems(
+      plugin.submissionHandlers,
+      registrationOwnership.submissionHandlers,
+      registerSubmissionHandler,
+      plugin,
+      conflicts,
+      strategy,
+      options?.onConflict
+    );
   }
 
-  // Call setup function if provided
-  if (plugin.setup) {
-    plugin.setup();
-  }
-  
-  // Track the plugin
+  // Setup hook
+  if (plugin.setup) plugin.setup();
+
   installedPlugins.set(plugin.name, plugin);
 }
 
-/**
- * Unregister a plugin (note: this does not remove already-registered components/handlers)
- * @param pluginName - Name of the plugin to unregister
- * @returns true if plugin was found and removed, false otherwise
- */
-export function unregisterPlugin(pluginName: string): boolean {
+/** Unregister plugin */
+export function unregisterPlugin(pluginName: string, removeRegistrations = false): boolean {
   const plugin = installedPlugins.get(pluginName);
-  if (!plugin) {
-    return false;
+  if (!plugin) return false;
+
+  if (plugin.cleanup) plugin.cleanup();
+
+  if (removeRegistrations) {
+    // Remove components
+    if (plugin.components) {
+      for (const key of Object.keys(plugin.components)) {
+        registrationOwnership.components.delete(key);
+      }
+    }
+
+    // Remove field validators
+    if (plugin.fieldValidators) {
+      for (const [category, validators] of Object.entries(plugin.fieldValidators)) {
+        const categoryMap = registrationOwnership.fieldValidators.get(category);
+        if (!categoryMap) continue;
+        for (const name of Object.keys(validators)) {
+          categoryMap.delete(name);
+        }
+        if (categoryMap.size === 0) registrationOwnership.fieldValidators.delete(category);
+      }
+    }
+
+    // Remove form validators
+    if (plugin.formValidators) {
+      for (const name of Object.keys(plugin.formValidators)) {
+        registrationOwnership.formValidators.delete(name);
+      }
+    }
+
+    // Remove submission handlers
+    if (plugin.submissionHandlers) {
+      for (const name of Object.keys(plugin.submissionHandlers)) {
+        registrationOwnership.submissionHandlers.delete(name);
+      }
+    }
   }
-  
-  // Call cleanup if provided
-  if (plugin.cleanup) {
-    plugin.cleanup();
-  }
-  
+
   installedPlugins.delete(pluginName);
   return true;
 }
 
-/**
- * Get installed plugin by name
- * @param pluginName - Plugin name
- * @returns Plugin definition or undefined
- */
+/** Get a plugin by name */
 export function getPlugin(pluginName: string): ReactaFormPlugin | undefined {
   return installedPlugins.get(pluginName);
 }
 
-/**
- * Get all installed plugins
- * @returns Array of installed plugins
- */
+/** Get all installed plugins */
 export function getAllPlugins(): ReactaFormPlugin[] {
   return Array.from(installedPlugins.values());
 }
 
-/**
- * Check if a plugin is registered
- * @param pluginName - Plugin name
- * @returns true if plugin is registered
- */
+/** Check if plugin is registered */
 export function hasPlugin(pluginName: string): boolean {
   return installedPlugins.has(pluginName);
 }
 
-/**
- * Helper to register multiple components at once
- * @param components - Object mapping field types to components
- */
-export function registerComponents(components: Record<string, unknown>): void {
+/** Helper to register multiple components at once */
+export function registerComponents(components: Record<string, React.ComponentType<unknown>>): void {
   for (const [type, component] of Object.entries(components)) {
     registerComponent(type, component);
   }

@@ -16,6 +16,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
   const ref = React.useRef<HTMLSpanElement | null>(null);
   const tooltipRef = React.useRef<HTMLDivElement | null>(null);
   const iconRectRef = React.useRef<DOMRect | null>(null);
+  const tooltipId = React.useId();
 
   const tooltipStyles = React.useMemo(() => {
     const sizeConfig: Record<string, React.CSSProperties> = {
@@ -43,7 +44,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
       },
       text: {
         ...sizeConfig[size],
-        position: "absolute" as const,
+        position: "fixed" as const, // important
         backgroundColor: `var(--reactaform-tooltip-color-bg, ${darkMode ? "rgba(45,45,45,0.95)" : "rgba(60,60,60,0.92)"})`,
         color: `var(--reactaform-tooltip-color, ${darkMode ? "#f0f0f0" : "#fff"})`,
         borderRadius: "6px",
@@ -52,19 +53,16 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
           ? "0 8px 16px rgba(0,0,0,0.4)"
           : "0 6px 18px rgba(0,0,0,0.12)",
         zIndex: 2147483647,
-        opacity: 0,
-        visibility: "hidden" as const,
-        transition: animation
-          ? "opacity 0.2s ease, visibility 0.2s ease"
-          : undefined,
-        pointerEvents: "none" as const,
-        whiteSpace: "normal" as const,
-        wordBreak: "break-word" as const,
-        boxSizing: "border-box" as const,
+        opacity: 0, // hidden by default
+        pointerEvents: "none", // prevent blocking mouse events
+        transition: animation ? "opacity 0.2s ease" : undefined,
+        whiteSpace: "normal",
+        wordBreak: "break-word",
+        boxSizing: "border-box",
       },
       textVisible: {
         opacity: 1,
-        visibility: "visible" as const,
+        pointerEvents: "auto",
       },
     };
 
@@ -86,37 +84,29 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
     return merged;
   }, [darkMode, size, animation, formStyle, fieldStyle]);
 
-  React.useEffect(() => {
-    if (hover) {
-      // Defer the reset of `positioned` to the next animation frame to
-      // avoid synchronous setState inside the effect body which triggers
-      // the `react-hooks/set-state-in-effect` rule.
-      const resetFrame = requestAnimationFrame(() => setPositioned(false));
-      const frame = requestAnimationFrame(() => {
-        if (ref.current) {
-          const rect = ref.current.getBoundingClientRect();
-          const margin = 8; // px margin from edge
-          // store icon rect for the measurement pass
-          iconRectRef.current = rect;
-          // initial placement: put to the right of the icon (measurement step will vertically center)
-          // Use viewport coordinates (getBoundingClientRect) because popup root is fixed to viewport.
-          const initX = rect.right + margin;
-          const initY = rect.top;
-              setPos({ x: initX, y: initY });
-              // Intentionally set state after measurement — this is a measurement-pass
-              // that must run after layout.
-              setPositioned(true);
-        }
-      });
-      return () => {
-        cancelAnimationFrame(frame);
-        cancelAnimationFrame(resetFrame);
-      };
-    } else {
-      // When hover is false we explicitly reset positioned. Defer to RAF to avoid
-      // synchronous setState in effect body and satisfy the lint rule.
-      requestAnimationFrame(() => setPositioned(false));
+  React.useLayoutEffect(() => {
+    if (!hover || !ref.current || !tooltipRef.current) return;
+
+    const iconRect = ref.current.getBoundingClientRect();
+    const tooltipRect = tooltipRef.current.getBoundingClientRect();
+    const margin = 8;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let x = iconRect.right + margin;
+    let y = iconRect.top + iconRect.height / 2 - tooltipRect.height / 2;
+
+    // flip horizontally if needed
+    if (x + tooltipRect.width > vw - margin) {
+      x = iconRect.left - margin - tooltipRect.width;
     }
+
+    // clamp
+    x = Math.max(margin, Math.min(x, vw - tooltipRect.width - margin));
+    y = Math.max(margin, Math.min(y, vh - tooltipRect.height - margin));
+
+    setPos({ x, y });
+    setPositioned(true);
   }, [hover]);
 
   // After the tooltip is rendered, measure and clamp so the tooltip box doesn't overflow the viewport
@@ -171,6 +161,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
   const tooltipContent = (
     <div
       ref={tooltipRef}
+      data-tooltip-id={tooltipId}
       style={{
         ...tooltipStyles.text,
         transform: positioned
@@ -193,6 +184,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
       <span
         data-testid="tooltip-icon"
         ref={ref}
+        aria-describedby={hover ? tooltipId : undefined}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         style={{

@@ -59,9 +59,10 @@ export function validateFieldValue(
 
   // Check cache first
   if (!fieldHandlerCache.has(cacheKey)) {
+    // Lookup by category and handler name (not the cacheKey which includes the category)
     const validationHandler = getFieldValidationHandler(
       category,
-      cacheKey
+      key
     );
     fieldHandlerCache.set(cacheKey, validationHandler);
   }

@@ -39,7 +39,13 @@
 - Enhance ARIA-compliant support for some components
 - Fix some small issues
 
-## 1.3.0 - 2025-12-14
+## 1.3.0 - 2025-12-17
 - Refactor import to make library works in React 18.
   Remove React 19 specific import logic to avoid type conflicts with React 18. For example, using this library in CRA app.
 - Add async for submit and validation
+
+## 1.4.0 - 2025-12-20
+- Ensure compatibility with React 18
+- Add support for plugins
+- Fix tooltip positioning in scrollable containers
+- Make field-level validators synchronous; keep form-level validation and submission asynchronous

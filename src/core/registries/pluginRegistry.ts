@@ -208,7 +208,9 @@ function registerItems<T>(
         const categoryMap = (ownershipMap as Map<string, Map<string, string>>).get(category) || new Map();
         categoryMap.set(key, plugin.name);
         (ownershipMap as Map<string, Map<string, string>>).set(category, categoryMap);
-        registerFn(key, (items as Record<string, Record<string, T>>)[category][key]);
+        // When registering categorized items (like field validators), `items` is
+        // already the map for that category, so simply use `items[key]`.
+        registerFn(key, items[key]);
       } else {
         (ownershipMap as Map<string, string>).set(key, plugin.name);
         registerFn(key, items[key]);

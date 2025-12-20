@@ -271,6 +271,66 @@ import { ReactaFormProvider, ReactaFormRenderer } from 'reactaform';
 </ReactaFormProvider>
 ```
 
+## 🔌 Plugin Support
+
+ReactaForm includes a plugin system to register components, validation handlers, submission handlers, and optional lifecycle hooks. Plugins let you bundle reusable form extensions and share them across projects.
+
+Basic plugin shape (TypeScript):
+
+```ts
+const myPlugin: ReactaFormPlugin = {
+  name: 'my-awesome-plugin',
+  version: '0.1.0',
+  description: 'Adds a custom field and validators',
+  components: {
+    customType: CustomInput,
+  },
+  fieldValidators: {
+    default: {
+      myValidator: (value) => (value ? null : 'Required'),
+    },
+  },
+  submissionHandlers: {
+    mySubmitHandler: async (_, __, values) => {
+      // Custom submission logic
+      return [] as string[]; // return array of errors or empty array
+    },
+  },
+  setup() {
+    // optional init logic
+  },
+  cleanup() {
+    // optional teardown logic
+  },
+};
+```
+
+Registering a plugin:
+
+```ts
+import { registerPlugin } from 'reactaform';
+
+registerPlugin(myPlugin, { conflictResolution: 'warn' });
+```
+
+Options and conflict handling:
+
+- `conflictResolution`: one of `'error'` (default), `'warn'`, `'override'`, or `'skip'`.
+- `onConflict`: optional callback `(conflict: PluginConflict) => boolean` to programmatically decide whether to proceed when a conflict occurs.
+
+Unregistering and inspecting plugins:
+
+```ts
+import { unregisterPlugin, getPlugin, getAllPlugins, hasPlugin } from 'reactaform';
+
+unregisterPlugin('my-awesome-plugin', true); // remove plugin and its registrations
+const plugin = getPlugin('my-awesome-plugin');
+const all = getAllPlugins();
+const exists = hasPlugin('my-awesome-plugin');
+```
+
+For implementation details and advanced behavior, see the plugin registry implementation: [src/core/registries/pluginRegistry.ts](src/core/registries/pluginRegistry.ts#L1-L240).
+
 ## 📚 API Reference
 
 ### ReactaForm Props

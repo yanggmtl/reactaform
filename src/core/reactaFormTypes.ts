@@ -119,6 +119,7 @@ export type TranslationFunction = (text: string, ...args: unknown[]) => string;
 
 // Field validator function: returns error string or undefined if valid
 export type FieldValidationHandler = (
+  fieldName: string,
   value: FieldValueType | unknown,
   t: TranslationFunction,
 ) => string | undefined;

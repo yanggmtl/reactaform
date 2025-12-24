@@ -1,13 +1,19 @@
 // components/FloatArrayInput.tsx
 import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
-import type { DefinitionPropertyField, BaseInputProps } from "../../core/reactaFormTypes";
+import type {
+  DefinitionPropertyField,
+  BaseInputProps,
+} from "../../core/reactaFormTypes";
 import { validateFieldValue } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 // Props for the generic number array input
-export type FloatArrayInputProps = BaseInputProps<string | number[], DefinitionPropertyField>;
+export type FloatArrayInputProps = BaseInputProps<
+  string | number[],
+  DefinitionPropertyField
+>;
 
 const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
 function isValidFloatArray(input: string) {
@@ -26,9 +32,6 @@ function isValidFloatArray(input: string) {
  * - Required field validation.
  * - Min/max validation for the number of values.
  * - Lower and upper limit constraints (inclusive or exclusive) per value.
- * - Inline error display.
- * - Tooltip support for field help.
- * - Integration with Reacta form context for localization, styles, and validation.
  *
  * Props:
  * - field: Metadata describing the input field, including validation rules and display info.
@@ -118,7 +121,9 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   };
 
   const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<FloatArrayInputProps["onError"] | undefined>(onError);
+  const onErrorRef = React.useRef<FloatArrayInputProps["onError"] | undefined>(
+    onError
+  );
   React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
@@ -143,7 +148,9 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         style={{ flex: 1 }}
         aria-invalid={!!validate(inputValue)}
-        aria-describedby={validate(inputValue) ? `${field.name}-error` : undefined}
+        aria-describedby={
+          validate(inputValue) ? `${field.name}-error` : undefined
+        }
       />
     </StandardFieldLayout>
   );

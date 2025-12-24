@@ -70,7 +70,7 @@ export function validateFieldValue(
   const validationHandler = fieldHandlerCache.get(cacheKey);
   if (validationHandler) {
     try {
-      const res = validationHandler(value, t);
+      const res = validationHandler(field.name, value, t);
       return res || null;
     } catch (err) {
       // If validation throws, surface as error string

@@ -11,6 +11,12 @@ export interface DefinitionLoadResult {
   error?: string;
 }
 
+export interface InstanceLoadResult {
+  success: boolean;
+  instance?: ReactaInstance;
+  error?: string;
+}
+
 /**
  * Validates that a definition object has the required structure
  */
@@ -79,7 +85,7 @@ export async function loadJsonDefinition(
 export function createInstanceFromDefinition(
   definition: ReactaDefinition, 
   name: string
-): { success: boolean; instance?: ReactaInstance; error?: string } {
+): InstanceLoadResult {
   try {
     if (!definition) {
       return { success: false, error: "Definition is required" };
@@ -100,11 +106,19 @@ export function createInstanceFromDefinition(
     if (Array.isArray(properties)) {
       (properties as unknown[]).forEach((prop) => {
         const p = prop as Record<string, unknown>;
-        if (p.defaultValue !== undefined) {
-          (instance.values as Record<string, unknown>)[p.name as string] = p.defaultValue;
+        if (p.type === 'unit') {
+          // unit type expects [number, unit]
+          const defaultUnit = p['defaultUnit'] as string;
+          const defaultValue = Number(p['defaultValue']) || undefined;
+          (instance.values as Record<string, unknown>)[p.name as string] = [defaultValue || 0, defaultUnit || "m"];
+        } else {
+          if (p.defaultValue !== undefined) {
+            (instance.values as Record<string, unknown>)[p.name as string] = p.defaultValue;
+          }
         }
       });
     }
+
 
     return { success: true, instance };
   } catch (error) {
@@ -120,7 +134,7 @@ export function createInstanceFromDefinition(
  */
 export function loadInstance(
   instanceData: string | Record<string, unknown>
-): { success: boolean; instance?: ReactaInstance; error?: string } {
+): InstanceLoadResult {
   try {
     if (!instanceData) {
       return { success: false, error: "Instance data is required" };
@@ -156,13 +170,13 @@ export function loadInstance(
 }
 
 export function upgradeInstanceToLatestDefinition(
-  instance: ReactaInstance,
+  oldInstance: ReactaInstance,
   latestDefinition: ReactaDefinition,
   // optional callback allowing custom upgrade logic
   callback?: (oldInstance: ReactaInstance, newInstance: Record<string, unknown>, latestDefinition: ReactaDefinition) => void
-): { success: boolean; upgradedInstance?: Record<string, unknown>; error?: string } {
+): InstanceLoadResult {
   try {
-    if (!instance) {
+    if (!oldInstance) {
       return { success: false, error: "Instance is required" };
     }
     if (!latestDefinition) {
@@ -170,13 +184,13 @@ export function upgradeInstanceToLatestDefinition(
     }
 
     // If the instance version and definition match the latest, no upgrade needed
-    if (instance.definition === latestDefinition.name && instance.version === latestDefinition.version) {
-      return { success: true, upgradedInstance: instance as unknown as Record<string, unknown> };
+    if (oldInstance.definition === latestDefinition.name && oldInstance.version === latestDefinition.version) {
+      return { success: true, instance: oldInstance};
     }
 
     // Create a new empty instance based on the latest definition (no values copied yet)
     const newInstance: Record<string, unknown> = {
-      name: instance.name || (latestDefinition.name + "-instance"),
+      name: oldInstance.name || (latestDefinition.name + "-instance"),
       definition: latestDefinition.name,
       version: latestDefinition.version,
       values: {},
@@ -236,7 +250,7 @@ export function upgradeInstanceToLatestDefinition(
     };
 
     // Iterate through old instance values and migrate those that still exist in latest definition
-    const oldValues = (instance.values || {}) as Record<string, unknown>;
+    const oldValues = (oldInstance.values || {}) as Record<string, unknown>;
     Object.keys(oldValues).forEach((key) => {
       const oldVal = oldValues[key];
       const latestProp = latestPropMap[key];
@@ -273,14 +287,14 @@ export function upgradeInstanceToLatestDefinition(
     // Allow caller to customize the upgrade process (merge/add custom values)
     try {
       if (typeof callback === 'function') {
-        callback?.(instance, newInstance, latestDefinition);
+        callback?.(oldInstance, newInstance, latestDefinition);
       }
     } catch (cbErr) {
       // swallow callback errors but report them
       return { success: false, error: `Upgrade callback error: ${cbErr instanceof Error ? cbErr.message : String(cbErr)}` };
     }
 
-    return { success: true, upgradedInstance: newInstance };
+    return { success: true, instance: newInstance as unknown as ReactaInstance };
   } catch (error) {
     return { 
       success: false, 

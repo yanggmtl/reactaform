@@ -24,9 +24,6 @@ function isValidIntegerArray(input: string) {
  * - Parsing and validating each integer value.
  * - Min/max validation for the number of values.
  * - Min/Max limit constraints (inclusive or exclusive) per value.
- * - Inline error display.
- * - Tooltip support for field help.
- * - Integration with Reacta form context for localization, styles, and validation.
  *
  * Props:
  * - field: Metadata describing the input field, including validation rules and display info.

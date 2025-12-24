@@ -10,24 +10,14 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 /**
  * IntegerInput component
  *
- * This component renders a controlled input field specifically for integer values.
- * It handles validation for required input, integer format, and optional min/max constraints,
- * with inclusive or exclusive boundaries. The component supports inline validation error
- * display and integrates with the Reacta form context for localization, styling, and field metadata.
- *
  * Props:
  * - field: The metadata describing the input field, including validation rules and display info.
  * - value: The current integer value to display.
  * - onChange: Callback invoked when the input changes, providing the parsed integer value and any validation error.
- * - parse: Function to parse string input into an integer.
- * - validNumberRegex: Regex pattern to validate the integer input format.
- * - typeName: Descriptive string for the value type (e.g., "integer") used in validation messages.
  *
  * Features:
  * - Validates input against integer format and required presence.
  * - Enforces min and max constraints with inclusive/exclusive options.
- * - Displays error messages inline below the input.
- * - Supports tooltips for additional user guidance.
  */
 export type IntegerInputProps = BaseInputProps<string | number, DefinitionPropertyField>;
 
@@ -46,12 +36,6 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
-  // Memoize parse function
-  const parseInteger = React.useCallback((s: string) => {
-    const n = parseInt(s, 10);
-    return Number.isNaN(n) ? null : n;
-  }, []);
-
   // Validate the current input value against the field constraints
   const validateCb = React.useCallback(
     (input: string): string | null => {
@@ -59,13 +43,15 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
         return field.required ? t("Value required") : null;
       }
 
+      // Check integer format. This is needed because parseInt will parse partial strings.
       if (!isValidInteger(input)) {
         return t("Must be a valid integer");
       }
 
-      const parsedValue = parseInteger(input);
-      if (parsedValue === null) return t("Must be a valid integer");
+      const parsedValue = parseInt(input, 10);
+      if (Number.isNaN(parsedValue)) return t("Must be a valid integer");
 
+      // Check min constraints
       if (field.min !== undefined) {
         const tooLow = field.minInclusive
           ? parsedValue < field.min
@@ -79,6 +65,7 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
         }
       }
 
+      // Check max constraints
       if (field.max !== undefined) {
         const tooHigh = field.maxInclusive
           ? parsedValue > field.max
@@ -108,7 +95,7 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
       const err = validateFieldValue(definitionName, field, parsedValue, t);
       return err ?? null;
     },
-    [field, definitionName, t, parseInteger]
+    [field, definitionName, t]
   );
 
   const prevErrorRef = React.useRef<string | null>(null);

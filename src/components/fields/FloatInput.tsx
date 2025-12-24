@@ -27,15 +27,6 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
  */
 export type FloatInputProps = BaseInputProps<string | number, DefinitionPropertyField>;
 
-// Regex to validate floating-point input (optional leading +/-, digits, optional decimal, optional exponent)
-const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
-
-// Parse string input to float (returns null for invalid parses)
-const parseFloatValue = (s: string) => {
-  const n = Number.parseFloat(s);
-  return Number.isNaN(n) ? null : n;
-};
-
 const FloatInput: React.FC<FloatInputProps> = ({
   field,
   value,
@@ -52,12 +43,8 @@ const FloatInput: React.FC<FloatInputProps> = ({
         return field.required ? t("Value required") : null;
       }
 
-      if (!validFloatRegex.test(input)) {
-        return t("Must be a valid float");
-      }
-
-      const parsedValue = parseFloatValue(input);
-      if (parsedValue === null) return t("Must be a valid float");
+      const parsedValue = Number.parseFloat(input);
+      if (Number.isNaN(parsedValue)) return t("Must be a valid float");
 
       if (field.min !== undefined) {
         const tooLow = field.minInclusive

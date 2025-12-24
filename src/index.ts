@@ -74,13 +74,13 @@ export type {
   PluginConflict,
 } from './core/registries/pluginRegistry';
 
-// Validation
-export {
-  validateFieldValue,
-  validateFormValues
-} from './core/validation';
-
 // Definition & Instance Management
+export type {
+  LoadDefinitionOptions,
+  DefinitionLoadResult,
+  InstanceLoadResult,
+} from './core/reactaFormModel';
+
 export {
   loadJsonDefinition,
   createInstanceFromDefinition, // Create new instance with default values
@@ -99,6 +99,10 @@ export {
 } from './core/registries/validationHandlerRegistry';
 
 // Hooks
+export type {
+  DebouncedCallback
+} from './hooks/useDebouncedCallback';
+
 export {
   useDebouncedCallback
 } from './hooks/useDebouncedCallback';

@@ -49,3 +49,11 @@
 - Add support for plugins
 - Fix tooltip positioning in scrollable containers
 - Make field-level validators synchronous; keep form-level validation and submission asynchronous
+
+## 1.4.2 - 2025-12-26
+Refactor: enhance code quality, performance, and type safety
+- Fix critical bugs: SliderInput padding syntax, character encoding in NumericStepper/SpinInput
+- Performance: add validation memoization to 7 field components
+- Type safety: enhance null checks, add strict TypeScript constraints
+- Optimization: improve cache operations, translation interpolation
+- Robustness: better number deserialization with Infinity/NaN validation

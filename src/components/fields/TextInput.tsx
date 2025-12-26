@@ -38,7 +38,8 @@ const TextInput: React.FC<TextInputProps> = ({
 
   const validate = React.useCallback(
     (val: string): string | null => {
-      if (val.trim() === "") {
+      const trimmed = val.trim();
+      if (trimmed === "") {
         return field.required ? t("Value required") : null;
       }
       if (field.minLength !== undefined && val.length < field.minLength) {

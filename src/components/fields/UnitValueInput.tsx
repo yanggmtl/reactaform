@@ -149,7 +149,6 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
   const { t, definitionName } = useReactaFormContext();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const selectRef = React.useRef<HTMLSelectElement | null>(null);
-  const rafRef = React.useRef<number | null>(null);
   const [localInput, setLocalInput] = React.useState<string | null>(null);
   const [localUnit, setLocalUnit] = React.useState<string | null>(null);
   const [showMenu, setShowMenu] = React.useState<boolean>(false);
@@ -191,26 +190,11 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
 
     if (inputRef.current) inputRef.current.value = val;
     if (selectRef.current) selectRef.current.value = unit;
-    // clear transient local edits when props change (deferred to avoid sync setState)
-    if (rafRef.current !== null) {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    }
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      setLocalInput(null);
-      setLocalUnit(null);
-    });
+    
+    // Clear transient local edits when props change
+    setLocalInput(null);
+    setLocalUnit(null);
   }, [value, unitFactors]);
-  // cleanup raf if unmounting
-  React.useEffect(() => {
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-    };
-  }, []);
 
   const prevErrorRef = React.useRef<string | null>(null);
   const onErrorRef = React.useRef<GenericUnitValueInputProps["onError"] | undefined>(

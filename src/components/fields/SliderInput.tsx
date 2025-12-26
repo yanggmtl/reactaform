@@ -113,7 +113,7 @@ const SliderInput: React.FC<SliderInputProps> = ({
           min={min}
           max={max}
           style={{
-            padding: "0px, 0px", // Remove padding to make Chrome browser works fine.
+            padding: 0, // Remove padding to make Chrome browser works fine.
             flex: 1,
           }}
           className={CSS_CLASSES.rangeInput}

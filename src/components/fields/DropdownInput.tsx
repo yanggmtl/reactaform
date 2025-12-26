@@ -8,9 +8,13 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
+type DropdownField = DefinitionPropertyField & {
+  options: NonNullable<DefinitionPropertyField['options']>;
+};
+
 export type DropdownInputProps = BaseInputProps<
   string,
-  DefinitionPropertyField
+  DropdownField
 >;
 
 /**
@@ -41,8 +45,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
       if (val === "" || val === null || val === undefined) {
         return t("Value required");
       }
-      // If options are not provided, we can't validate here; treat as valid.
-      if (!field.options || field.options.length === 0) return null;
+      // Options are guaranteed to exist due to type constraint
       if (!field.options.some((opt) => opt.value === val)) {
         return t("Invalid option selected");
       }
@@ -56,7 +59,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     const safeVal = value != null ? String(value) : "";
     // If incoming value is invalid and there is at least one option, pick the first option
     const err = validate(safeVal);
-    if (err && field.options && field.options.length > 0) {
+    if (err && field.options.length > 0) {
       const first = String(field.options[0].value);
       if (selectRef.current) selectRef.current.value = first;
       // notify parent that we normalized the value
@@ -88,7 +91,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
           CSS_CLASSES.inputSelect
         )}
       >
-        {(field.options ?? []).map((opt) => (
+        {field.options.map((opt) => (
           <option key={String(opt.value)} value={String(opt.value)}>
             {t(opt.label)}
           </option>

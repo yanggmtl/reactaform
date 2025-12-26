@@ -8,7 +8,11 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { validateFieldValue } from "../../core/validation";
 
-export type RadioInputProps = BaseInputProps<string, DefinitionPropertyField>;
+type RadioField = DefinitionPropertyField & {
+  options: NonNullable<DefinitionPropertyField['options']>;
+};
+
+export type RadioInputProps = BaseInputProps<string, RadioField>;
 
 /**
  * RadioInput
@@ -40,8 +44,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
       if (val === "" || val === null || val === undefined) {
         return t("Value required");
       }
-      // If options are not provided, we can't validate here; treat as valid.
-      if (!field.options || field.options.length === 0) return null;
+      // Options are guaranteed to exist due to type constraint
       if (!field.options.some((opt) => opt.value === val)) {
         return t("Invalid option selected");
       }
@@ -60,7 +63,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
         groupRef.current.querySelectorAll<HTMLInputElement>("input[type=radio]")
       );
       // If normalization required, set first option checked; otherwise set checked by value
-      if (err && field.options && field.options.length > 0) {
+      if (err && field.options.length > 0) {
         const first = String(field.options[0].value);
         inputs.forEach((inp) => (inp.checked = inp.value === first));
         onChange?.(first, null);
@@ -96,7 +99,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
         }}
         ref={groupRef}
       >
-        {(field.options ?? []).map((opt) => (
+        {field.options.map((opt) => (
           <label
             key={String(opt.value)}
             className={combineClasses(CSS_CLASSES.label)}

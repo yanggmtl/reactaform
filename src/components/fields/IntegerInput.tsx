@@ -128,7 +128,10 @@ const IntegerInput: React.FC<IntegerInputProps> = ({
     onChange?.(input, err);
   };
 
-  const error = validateCb(String(value ?? ""));
+  const error = React.useMemo(
+    () => validateCb(String(value ?? "")),
+    [value, validateCb]
+  );
 
   return (
     <StandardFieldLayout field={field} error={error}>

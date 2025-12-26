@@ -2,14 +2,19 @@ export class BaseRegistry<T> {
   private map: Record<string, T> = {};
 
   register(name: string, value: T): void {
+    if (!name || typeof name !== 'string') {
+      throw new Error('Registry key must be a non-empty string');
+    }
     this.map[name] = value;
   }
 
   get(name: string): T | undefined {
+    if (!name || typeof name !== 'string') return undefined;
     return this.map[name];
   }
 
   has(name: string): boolean {
+    if (!name || typeof name !== 'string') return false;
     return name in this.map;
   }
 
@@ -44,15 +49,24 @@ export class BaseRegistry<T> {
   // Batch operations for better performance
   registerAll(entries: Record<string, T> | [string, T][]): void {
     if (Array.isArray(entries)) {
-      entries.forEach(([name, value]) => this.register(name, value));
-    } else {
-      Object.entries(entries).forEach(([name, value]) => this.register(name, value));
+      entries.forEach(([name, value]) => {
+        if (name && typeof name === 'string') {
+          this.register(name, value);
+        }
+      });
+    } else if (entries && typeof entries === 'object') {
+      Object.entries(entries).forEach(([name, value]) => {
+        if (name && typeof name === 'string') {
+          this.register(name, value);
+        }
+      });
     }
   }
 
   // Get with fallback
   getOrDefault(name: string, defaultValue: T): T {
-    return this.get(name) ?? defaultValue;
+    const value = this.get(name);
+    return value !== undefined ? value : defaultValue;
   }
 }
 

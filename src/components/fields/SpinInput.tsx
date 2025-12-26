@@ -52,11 +52,11 @@ const SpinInput: React.FC<SpinInputProps> = ({
       }
 
       if (parsedValue < minVal) {
-        return t("Must be �?{{1}}", minVal);
+        return t("Must be ≥ {{1}}", minVal);
       }
 
       if (parsedValue > maxVal) {
-        return t("Must be �?{{1}}", maxVal);
+        return t("Must be ≤ {{1}}", maxVal);
       }
 
       const err = validateFieldValue(definitionName, field, parsedValue, t);

@@ -57,6 +57,11 @@ export {
   getComponent,
 } from './core/registries/componentRegistry';
 
+// Validation Utilities for custom validation logic
+export {
+  validateFieldValue
+} from './core/validation';
+
 // Plugin System
 export {
   registerPlugin,

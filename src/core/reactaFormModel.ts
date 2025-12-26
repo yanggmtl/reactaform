@@ -21,17 +21,40 @@ export interface InstanceLoadResult {
  * Validates that a definition object has the required structure
  */
 export function validateDefinitionSchema(definition: ReactaDefinition): string | null {
-  if (!definition || typeof definition !== "object") return "Definition must be an object";
+  if (!definition || typeof definition !== "object") {
+    return "Definition must be an object";
+  }
   const def = definition;
-  if (!def.name || typeof def.name !== "string") return "Definition must include a 'name' string";
-  if (!def.version || typeof def.version !== "string") return "Definition must include a 'version' string";
-  if (def.properties !== undefined && !Array.isArray(def.properties)) return "'properties' must be an array if provided";
+  if (!def.name || typeof def.name !== "string") {
+    return "Definition must include a 'name' string";
+  }
+  if (def.name.trim() === "") {
+    return "Definition 'name' cannot be empty";
+  }
+  if (!def.version || typeof def.version !== "string") {
+    return "Definition must include a 'version' string";
+  }
+  if (def.properties !== undefined && !Array.isArray(def.properties)) {
+    return "'properties' must be an array if provided";
+  }
   if (Array.isArray(def.properties)) {
     for (let i = 0; i < def.properties.length; i++) {
       const p = def.properties[i];
-      if (!p || typeof p !== 'object') return `Property at index ${i} must be an object`;
-      if (!p.name || typeof p.name !== 'string') return `Property at index ${i} must have a string 'name'`;
-      if (!p.type || typeof p.type !== 'string') return `Property '${p.name}' must have a string 'type'`;
+      if (!p || typeof p !== 'object') {
+        return `Property at index ${i} must be an object`;
+      }
+      if (!p.name || typeof p.name !== 'string') {
+        return `Property at index ${i} must have a string 'name'`;
+      }
+      if (p.name.trim() === "") {
+        return `Property at index ${i} has an empty 'name'`;
+      }
+      if (!p.type || typeof p.type !== 'string') {
+        return `Property '${p.name}' must have a string 'type'`;
+      }
+      if (p.type.trim() === "") {
+        return `Property '${p.name}' has an empty 'type'`;
+      }
     }
   }
   return null;
@@ -205,39 +228,46 @@ export function upgradeInstanceToLatestDefinition(
     });
 
     // Helper: best-effort conversion from old value to a target type string
-    const convertValueToType = (value: unknown, targetType: string, prop?: DefinitionPropertyField) => {
+    const convertValueToType = (value: unknown, targetType: string, prop?: DefinitionPropertyField): unknown => {
       if (value === null || value === undefined) return value;
       const t = targetType.toLowerCase();
       try {
-        if (t === 'string') return String(value);
+        if (t === 'string' || t === 'text') return String(value);
         if (t === 'int' || t === 'integer' || t === 'number' || t === 'float') {
           if (typeof value === 'number') return value;
           if (typeof value === 'boolean') return value ? 1 : 0;
           if (typeof value === 'string') {
-            const n = Number(value.trim());
+            const trimmed = value.trim();
+            if (trimmed === '') return null;
+            const n = Number(trimmed);
             return Number.isNaN(n) ? 0 : n;
           }
           return 0;
         }
-        if (t === 'boolean' || t === 'bool') {
+        if (t === 'boolean' || t === 'bool' || t === 'checkbox' || t === 'switch') {
           if (typeof value === 'boolean') return value;
           if (typeof value === 'number') return value !== 0;
-          if (typeof value === 'string') return ['true','1','yes'].includes(value.toLowerCase());
+          if (typeof value === 'string') {
+            const lower = value.toLowerCase().trim();
+            return ['true','1','yes','on'].includes(lower);
+          }
           return Boolean(value);
         }
         if (t === 'unit') {
           // Expect [number, unit]
-          if (Array.isArray(value) && value.length >= 1) return value;
-          if (typeof value === 'number') return [value, (prop && prop.defaultUnit) || ''];
+          if (Array.isArray(value) && value.length >= 2) return value;
+          if (Array.isArray(value) && value.length === 1) {
+            return [value[0], (prop && prop.defaultUnit) || 'm'];
+          }
+          if (typeof value === 'number') return [value, (prop && prop.defaultUnit) || 'm'];
           if (typeof value === 'string') {
             const num = Number(value);
-            if (!Number.isNaN(num)) return [num, (prop && prop.defaultUnit) || ''];
-            return [0, (prop && prop.defaultUnit) || ''];
+            return [Number.isNaN(num) ? 0 : num, (prop && prop.defaultUnit) || 'm'];
           }
-          return value;
+          return [0, (prop && prop.defaultUnit) || 'm'];
         }
         // array target type e.g., string[] or number[]
-        if (t.endsWith('[]') || t === 'array') {
+        if (t.endsWith('[]') || t === 'array' || t === 'int-array' || t === 'float-array') {
           if (Array.isArray(value)) return value;
           if (typeof value === 'string') return value.split(',').map(s => s.trim()).filter(Boolean);
           return [value];

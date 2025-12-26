@@ -110,8 +110,13 @@ const UrlInput: React.FC<UrlInputProps> = ({
     return undefined;
   }, [value, validateCb]);
 
+  const error = React.useMemo(
+    () => validateCb(String(value ?? "")),
+    [value, validateCb]
+  );
+
   return (
-    <StandardFieldLayout field={field} error={validateCb(String(value ?? ""))}>
+    <StandardFieldLayout field={field} error={error}>
       <input
         id={field.name}
         type="url"
@@ -121,8 +126,8 @@ const UrlInput: React.FC<UrlInputProps> = ({
         style={{ alignItems: "left" }}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         placeholder="https://example.com"
-        aria-invalid={!!validateCb(String(value ?? ""))}
-        aria-describedby={validateCb(String(value ?? "")) ? `${field.name}-error` : undefined}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

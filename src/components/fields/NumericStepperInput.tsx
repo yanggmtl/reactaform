@@ -35,11 +35,11 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
       }
 
       if (minVal !== undefined && value < minVal) {
-        return t("Must be �?{{1}}", minVal);
+        return t("Must be ≥ {{1}}", minVal);
       }
 
       if (maxVal !== undefined && value > maxVal) {
-        return t("Must be �?{{1}}", maxVal);
+        return t("Must be ≤ {{1}}", maxVal);
       }
 
       const err = validateFieldValue(definitionName, field, value, t);

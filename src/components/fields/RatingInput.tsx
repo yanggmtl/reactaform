@@ -21,9 +21,12 @@ import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
 
-// lib/baseTypes.ts or similar
+type RatingField = DefinitionPropertyField & {
+  max?: number;
+  icon?: string;
+};
 
-export type RatingInputProps = BaseInputProps<number, DefinitionPropertyField>;
+export type RatingInputProps = BaseInputProps<number, RatingField>;
 
 const RatingInput: React.FC<RatingInputProps> = ({
   field,
@@ -90,8 +93,7 @@ const RatingInput: React.FC<RatingInputProps> = ({
         aria-describedby={validate(ratingValue) ? `${field.name}-error` : undefined}
       >
         {(() => {
-          const iconProp = (field as DefinitionPropertyField & { icon?: string }).icon;
-          const iconChar = iconProp && String(iconProp).trim() ? String(iconProp) : "★";
+          const iconChar = field.icon && String(field.icon).trim() ? String(field.icon) : "★";
           return [...Array(max)].map((_, i) => {
             const isActive = i < ratingValue;
             const isHover = hoverIndex !== null && i <= hoverIndex;

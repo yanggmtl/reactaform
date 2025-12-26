@@ -31,12 +31,13 @@ export function validateFieldValue(
   value: FieldValueType | unknown,
   t: TranslationFunction
 ): string | null {
-  if (!field) {
+  if (!field || !field.validationHandlerName) {
     return null;
   }
 
-  let category: string | null = null;
-  let key: string | null = null;
+  let category: string;
+  let key: string;
+  
   if (typeof field.validationHandlerName === "string") {
     category = definitionName;
     key = field.validationHandlerName;
@@ -48,26 +49,23 @@ export function validateFieldValue(
     } else if (cat) {
       category = definitionName;
       key = cat;
+    } else {
+      return null;
     }
-  }
-
-  if (category === null || key === null) {
+  } else {
     return null;
   }
 
   const cacheKey = `${category}:${key}`;
 
   // Check cache first
-  if (!fieldHandlerCache.has(cacheKey)) {
-    // Lookup by category and handler name (not the cacheKey which includes the category)
-    const validationHandler = getFieldValidationHandler(
-      category,
-      key
-    );
+  let validationHandler = fieldHandlerCache.get(cacheKey);
+  if (validationHandler === undefined) {
+    // Lookup by category and handler name
+    validationHandler = getFieldValidationHandler(category, key) || null;
     fieldHandlerCache.set(cacheKey, validationHandler);
   }
 
-  const validationHandler = fieldHandlerCache.get(cacheKey);
   if (validationHandler) {
     try {
       const res = validationHandler(field.name, value, t);
@@ -87,30 +85,28 @@ export async function validateFormValues(
   valuesMap: Record<string, FieldValueType | unknown>,
   t: (key: string) => string
 ): Promise<string[] | null> {
-  if (
-    definition &&
-    typeof (definition as ReactaDefinition).validationHandlerName === "string"
-  ) {
-    const handlerName = (definition as ReactaDefinition)
-      .validationHandlerName as string;
+  if (!definition || typeof definition.validationHandlerName !== "string") {
+    return null;
+  }
 
-    // Check cache first
-    if (!formHandlerCache.has(handlerName)) {
-      const validationHandler = getFormValidationHandler(handlerName);
-      formHandlerCache.set(handlerName, validationHandler);
-    }
+  const handlerName = definition.validationHandlerName;
 
-    const validationHandler = formHandlerCache.get(handlerName);
-    if (validationHandler) {
-      try {
-        const res = validationHandler(valuesMap, t);
-        if (isThenable(res)) {
-          return (await res) || null;
-        }
-        return (res as string[] | undefined) || null;
-      } catch (err) {
-        return [String(err instanceof Error ? err.message : err)];
+  // Check cache first
+  let validationHandler = formHandlerCache.get(handlerName);
+  if (validationHandler === undefined) {
+    validationHandler = getFormValidationHandler(handlerName) || null;
+    formHandlerCache.set(handlerName, validationHandler);
+  }
+
+  if (validationHandler) {
+    try {
+      const res = validationHandler(valuesMap, t);
+      if (isThenable(res)) {
+        return (await res) || null;
       }
+      return (res as string[] | undefined) || null;
+    } catch (err) {
+      return [String(err instanceof Error ? err.message : err)];
     }
   }
   return null;

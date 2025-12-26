@@ -69,8 +69,13 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   const [showPassword, setShowPassword] = React.useState(false);
   const toggleShow = () => setShowPassword((s) => !s);
 
+  const error = React.useMemo(
+    () => validate(String(value ?? "")),
+    [value, validate]
+  );
+
   return (
-    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
+    <StandardFieldLayout field={field} error={error}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, width: '100%' }}>
         <input
           id={field.name}
@@ -80,8 +85,8 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           onChange={handleChange}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
           style={{ flex: 1, minWidth: 0 }}
-          aria-invalid={!!validate(String(value ?? ""))}
-          aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${field.name}-error` : undefined}
         />
         <button
           type="button"

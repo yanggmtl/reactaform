@@ -85,69 +85,35 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
   }, [darkMode, size, animation, formStyle, fieldStyle]);
 
   React.useLayoutEffect(() => {
-    if (!hover || !ref.current || !tooltipRef.current) return;
+    if (!hover || !ref.current || !tooltipRef.current) {
+      setPositioned(false);
+      return;
+    }
 
     const iconRect = ref.current.getBoundingClientRect();
+    iconRectRef.current = iconRect;
     const tooltipRect = tooltipRef.current.getBoundingClientRect();
     const margin = 8;
     const vw = window.innerWidth;
     const vh = window.innerHeight;
+    const verticalNudge = -4; // visual tweak to better center the bubble with the icon
 
+    // Calculate preferred position: to the right of icon, vertically centered
     let x = iconRect.right + margin;
-    let y = iconRect.top + iconRect.height / 2 - tooltipRect.height / 2;
+    let y = iconRect.top + iconRect.height / 2 - tooltipRect.height / 2 + verticalNudge;
 
-    // flip horizontally if needed
+    // Flip horizontally if it would overflow right edge
     if (x + tooltipRect.width > vw - margin) {
       x = iconRect.left - margin - tooltipRect.width;
     }
 
-    // clamp
+    // Clamp to viewport boundaries
     x = Math.max(margin, Math.min(x, vw - tooltipRect.width - margin));
     y = Math.max(margin, Math.min(y, vh - tooltipRect.height - margin));
 
     setPos({ x, y });
     setPositioned(true);
   }, [hover]);
-
-  // After the tooltip is rendered, measure and clamp so the tooltip box doesn't overflow the viewport
-  React.useEffect(() => {
-    if (!positioned) return;
-    const frame = requestAnimationFrame(() => {
-      if (!tooltipRef.current) return;
-      const tr = tooltipRef.current.getBoundingClientRect();
-      const margin = 8;
-      const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
-      const vh = typeof window !== "undefined" ? window.innerHeight : 768;
-      let newX = pos.x;
-      let newY = pos.y;
-      const iconRect = iconRectRef.current;
-      if (iconRect) {
-        // prefer to place to the right of the icon, vertically centered
-        const verticalNudge = -4; // visual tweak to better center the bubble with the icon
-        // Use viewport coords (no page scroll offsets) because popup root is fixed
-        newX = iconRect.right + margin;
-        newY =
-          iconRect.top + iconRect.height / 2 - tr.height / 2 + verticalNudge;
-        // if placing to the right would overflow, place to the left of the icon
-        if (newX + tr.width > vw - margin) {
-          newX = iconRect.left - margin - tr.width;
-        }
-      }
-      // clamp into viewport as a final fallback
-      if (newX + tr.width > vw - margin) {
-        newX = Math.max(margin, vw - tr.width - margin);
-      }
-      if (newX < margin) newX = margin;
-      if (newY + tr.height > vh - margin) {
-        newY = Math.max(margin, vh - tr.height - margin);
-      }
-      if (newY < margin) newY = margin;
-      if (newX !== pos.x || newY !== pos.y) {
-        setPos({ x: newX, y: newY });
-      }
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [positioned, pos.x, pos.y]);
 
   const popupRoot =
     typeof document !== "undefined"

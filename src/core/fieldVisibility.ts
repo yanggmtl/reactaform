@@ -32,18 +32,21 @@ const showChildrenRecursively = (
   visibility: Record<string, boolean>
 ): void => {
   const parentField = fieldMap[parentName];
-  if (!parentField?.children) return;
+  if (!parentField || !parentField.children) return;
 
   // Handle boolean false correctly - don't use || which treats false as falsy
   const parentValue = values[parentName];
   const selectedValue = parentValue !== undefined && parentValue !== null 
     ? String(parentValue) 
     : '';
-  const childrenToShow = parentField.children[selectedValue] || [];
+  const childrenToShow = parentField.children[selectedValue];
+  if (!childrenToShow || !Array.isArray(childrenToShow)) return;
   
   childrenToShow.forEach((childName: string) => {
-    visibility[childName] = true;
-    showChildrenRecursively(childName, fieldMap, values, visibility);
+    if (typeof childName === 'string') {
+      visibility[childName] = true;
+      showChildrenRecursively(childName, fieldMap, values, visibility);
+    }
   });
 };
 
@@ -56,14 +59,17 @@ const hideChildrenRecursively = (
   visibility: Record<string, boolean>
 ): void => {
   const parentField = fieldMap[parentName];
-  if (!parentField?.children) return;
+  if (!parentField || !parentField.children) return;
 
   // Hide all possible children regardless of current value
   Object.values(parentField.children)
+    .filter(Array.isArray)
     .flat()
     .forEach((childName) => {
-      visibility[childName] = false;
-      hideChildrenRecursively(childName, fieldMap, visibility);
+      if (typeof childName === 'string' && childName in visibility) {
+        visibility[childName] = false;
+        hideChildrenRecursively(childName, fieldMap, visibility);
+      }
     });
 };
 
@@ -107,14 +113,18 @@ export const updateVisibilityBasedOnSelection = (
   // Show new children based on the selected value
   if (value !== undefined && value !== null) {
     const field = fieldMap[fieldName];
-    if (field?.children) {
+    if (field && field.children) {
       const valueKey = String(value);
-      const childrenToShow = field.children[valueKey] || [];
+      const childrenToShow = field.children[valueKey];
       
-      childrenToShow.forEach((childName) => {
-        newVisibility[childName] = true;
-        showChildrenRecursively(childName, fieldMap, valuesMap, newVisibility);
-      });
+      if (childrenToShow && Array.isArray(childrenToShow)) {
+        childrenToShow.forEach((childName) => {
+          if (typeof childName === 'string') {
+            newVisibility[childName] = true;
+            showChildrenRecursively(childName, fieldMap, valuesMap, newVisibility);
+          }
+        });
+      }
     }
   }
 

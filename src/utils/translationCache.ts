@@ -237,17 +237,6 @@ export const loadUserTranslation = async (
       ])
     );
 
-    // Validate that response is an object
-    if (!userTranslations || typeof userTranslations !== "object") {
-      const error = "Invalid translation file format";
-      userFailedSet.add(cacheKey);
-      return {
-        success: false,
-        translations: {},
-        error,
-      };
-    }
-
     // Cache successful result
     userTranslationCache.set(cacheKey, userTranslations);
     cacheMetadata.set(cacheKey, {
@@ -308,7 +297,7 @@ export function isDebugMode(): boolean {
  * Interpolation text
  */
 function interpolateText(text: string, args: unknown[]): string {
-  if (args.length === 0) {
+  if (args.length === 0 || !text.includes('{{')) {
     return text;
   }
   
@@ -359,10 +348,10 @@ export const createTranslationFunction = (
       translated = true;
     } else {
       // Priority: user-defined > common translations
-      if (Object.prototype.hasOwnProperty.call(userMap, defaultText)) {
+      if (defaultText in userMap) {
         translateText = userMap[defaultText];
         translated = true;
-      } else if (Object.prototype.hasOwnProperty.call(commonMap, defaultText)) {
+      } else if (defaultText in commonMap) {
         translateText = commonMap[defaultText];
         translated = true;
       } else {

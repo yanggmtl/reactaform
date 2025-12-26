@@ -41,34 +41,43 @@ export async function submitForm(
       
       const schemaType = prop.type;
       try {
-        if ((schemaType === "int" || schemaType === "number" || schemaType === "float")) {
-          const numValue = Number(String(raw).trim());
-          if (isNaN(numValue)) {
-            transformationErrors.push(t(`Invalid number format for field ${prop.displayName || propName}`));
+        if (schemaType === "int" || schemaType === "number" || schemaType === "float") {
+          const strValue = String(raw).trim();
+          if (strValue === "") {
+            finalMap[propName] = 0;
           } else {
-            finalMap[propName] = numValue;
+            const numValue = Number(strValue);
+            if (isNaN(numValue)) {
+              transformationErrors.push(t(`Invalid number format for field {{1}}`, prop.displayName || propName));
+            } else {
+              finalMap[propName] = numValue;
+            }
           }
-        } else if ((schemaType === "int-array" || schemaType === "float-array")) {
+        } else if (schemaType === "int-array" || schemaType === "float-array") {
           const arr = String(raw)
             .split(",")
             .map((v) => v.trim())
             .filter(Boolean);
           
-          const numArr = arr.map(v => {
+          const numArr: number[] = [];
+          let hasError = false;
+          
+          for (const v of arr) {
             const num = Number(v);
             if (isNaN(num)) {
-              transformationErrors.push(t(`Invalid number "${v}" in array for field ${prop.displayName || propName}`));
-              return 0;
+              transformationErrors.push(t(`Invalid number {{1}} in array for field {{2}}`, v, prop.displayName || propName));
+              hasError = true;
+              break;
             }
-            return num;
-          });
+            numArr.push(num);
+          }
           
-          if (transformationErrors.length === 0) {
+          if (!hasError) {
             finalMap[propName] = numArr;
           }
         }
       } catch (error) {
-        transformationErrors.push(t(`Error processing field ${prop.displayName || propName}: ${error}`));
+        transformationErrors.push(t(`Error processing field {{1}}: {{2}}`, prop.displayName || propName, error instanceof Error ? error.message : String(error)));
       }
     }
   }
@@ -84,18 +93,16 @@ export async function submitForm(
   // Perform form-level validation
   const validationErrors = await validateFormValues(definition, finalMap, t);
   if (validationErrors && validationErrors.length > 0) {
-    // Combine validation messages into a single string starting with a header
-    const msg = "Validation Fail";
     return {
       success: false,
-      message: msg,
+      message: t("Validation failed"),
       errors: validationErrors,
     };
   }
 
   // Execute custom submission handler if defined
-  if (definition && typeof (definition as ReactaDefinition).submitHandlerName === 'string') {
-    const submitHandler = getFormSubmissionHandler((definition as ReactaDefinition).submitHandlerName as string);
+  if (definition && typeof definition.submitHandlerName === 'string') {
+    const submitHandler = getFormSubmissionHandler(definition.submitHandlerName);
 
     if (submitHandler) {
       try {
@@ -103,15 +110,15 @@ export async function submitForm(
         if (submitResult && submitResult.length > 0) {
           return { 
             success: false, 
-            message: t("Submission failed."),
-            errors: Array.isArray(submitResult) ? submitResult : [submitResult]
+            message: t("Submission failed"),
+            errors: Array.isArray(submitResult) ? submitResult : [String(submitResult)]
           };
         }
       } catch (error) {
         return {
           success: false,
-          message: t("Submission handler error occurred."),
-          errors: [String(error)]
+          message: t("Submission handler error occurred"),
+          errors: [String(error instanceof Error ? error.message : error)]
         };
       }
     }

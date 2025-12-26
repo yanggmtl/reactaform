@@ -13,7 +13,11 @@ type ColorOption = {
   value: string; // Color hex value
 };
 
-export type ColorInputProps = BaseInputProps<string, DefinitionPropertyField>;
+type ColorField = DefinitionPropertyField & {
+  defaultValue?: string; // Should be a valid hex color
+};
+
+export type ColorInputProps = BaseInputProps<string, ColorField>;
 
 const predefinedColors: ColorOption[] = [
   { label: "Black", value: "#000000" },

@@ -554,7 +554,7 @@ export function deserializeDefinition(
     // Validate required fields
     const requiredFields = ['name', 'version', 'displayName'];
     for (const field of requiredFields) {
-      if (!obj[field]) {
+      if (!(field in obj) || !obj[field]) {
         if (strict) {
           validationErrors.push(`Required field '${field}' is missing`);
         } else {
@@ -677,12 +677,25 @@ function deserializeDateValue(value: unknown, _format: 'auto' | 'iso' | 'timesta
  * Deserialize integer values
  */
 function deserializeIntegerValue(value: unknown, validate: boolean): unknown {
-  if (typeof value === 'number' && Number.isInteger(value)) {
-    return value;
+  if (typeof value === 'number') {
+    if (Number.isInteger(value)) {
+      return value;
+    }
+    if (validate) {
+      throw new Error(`Number ${value} is not an integer`);
+    }
+    return Math.floor(value);
   }
   
-  if (typeof value === 'string' && value.trim() !== '') {
-    const parsed = parseInt(value, 10);
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '') {
+      if (validate) {
+        throw new Error('Cannot convert empty string to integer');
+      }
+      return value;
+    }
+    const parsed = parseInt(trimmed, 10);
     if (validate && isNaN(parsed)) {
       throw new Error(`Cannot convert "${value}" to integer`);
     }
@@ -701,12 +714,22 @@ function deserializeIntegerValue(value: unknown, validate: boolean): unknown {
  */
 function deserializeNumberValue(value: unknown, validate: boolean): unknown {
   if (typeof value === 'number') {
+    if (validate && !isFinite(value)) {
+      throw new Error(`Number ${value} is not finite`);
+    }
     return value;
   }
   
-  if (typeof value === 'string' && value.trim() !== '') {
-    const parsed = parseFloat(value);
-    if (validate && isNaN(parsed)) {
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '') {
+      if (validate) {
+        throw new Error('Cannot convert empty string to number');
+      }
+      return value;
+    }
+    const parsed = parseFloat(trimmed);
+    if (validate && (isNaN(parsed) || !isFinite(parsed))) {
       throw new Error(`Cannot convert "${value}" to number`);
     }
     return parsed;

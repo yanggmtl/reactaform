@@ -32,9 +32,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
       if (field.pattern && !new RegExp(field.pattern).test(trimmedInput)) {
         if (field.patternErrorMessage) 
           return t(field.patternErrorMessage);
-        return t(`Email does not match pattern: {{%1}}`, {
-          "%1": `${field.pattern}`,
-        });
+        return t("Email does not match pattern: {{1}}", field.pattern);
       }
 
       const err = validateFieldValue(definitionName, field, input, t);

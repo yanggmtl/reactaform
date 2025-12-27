@@ -357,7 +357,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
       role="listbox"
       aria-activedescendant={activeIndex >= 0 ? `multi-opt-${activeIndex}` : undefined}
       style={{
-        position: "absolute",
+        position: "fixed",
         top: livePos ? livePos.top : position.y,
         left: livePos ? livePos.left : position.x,
         width: popupWidth ?? baseWidth,

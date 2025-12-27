@@ -57,3 +57,9 @@ Refactor: enhance code quality, performance, and type safety
 - Type safety: enhance null checks, add strict TypeScript constraints
 - Optimization: improve cache operations, translation interpolation
 - Robustness: better number deserialization with Infinity/NaN validation
+
+## 1.4.3 - 2025-12-26
+- Add ReactaForm Builder support in README.md
+
+## 1.4.4 - 2025-12-27
+- Fix popup position issues of MultiSelection and UnitValueInput

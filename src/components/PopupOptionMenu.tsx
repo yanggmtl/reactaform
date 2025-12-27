@@ -25,6 +25,11 @@ export function PopupOptionMenu<T extends PopupOption>({
 }: PopupOptionMenuProps<T>) {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const isSelectingRef = React.useRef<boolean>(false);
+  const [adjustedPosition, setAdjustedPosition] = React.useState<{ top: number; left: number; ready: boolean }>({ 
+    top: pos?.y ?? 0, 
+    left: pos?.x ?? 0, 
+    ready: false 
+  });
   
   // Prefer an explicit `#popup-root` if present; otherwise render into document.body
   const popupRoot =
@@ -58,20 +63,40 @@ export function PopupOptionMenu<T extends PopupOption>({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
+  // Calculate adjusted position based on menu dimensions and viewport
+  // Use useLayoutEffect to avoid visual flash
+  React.useLayoutEffect(() => {
+    if (!menuRef.current || !pos || pos.x == null || pos.y == null) {
+      return;
+    }
+
+    const menuRect = menuRef.current.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    let left = pos.x;
+    let top = pos.y;
+
+    // Check if menu would overflow right edge
+    if (left + menuRect.width > vw) {
+      // Try to align to the right edge of viewport with some padding
+      left = Math.max(0, vw - menuRect.width - 10);
+    }
+
+    // Check if menu would overflow bottom edge
+    if (top + menuRect.height > vh) {
+      // Flip to show above the trigger element
+      // Assume the trigger has some height, subtract menu height and a small gap
+      top = Math.max(0, pos.y - menuRect.height - 5);
+    }
+
+    setAdjustedPosition({ top, left, ready: true });
+  }, [pos, options]);
+
   if (!popupRoot) return null;
   if (options === undefined || options.length === 0) return null;
   // allow 0 coordinates; only bail when pos or coordinates are null/undefined
   if (!pos || pos.x == null || pos.y == null) return null;
-
-  // Treat pos as viewport (client) coordinates from getBoundingClientRect
-  const clientX = pos.x;
-  const clientY = pos.y;
-
-  // clamp position so the popup doesn't render off-screen
-  const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
-  const maxLeft = Math.max(0, vw - 160);
-  const safeLeft = Math.max(0, Math.min(clientX, maxLeft));
-  const safeTop = Math.max(0, clientY);
 
   return ReactDOM.createPortal(
     <div
@@ -81,14 +106,17 @@ export function PopupOptionMenu<T extends PopupOption>({
       }}
       style={{
         position: "fixed",
-        top: safeTop,
-        left: safeLeft,
+        top: adjustedPosition.top,
+        left: adjustedPosition.left,
+        visibility: adjustedPosition.ready ? "visible" : "hidden",
         backgroundColor: "var(--reactaform-primary-bg, #fff)",
         border: "1px solid var(--reactaform-border-color, #ccc)",
         borderRadius: "var(--reactaform-border-radius, 4px)",
         boxShadow: "var(--reactaform-shadow, 0 2px 10px rgba(0,0,0,0.2))",
         zIndex: 9999,
         minWidth: "var(--reactaform-menu-min-width, 150px)",
+        maxHeight: "var(--reactaform-menu-max-height, 300px)",
+        overflowY: "auto",
         pointerEvents: "auto",
       }}
     >

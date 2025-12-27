@@ -1,6 +1,6 @@
 {
   "name": "reactaform",
-  "version": "1.4.2",
+  "version": "1.4.4",
   "description": "A powerful, type-safe React form builder library with dynamic field rendering, conditional visibility, multi-language support, and extensible validation",
   "keywords": [
     "react",

@@ -33,7 +33,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
   instance,
   language,
   className,
-  darkMode,
+  theme,
   style, 
 }) => {
     const definition = React.useMemo<ReactaDefinition | null>(() => {
@@ -45,8 +45,8 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
     }, [definitionData]);
     const inputStyle = { fontSize: "inherit", fontFamily: "inherit", ...style };
     
-    const theme = useNearestReactaformTheme();
-    const inputDarkMode = darkMode ?? (theme === 'dark');
+    const detectedTheme = useNearestReactaformTheme();
+    const inputTheme = theme ?? detectedTheme ?? 'light';
 
     const inputLanguage = language ?? 'en';
 
@@ -80,7 +80,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
         definitionName={definition.name}
         defaultStyle={inputStyle}
         defaultLanguage={inputLanguage}
-        defaultDarkMode={inputDarkMode}
+        defaultTheme={inputTheme}
         defaultLocalizeName={definition.localization || ""}
         className={className}
       >

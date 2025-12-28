@@ -1,3 +1,3 @@
-import './main';
+import './main.tsx';
 
-// `src/main.jsx` mounts the app. This file preserves CRA's default entry `src/index.js`.
+// `src/main.tsx` mounts the app. This file preserves CRA's default entry `src/index.js`.

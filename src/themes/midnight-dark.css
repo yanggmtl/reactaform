@@ -1,0 +1,24 @@
+[data-reactaform-theme="midnight-dark"] {
+  --reactaform-primary-bg: #0b1120;
+  --reactaform-secondary-bg: #111c2d;
+  --reactaform-input-bg: #14223a;
+
+  --reactaform-text-color: #e5f0ff;
+  --reactaform-text-muted: #9db2d4;
+
+  --reactaform-border-color: #1f2b44;
+  --reactaform-border-hover: #2c3d5e;
+  --reactaform-border-focus: #60a5fa;
+
+  --reactaform-error-color: #fb7185;
+  --reactaform-success-color: #4ade80;
+
+  --reactaform-hover-bg: rgba(255,255,255,0.06);
+  --reactaform-border-radius: 6px;
+
+  --reactaform-shadow: 0 12px 28px rgba(0,0,0,0.55);
+
+  /* Tooltip */
+  --reactaform-tooltip-color-bg: rgba(40, 40, 40, 0.95);
+  --reactaform-tooltip-color: #F5F5F5;
+}

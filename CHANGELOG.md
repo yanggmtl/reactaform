@@ -63,3 +63,8 @@ Refactor: enhance code quality, performance, and type safety
 
 ## 1.4.4 - 2025-12-27
 - Fix popup position issues of MultiSelection and UnitValueInput
+
+## 1.5.0 - 2025-12-27
+- Enhance themes support
+  Replace darkMode in props of ReactaForm to theme
+  Add 20 themes

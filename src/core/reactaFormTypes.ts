@@ -110,7 +110,7 @@ export interface ReactaFormProps {
   language?: string;
   instance?: ReactaInstance;
   className?: string;
-  darkMode?: boolean;
+  theme?: string;
   style?: React.CSSProperties;
 }
 
@@ -159,7 +159,7 @@ export interface BaseInputProps<
 export type ReactaFormContextType = {
   definitionName: string;
   language: string;
-  darkMode: boolean;
+  theme: string;
   formStyle: { container?: React.CSSProperties; titleStyle?: React.CSSProperties };
   fieldStyle: Record<string, unknown>;
   t: TranslationFunction;
@@ -171,7 +171,7 @@ export type ReactaFormProviderProps = {
   definitionName?: string;
   defaultStyle?: Record<string, unknown>;
   defaultLanguage?: string;
-  defaultDarkMode?: boolean;
+  defaultTheme?: string;
   defaultLocalizeName?: string;
   className?: string;
 };

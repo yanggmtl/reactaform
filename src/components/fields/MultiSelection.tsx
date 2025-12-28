@@ -6,6 +6,7 @@ import type { BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
+import { isDarkTheme } from "../../utils/themeUtils";
 
 export type OptionsField = DefinitionPropertyField & { options: NonNullable<DefinitionPropertyField['options']> }
 
@@ -28,7 +29,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
-  const { t, darkMode, formStyle, fieldStyle, definitionName } = useReactaFormContext();
+  const { t, theme, formStyle, fieldStyle, definitionName } = useReactaFormContext();
   const styleFrom = (
     source: unknown,
     section?: string,
@@ -180,7 +181,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
           onToggleOption={toggleOption}
           onClose={() => setMenuOpen(false)}
           controlRef={controlRef}
-          darkMode={darkMode}
+          theme={theme}
         />
       )}
     </div>
@@ -197,7 +198,7 @@ interface PopupProps {
   onToggleOption: (v: string) => void;
   onClose: () => void;
   controlRef: React.RefObject<HTMLDivElement | null>;
-  darkMode?: boolean;
+  theme?: string;
 }
 
 const MultiSelectionPopup: React.FC<PopupProps> = ({
@@ -207,11 +208,13 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   onToggleOption,
   onClose,
   controlRef,
-  darkMode,
+  theme,
 }) => {
   const popupRef = React.useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
   const { formStyle, fieldStyle } = useReactaFormContext();
+
+  const isThemeDark = isDarkTheme(theme ?? 'light');
 
   const styleFrom = (
     source: unknown,
@@ -364,11 +367,11 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
         // spread the static popup styles
         ...mergedPopupStyles,
       }}
-      data-reactaform-theme={darkMode ? "dark" : "light"}
+      data-reactaform-theme={theme ?? 'light'}
     >
           {options.map((opt, idx) => {
         const selected = selectedValues.includes(opt.value);
-        const hoverBg = darkMode
+        const hoverBg = isThemeDark
           ? "var(--reactaform-hover-bg, rgba(255,255,255,0.01))"
           : "var(--reactaform-hover-bg, #eee)";
         const optionStyle: React.CSSProperties = {
@@ -438,7 +441,7 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
                 width: "1.125em",
                 height: "1.125em",
                 verticalAlign: "middle",
-                accentColor: darkMode ? "#10b981" : "#22c55e",
+                accentColor: isThemeDark ? "#10b981" : "#22c55e",
                 cursor: "pointer",
               }}
             />

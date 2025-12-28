@@ -1,6 +1,6 @@
 {
   "name": "reactaform",
-  "version": "1.4.4",
+  "version": "1.5.0",
   "description": "A powerful, type-safe React form builder library with dynamic field rendering, conditional visibility, multi-language support, and extensible validation",
   "keywords": [
     "react",
@@ -34,7 +34,28 @@
       "import": "./dist/reactaform.es.js",
       "require": "./dist/reactaform.cjs.js"
     },
-    "./style.css": "./dist/reactaform.css"
+    "./style.css": "./dist/reactaform.css",
+    "./themes/*.css": "./dist/themes/*.css",
+    "./themes/ant-design.css": "./dist/themes/ant-design.css",
+    "./themes/ant-design-dark.css": "./dist/themes/ant-design-dark.css",
+    "./themes/blueprint.css": "./dist/themes/blueprint.css",
+    "./themes/blueprint-dark.css": "./dist/themes/blueprint-dark.css",
+    "./themes/compact-variant.css": "./dist/themes/compact-variant.css",
+    "./themes/fluent.css": "./dist/themes/fluent.css",
+    "./themes/glass-morphism.css": "./dist/themes/glass-morphism.css",
+    "./themes/high-contrast-accessible.css": "./dist/themes/high-contrast-accessible.css",
+    "./themes/ios-mobile.css": "./dist/themes/ios-mobile.css",
+    "./themes/macos-native.css": "./dist/themes/macos-native.css",
+    "./themes/material.css": "./dist/themes/material.css",
+    "./themes/material-dark.css": "./dist/themes/material-dark.css",
+    "./themes/midnight-dark.css": "./dist/themes/midnight-dark.css",
+    "./themes/modern-light.css": "./dist/themes/modern-light.css",
+    "./themes/neon-cyber-dark.css": "./dist/themes/neon-cyber-dark.css",
+    "./themes/shadcn.css": "./dist/themes/shadcn.css",
+    "./themes/soft-pastel.css": "./dist/themes/soft-pastel.css",
+    "./themes/spacious-variant.css": "./dist/themes/spacious-variant.css",
+    "./themes/tailwind.css": "./dist/themes/tailwind.css",
+    "./themes/tailwind-dark.css": "./dist/themes/tailwind-dark.css"
   },
   "files": [
     "dist/*.js",
@@ -44,6 +65,7 @@
     "dist/*.css",
     "dist/*.map",
     "dist/*.d.ts",
+    "dist/themes/*.css",
     "README.md",
     "LICENSE"
   ],
@@ -53,7 +75,7 @@
   },
   "scripts": {
     "build:types": "tsc -p tsconfig.build.json --noEmit false",
-    "build:lib": "vite build --config vite.lib.config.ts && npm run build:types",
+    "build:lib": "vite build --config vite.lib.config.ts && npm run build:types && node scripts/copy-themes.js",
     "build:pack": "npm run build:lib && npm pack",
     "test": "vitest run --config ./vitest.config.ts",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",

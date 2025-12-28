@@ -1,0 +1,50 @@
+[data-reactaform-theme="tailwind"] {
+  /* Backgrounds */
+  --reactaform-primary-bg: #f9fafb; /* slate-50 */
+  --reactaform-secondary-bg: #ffffff; /* white */
+  --reactaform-input-bg: #ffffff;
+
+  /* Text */
+  --reactaform-text-color: #111827; /* gray-900 */
+  --reactaform-text-muted: #6b7280; /* gray-500 */
+  --reactaform-field-text-color: #1f2937; /* gray-800 */
+
+  /* Borders */
+  --reactaform-border-color: #d1d5db; /* gray-300 */
+  --reactaform-border-hover: #9ca3af; /* gray-400 */
+  --reactaform-border-focus: #6366f1; /* indigo-500 */
+
+  /* Status colors */
+  --reactaform-error-color: #f43f5e; /* rose-500 */
+  --reactaform-success-color: #10b981; /* emerald-500 */
+
+  /* Hover */
+  --reactaform-hover-bg: #f3f4f6; /* gray-100 */
+
+  /* Radii */
+  --reactaform-border-radius: 0.5rem; /* rounded-lg */
+
+  /* Shadows (Tailwind style) */
+  --reactaform-shadow:
+      0 1px 2px rgba(0,0,0,.05),
+      0 1px 3px rgba(0,0,0,.1);
+
+  /* Typography */
+  --reactaform-font-size: 14px;
+  --reactaform-font-weight: 500;
+
+  /* Spacing (Tailwind scale) */
+  --reactaform-space: 0.5rem;     /* 2 = 8px */
+  --reactaform-space-lg: 0.75rem; /* 3 = 12px */
+
+  /* Buttons */
+  --reactaform-button-bg: #4f46e5; /* indigo-600 */
+  --reactaform-button-text: #ffffff;
+  --reactaform-button-border-radius: 0.5rem;
+  --reactaform-button-shadow:
+      0 2px 4px rgba(79,70,229,.3);
+
+  /* Tooltip */
+  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color: #ffffff;
+}

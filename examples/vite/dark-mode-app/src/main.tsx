@@ -55,7 +55,7 @@ export default function App() {
         definitionData={{
           ...darkModeDefinition,
         }}
-        darkMode={darkMode}
+        theme={darkMode ? "dark" : "light"}
       />
     </div>
   );

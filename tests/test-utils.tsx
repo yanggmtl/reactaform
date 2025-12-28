@@ -5,7 +5,7 @@ import type { RenderOptions } from '@testing-library/react';
 import { ReactaFormProvider } from '../src/components/ReactaFormProvider';
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  darkMode?: boolean;
+  theme?: string;
   language?: string;
 }
 
@@ -13,7 +13,7 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
 export function renderWithProvider(
   ui: React.ReactElement,
   {
-    darkMode = false,
+    theme = 'light',
     language = 'en',
     ...renderOptions
   }: CustomRenderOptions = {}
@@ -21,7 +21,7 @@ export function renderWithProvider(
   function Wrapper({ children }: { children: ReactNode }) {
     return (
       <ReactaFormProvider
-        defaultDarkMode={darkMode}
+        defaultTheme={theme}
         defaultLanguage={language}
         definitionName="test-form"
       >

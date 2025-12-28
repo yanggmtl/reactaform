@@ -1,0 +1,9 @@
+[data-reactaform-size="spacious"] {
+  --reactaform-input-padding: 14px 16px;
+  --reactaform-font-size: 15px;
+  --reactaform-space: 14px;
+  --reactaform-space-lg: 18px;
+  --reactaform-field-gap: 18px;
+  --reactaform-column-gap: 14px;
+  --reactaform-border-radius: 10px;
+}

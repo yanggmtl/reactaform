@@ -15,10 +15,8 @@ registerBaseComponents();
 
 // Local copies of style generators previously in utils/styleConfig.ts
 const getFormStyle = (
-  style: Record<string, unknown> | undefined,
-  _darkMode : boolean = false
+  style: Record<string, unknown> | undefined
 ): Record<string, Record<string, unknown>> => {
-  void _darkMode;
   return {
     container: {
       padding: "var(--reactaform-space-sm, 8px)",
@@ -71,10 +69,8 @@ const getFormStyle = (
 };
 
 const getFieldStyle = (
-  style: Record<string, unknown> | undefined,
-  _darkMode : boolean = false
+  style: Record<string, unknown> | undefined
 ): Record<string, Record<string, unknown>> => {
-  void _darkMode;
   const baseInputStyle = {
     color: "var(--reactaform-color-text)",
     fontFamily: (style as Record<string, unknown>)?.fontFamily as string || "var(--reactaform-font-family, inherit)",
@@ -140,13 +136,13 @@ export const ReactaFormProvider = ({
   definitionName = '',
   defaultStyle,
   defaultLanguage = 'en',
-  defaultDarkMode = false,
+  defaultTheme = 'light',
   defaultLocalizeName = '',
   className = 'reactaform-container',
 }: ReactaFormProviderProps) => {
   const providerDefinitionName = definitionName;
   const localizeName = defaultLocalizeName;
-  const darkMode = defaultDarkMode;
+  const theme = defaultTheme;
   const language = defaultLanguage;
 
   // Make a stable defaultStyle object so effects that depend on it don't
@@ -202,9 +198,9 @@ export const ReactaFormProvider = ({
 
   // Initialize form and field style
   React.useEffect(() => {
-    setFormStyle(getFormStyle(stableDefaultStyle, darkMode));
-    setFieldStyle(getFieldStyle(stableDefaultStyle, darkMode));
-  }, [stableDefaultStyle, darkMode]);
+    setFormStyle(getFormStyle(stableDefaultStyle));
+    setFieldStyle(getFieldStyle(stableDefaultStyle));
+  }, [stableDefaultStyle]);
 
   // Memoize the underlying translation function so `t` is stable and cheap to call
   const translationFn = React.useMemo(
@@ -221,12 +217,12 @@ export const ReactaFormProvider = ({
     () => ({
       definitionName: providerDefinitionName,
       language,
-      darkMode,
+      theme,
       formStyle,
       fieldStyle,
       t,
     }),
-    [providerDefinitionName, language, darkMode, fieldStyle, formStyle, t]
+    [providerDefinitionName, language, theme, fieldStyle, formStyle, t]
   );
 
   // Only apply height: 100% if the user provided a height in their style prop
@@ -235,7 +231,7 @@ export const ReactaFormProvider = ({
   return (
     <ReactaFormContext.Provider value={contextValue}>
       <div
-        data-reactaform-theme={darkMode ? 'dark' : 'light'}
+        data-reactaform-theme={theme}
         className= {className}
         style={wrapperStyle}
       >

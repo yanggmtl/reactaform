@@ -1,8 +1,8 @@
-"use client";
-
+// Custom Styles App (CRA): converted from Vite TSX to JSX
 // Custom Styles App: demonstrates applying a custom class that overrides
 // ReactaForm CSS variables to change background and text color.
 // Check out style.css for the custom styles applied.
+import { createRoot } from "react-dom/client";
 import { ReactaForm } from "reactaform";
 import "./style.css";
 
@@ -132,3 +132,6 @@ export default function App() {
     </div>
   );
 }
+
+const container = document.getElementById('root');
+if (container) createRoot(container).render(<App />);

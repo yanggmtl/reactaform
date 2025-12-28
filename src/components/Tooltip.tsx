@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import useReactaFormContext from "../hooks/useReactaFormContext";
+import { isDarkTheme } from "../utils/themeUtils";
 
 type TooltipProps = {
   content: string;
@@ -9,7 +10,7 @@ type TooltipProps = {
 };
 
 const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation = true }) => {
-  const { t, darkMode, formStyle, fieldStyle } = useReactaFormContext();
+  const { t, theme, formStyle, fieldStyle } = useReactaFormContext();
   const [hover, setHover] = React.useState(false);
   const [pos, setPos] = React.useState({ x: 0, y: 0 });
   const [positioned, setPositioned] = React.useState(false);
@@ -17,6 +18,8 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
   const tooltipRef = React.useRef<HTMLDivElement | null>(null);
   const iconRectRef = React.useRef<DOMRect | null>(null);
   const tooltipId = React.useId();
+
+  const isThemeDark = isDarkTheme(theme);
 
   const tooltipStyles = React.useMemo(() => {
     const sizeConfig: Record<string, React.CSSProperties> = {
@@ -35,9 +38,9 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
         fontSize: "0.9em",
         fontWeight: "bold",
         borderRadius: "50%",
-        backgroundColor: darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)",
-        color: darkMode ? "#f0f0f0" : "#333",
-        border: `1px solid ${darkMode ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"}`,
+        backgroundColor: isThemeDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)",
+        color: isThemeDark ? "#f0f0f0" : "#333",
+        border: `1px solid ${isThemeDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"}`,
         cursor: "pointer",
         transition: animation ? "all 0.2s ease" : undefined,
         marginLeft: "0.3em",
@@ -45,11 +48,11 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
       text: {
         ...sizeConfig[size],
         position: "fixed" as const, // important
-        backgroundColor: `var(--reactaform-tooltip-color-bg, ${darkMode ? "rgba(45,45,45,0.95)" : "rgba(60,60,60,0.92)"})`,
-        color: `var(--reactaform-tooltip-color, ${darkMode ? "#f0f0f0" : "#fff"})`,
+        backgroundColor: `var(--reactaform-tooltip-color-bg, ${isThemeDark ? "rgba(45,45,45,0.95)" : "rgba(34, 10, 170, 0.92)"})`,
+        color: `var(--reactaform-tooltip-color, ${isThemeDark ? "#f0f0f0" : "#fff"})`,
         borderRadius: "6px",
-        border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-        boxShadow: darkMode
+        border: `1px solid ${isThemeDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+        boxShadow: isThemeDark
           ? "0 8px 16px rgba(0,0,0,0.4)"
           : "0 6px 18px rgba(0,0,0,0.12)",
         zIndex: 2147483647,
@@ -82,7 +85,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
     };
 
     return merged;
-  }, [darkMode, size, animation, formStyle, fieldStyle]);
+  }, [isThemeDark, size, animation, formStyle, fieldStyle]);
 
   React.useLayoutEffect(() => {
     if (!hover || !ref.current || !tooltipRef.current) {
@@ -113,6 +116,22 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
 
     setPos({ x, y });
     setPositioned(true);
+
+    // Update tooltip background and foreground color variables based on form styles
+    const form = ref.current.closest('[data-reactaform-theme]');
+    const popupRoot = document.getElementById('popup-root');
+
+    if (form && popupRoot) {
+      const styles = getComputedStyle(form);
+      popupRoot.style.setProperty(
+        '--reactaform-tooltip-color-bg',
+        styles.getPropertyValue('--reactaform-tooltip-color-bg')
+      );
+      popupRoot.style.setProperty(
+        '--reactaform-tooltip-color',
+        styles.getPropertyValue('--reactaform-tooltip-color')
+      );
+    }
   }, [hover]);
 
   const popupRoot =
@@ -140,11 +159,11 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
         top: pos.y,
         left: pos.x,
       }}
-      data-reactaform-theme={darkMode ? "dark" : "light"}
     >
       {t(content)}
     </div>
   );
+  
   return (
     <>
       <span

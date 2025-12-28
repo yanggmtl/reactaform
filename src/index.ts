@@ -115,6 +115,9 @@ export {
 // Unit Mapping (existing utilities)
 export * as Units from './utils/unitValueMapper';
 
+// Theme Utilities
+export { isDarkTheme } from './utils/themeUtils';
+
 // Serialization Utilities
 export {
   serializeInstance,

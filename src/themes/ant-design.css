@@ -1,0 +1,42 @@
+[data-reactaform-theme="antd"] {
+  /* Surfaces */
+  --reactaform-primary-bg: #ffffff;
+  --reactaform-secondary-bg: #ffffff;
+  --reactaform-input-bg: #ffffff;
+
+  /* Text */
+  --reactaform-text-color: #1f1f1f;
+  --reactaform-text-muted: #8c8c8c;
+
+  /* Borders */
+  --reactaform-border-color: #d9d9d9;
+  --reactaform-border-hover: #bfbfbf;
+  --reactaform-border-focus: #1677ff; /* Ant Primary */
+
+  /* States */
+  --reactaform-error-color: #ff4d4f;
+  --reactaform-success-color: #52c41a;
+
+  /* Interaction */
+  --reactaform-hover-bg: #fafafa;
+
+  /* Shape — AntD slightly rounded */
+  --reactaform-border-radius: 6px;
+
+  /* Elevation */
+  --reactaform-shadow:
+    0 2px 8px rgba(0,0,0,.08);
+
+  /* Buttons */
+  --reactaform-button-bg: #1677ff;
+  --reactaform-button-text: #ffffff;
+  --reactaform-button-border-radius: 6px;
+
+  /* Comfortable spacing */
+  --reactaform-input-padding: 10px 12px;
+  --reactaform-font-size: 14px;
+
+  /* Tooltip */
+  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color: #ffffff;
+}

@@ -1,5 +1,6 @@
 import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { isDarkTheme } from "../../utils/themeUtils";
 
 interface SeparatorProps {
   color?: string;
@@ -54,9 +55,10 @@ interface FieldSeparatorProps {
 }
 
 const FieldSeparator: React.FC<FieldSeparatorProps> = ({ field }) => {
-  const { darkMode } = useReactaFormContext();
+  const { theme } = useReactaFormContext();
+  
   const {
-    color = darkMode ? "#444444" : "#CCCCCC",
+    color = isDarkTheme(theme) ? "#444444" : "#CCCCCC",
     thickness = 1,
     margin = "8px 0",
   } = field;

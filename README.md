@@ -193,28 +193,88 @@ interface ReactaDefinition {
 
 ## 🎨 Theming
 
+ReactaForm includes **20 pre-built themes** that you can import individually for optimal bundle size.
+
+### Quick Start
+
+```tsx
+// Import a theme
+import 'reactaform/themes/material.css';
+import { ReactaForm } from 'reactaform';
+
+function App() {
+  return <ReactaForm theme="material" definitionData={...} />;
+}
+```
+
+### Available Themes
+
+**Light Themes:**
+- `material`, `ant-design`, `blueprint`, `fluent`, `shadcn`, `tailwind`
+- `modern-light`, `macos-native`, `ios-mobile`, `soft-pastel`
+- `glass-morphism`, `high-contrast-accessible`
+
+**Dark Themes:**
+- `material-dark`, `ant-design-dark`, `blueprint-dark`, `tailwind-dark`
+- `midnight-dark`, `neon-cyber-dark`
+
+**Variants:**
+- `compact-variant`, `spacious-variant` (size adjustments)
+
+### Theme Switching
+
+```tsx
+import 'reactaform/themes/material.css';
+import 'reactaform/themes/material-dark.css';
+import { ReactaForm } from 'reactaform';
+import { useState } from 'react';
+
+function App() {
+  const [isDark, setIsDark] = useState(false);
+  
+  return (
+    <>
+      <button onClick={() => setIsDark(!isDark)}>Toggle Theme</button>
+      <ReactaForm 
+        theme={isDark ? 'material-dark' : 'material'}
+        definitionData={...}
+      />
+    </>
+  );
+}
+```
+
+### Custom Theme
+
 Customize with CSS variables:
 
 ```css
-:root {
-  --reactaform-color-primary: #2563eb;
-  --reactaform-color-error: #ef4444;
-  --reactaform-font-size: 1rem;
-  --reactaform-input-bg: #ffffff;
-}
-
-/* Dark */
-[data-reactaform-theme="dark"] {
-  --reactaform-bg-primary: #1a1a1a;
-  --reactaform-text-color: #ededed;
+[data-reactaform-theme="my-custom"] {
+  --reactaform-primary-bg: #ffffff;
+  --reactaform-secondary-bg: #f9f9f9;
+  --reactaform-text-color: #000000;
+  --reactaform-border-color: #cccccc;
+  --reactaform-border-radius: 8px;
+  /* ... see theme files for all variables */
 }
 ```
-
-**Enable Dark Mode:**
 
 ```tsx
-<ReactaForm darkMode={true} ... />
+<ReactaForm theme="my-custom" definitionData={...} />
 ```
+
+**Dark Theme Convention:** Include "dark" in your theme name (e.g., `my-custom-dark`) for automatic dark mode detection.
+
+### Detect Dark Themes
+
+```tsx
+import { isDarkTheme } from 'reactaform';
+
+isDarkTheme('material-dark'); // true
+isDarkTheme('material');      // false
+```
+
+📖 **Full theme documentation:** [docs/theme-integration.md](docs/theme-integration.md)
 
 ## 🌍 Internationalization (i18n)
 

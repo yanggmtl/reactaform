@@ -1,0 +1,32 @@
+[data-reactaform-theme="macos"] {
+  --reactaform-primary-bg: #f5f5f7;
+  --reactaform-secondary-bg: #ffffff;
+  --reactaform-input-bg: #ffffff;
+
+  --reactaform-text-color: #111111;
+  --reactaform-text-muted: #6e6e73;
+
+  --reactaform-border-color: #d2d2d7;
+  --reactaform-border-hover: #9e9ea2;
+  --reactaform-border-focus: #0a84ff;
+
+  --reactaform-success-color: #34c759;
+  --reactaform-error-color: #ff3b30;
+
+  --reactaform-hover-bg: rgba(0,0,0,0.03);
+
+  --reactaform-border-radius: 10px;
+
+  --reactaform-shadow:
+    0 8px 30px rgba(0,0,0,.08);
+
+  --reactaform-button-bg: #0a84ff;
+  --reactaform-button-text: white;
+  --reactaform-button-border-radius: 999px;
+
+  --reactaform-input-padding: 12px 14px;
+
+  /* Tooltip */
+  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color: #ffffff;
+}

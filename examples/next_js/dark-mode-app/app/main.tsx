@@ -28,7 +28,7 @@ export default function App() {
           Dark mode
         </label>
       </div>
-      <ReactaForm definitionData={{ ...darkModeDefinition }} darkMode={darkMode} />
+      <ReactaForm definitionData={{ ...darkModeDefinition }} theme={darkMode ? "dark" : "light"} />
     </div>
   );
 }

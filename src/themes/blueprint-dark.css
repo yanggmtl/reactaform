@@ -1,0 +1,31 @@
+[data-reactaform-theme="blueprint-dark"] {
+  --reactaform-primary-bg: #202b33;
+  --reactaform-secondary-bg: #293742;
+  --reactaform-input-bg: #30404d;
+
+  --reactaform-text-color: #f5f8fa;
+  --reactaform-text-muted: #c0cbd3;
+
+  --reactaform-border-color: #394b59;
+  --reactaform-border-hover: #738694;
+  --reactaform-border-focus: #2b95d6;
+
+  --reactaform-hover-bg: rgba(255,255,255,0.07);
+
+  --reactaform-error-color: #ff7373;
+  --reactaform-success-color: #3dcc91;
+
+  --reactaform-border-radius: 4px;
+
+  --reactaform-shadow:
+    0 4px 20px rgba(16,22,26,.45);
+
+  --reactaform-button-bg: #2b95d6;
+  --reactaform-button-text: white;
+
+  --reactaform-input-padding: 8px 10px;
+
+  /* Tooltip */
+  --reactaform-tooltip-color-bg: rgba(40, 40, 40, 0.95);
+  --reactaform-tooltip-color: #F5F5F5;
+}

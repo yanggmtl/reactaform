@@ -1,0 +1,40 @@
+[data-reactaform-theme="shadcn"] {
+  /* Surfaces */
+  --reactaform-primary-bg: #ffffff;
+  --reactaform-secondary-bg: #ffffff;
+  --reactaform-input-bg: #f5f6f8;
+
+  /* Text */
+  --reactaform-text-color: #242424;
+  --reactaform-text-muted: #616161;
+
+  /* Borders */
+  --reactaform-border-color: #d1d1d6;
+  --reactaform-border-hover: #bdbdbd;
+  --reactaform-border-focus: #0078d4;
+
+  /* Accent */
+  --reactaform-success-color: #107c10;
+  --reactaform-error-color: #d13438;
+
+  /* Interaction */
+  --reactaform-hover-bg: rgba(0,0,0,0.04);
+
+  /* Shape */
+  --reactaform-border-radius: 6px;
+
+  /* Shadow */
+  --reactaform-shadow:
+    0 4px 12px rgba(0,0,0,.08);
+
+  /* Buttons */
+  --reactaform-button-bg: #0078d4;
+  --reactaform-button-text: white;
+  --reactaform-button-border-radius: 6px;
+
+  --reactaform-input-padding: 10px 12px;
+
+  /* Tooltip */
+  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color: #ffffff;
+}

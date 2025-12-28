@@ -1,0 +1,27 @@
+[data-reactaform-theme="material-dark"] {
+  --reactaform-primary-bg: #121212;
+  --reactaform-secondary-bg: #1D1B20;
+  --reactaform-input-bg: #2B2830;
+
+  --reactaform-text-color: #EDE7F6;
+  --reactaform-text-muted: #BDB5D7;
+
+  --reactaform-border-color: #3A3346;
+  --reactaform-border-hover: #524364;
+  --reactaform-border-focus: #D0BCFF;
+
+  --reactaform-hover-bg: rgba(255,255,255,0.06);
+
+  --reactaform-error-color: #F2B8B5;
+  --reactaform-success-color: #81C995;
+
+  --reactaform-border-radius: 12px;
+  --reactaform-shadow: 0 8px 30px rgba(0,0,0,0.4);
+
+  --reactaform-button-bg: #D0BCFF;
+  --reactaform-button-text: #381E72;
+
+  /* Tooltip */
+  --reactaform-tooltip-color-bg: rgba(40, 40, 40, 0.95);
+  --reactaform-tooltip-color: #F5F5F5;
+}

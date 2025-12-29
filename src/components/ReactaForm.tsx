@@ -60,19 +60,27 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
       }
     }, []);
 
+    // Ensure we always have an instance to pass to the renderer. If the
+    // caller didn't provide one, create a new instance from the definition.
+    // We memoize this to prevent creating a new instance on every render,
+    // which would reset the form state.
+    const resolvedInstance = React.useMemo(() => {
+      if (instance) return instance;
+      if (!definition) return null;
+
+      const created = createInstanceFromDefinition(definition, definition.name);
+      if (!created.success || !created.instance) {
+        return null;
+      }
+      return created.instance;
+    }, [instance, definition]);
+
     if (!definition) {
       return <div style={{ color: 'red' }}>Error: No form definition provided.</div>;
     }
 
-    // Ensure we always have an instance to pass to the renderer. If the
-    // caller didn't provide one, create a new instance from the definition.
-    let resolvedInstance = instance;
     if (!resolvedInstance) {
-      const created = createInstanceFromDefinition(definition, definition.name);
-      if (!created.success || !created.instance) {
-        return <div style={{ color: 'red' }}>Error: Failed to create instance from definition.</div>;
-      }
-      resolvedInstance = created.instance;
+      return <div style={{ color: 'red' }}>Error: Failed to create instance from definition.</div>;
     }
 
     return (

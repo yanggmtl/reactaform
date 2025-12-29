@@ -20,16 +20,8 @@ const TextInput: React.FC<TextInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
-
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<TextInputProps["onError"] | undefined>(
-    onError
-  );
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
-
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  
   // Memoize regex pattern compilation
   const patternRegex = React.useMemo(
     () => field.pattern ? new RegExp(field.pattern) : null,
@@ -56,38 +48,48 @@ const TextInput: React.FC<TextInputProps> = ({
     [field, definitionName, t, patternRegex]
   );
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  // Calculate error during render (derived state)
+  const currentValue = String(value ?? "");
+  const error = validate(currentValue);
+
+  // Notify parent of error status changes
+  // We use a ref to track the previous error to avoid infinite loops if onError triggers a re-render
+  const prevErrorRef = React.useRef<string | null>(null);
+  
+  React.useEffect(() => {
+    if (error !== prevErrorRef.current) {
+      prevErrorRef.current = error;
+      onError?.(error);
+    }
+  }, [error, onError]);
+
+  // Sync with external value changes
+  React.useEffect(() => {
+    if (inputRef.current && inputRef.current.value !== currentValue) {
+      inputRef.current.value = currentValue;
+    }
+  }, [currentValue]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
+    // We validate immediately for the onChange callback, but the UI error state 
+    // will be updated on the next render via the `error` variable above.
     const err = validate(newValue);
     onChange?.(newValue, err);
   };
 
-  React.useEffect(() => {
-    // Validate on initial mount or when value changes; notify parent via onErrorRef
-    const err = validate(value);
-    if (inputRef.current && inputRef.current.value !== String(value ?? "")) {
-      inputRef.current.value = String(value ?? "");
-    }
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
-    }
-    return undefined;
-  }, [value, validate]);
-
   return (
-    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
+    <StandardFieldLayout field={field} error={error}>
       <input
         id={field.name}
-        aria-invalid={!!validate(String(value ?? ""))}
-        aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
         type="text"
-        defaultValue={String(value ?? "")}
+        defaultValue={currentValue}
         ref={inputRef}
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
+        placeholder={field.placeholder}
       />
     </StandardFieldLayout>
   );

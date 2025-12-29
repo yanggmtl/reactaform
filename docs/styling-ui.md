@@ -1,104 +1,449 @@
 # Style & Theming
 
-Purpose: How ReactaForm handles light/dark themes, CSS variables for theming, and the recommended customization approaches.
+ReactaForm provides 20 professionally designed pre-built themes plus a flexible CSS variable system for custom styling. This guide covers theme usage, customization, and best practices.
 
-## Theme Mode
-ReactaForm exposes theme mode in two related places. The details are shown below with indented/nested bullets for clarity.
+## Quick Start
 
-- Provider attribute:
-  - `data-reactaform-theme` — set to `"dark"` or `"light"` on the provider wrapper depending on active theme.
-    - Example: - `<div data-reactaform-theme="dark" class="reactaform-container">...` when dark mode is active.
+```tsx
+import 'reactaform/themes/material.css';
+import { ReactaForm } from 'reactaform';
 
-
-- Container class:
-  - `reactaform-container` — default container class applied by the provider (configurable via the `className` prop).
-
-- Component-level prop (renderer usage):
-  - `darkMode` — some renderers (e.g., `ReactaForm` component) accept a `darkMode` prop to request dark mode.
-    - Example: `<ReactaForm definitionData={definition} darkMode={true} />`
-
-## Recommended Theming Mechanisms
-
-1. CSS Custom Properties (recommended)
-   - The core stylesheet (`src/core/reactaform.css`) uses CSS variables for colors, spacing, borders and typographic tokens.
-   - Override variables globally (`:root`) or scope them per-theme using the `[data-reactaform-theme]` attribute.
-
-2. Provider Inline Styles (for structure/layout only)
-   - `ReactaFormProvider` accepts a `defaultStyle` prop that produces small inline style objects (e.g., `formStyle`, `fieldStyle`) applied to container elements.
-   - Use inline styles for layout-level overrides (width, font-family, container padding). Do not use inline styles for color theming — prefer CSS variables.
-
-## Important CSS Variables (non-exhaustive)
-
-Colors & surfaces:
-- `--reactaform-primary-bg` — main container background
-- `--reactaform-secondary-bg` — card / surface background
-- `--reactaform-input-bg` — input background
-- `--reactaform-text-color` — primary text
-- `--reactaform-text-muted` — secondary/muted text
-- `--reactaform-border-color`, `--reactaform-border-hover`, `--reactaform-border-focus`
-- `--reactaform-error-color`, `--reactaform-success-color`
-
-Spacing & sizing:
-- `--reactaform-space`, `--reactaform-space-lg` — base spacing units
-- `--reactaform-field-gap`, `--reactaform-column-gap`, `--reactaform-inline-gap`, `--reactaform-label-gap`
-- `--reactaform-container-padding`, `--reactaform-input-padding`
-
-Typography & shape:
-- `--reactaform-font-size`, `--reactaform-font-weight`
-- `--reactaform-border-radius`
-
-Buttons & controls:
-- `--reactaform-button-bg`, `--reactaform-button-text`, `--reactaform-button-padding`, `--reactaform-button-font-size`
-
-There are dark-mode overrides in the core stylesheet under `[data-reactaform-theme="dark"]` which adjust the above variables for a dark color palette.
-
-## Examples
-
-Global CSS variable override (recommended):
-
-```css
-:root {
-  --reactaform-primary-bg: #ffffff;
-  --reactaform-text-color: #111827;
-  --reactaform-border-focus: #0ea5e9;
-}
-
-[data-reactaform-theme="dark"] {
-  --reactaform-primary-bg: #0b1220;
-  --reactaform-text-color: #eef2ff;
+function App() {
+  return <ReactaForm theme="material" definitionData={definition} />;
 }
 ```
 
-Provider inline style for layout only:
+## Pre-Built Themes
+
+ReactaForm includes **20 ready-to-use themes** inspired by popular design systems:
+
+### Light Themes
+- `material` — Material Design 3 with elevated surfaces
+- `ant-design` — Ant Design System with clean lines
+- `blueprint` — Blueprint.js compact professional style
+- `fluent` — Microsoft Fluent Design
+- `shadcn` — shadcn/ui minimal design
+- `tailwind` — Tailwind CSS aligned colors
+- `modern-light` — Contemporary clean design
+- `macos-native` — Apple macOS native look
+- `ios-mobile` — iOS design for mobile
+- `soft-pastel` — Gentle pastel colors
+- `glass-morphism` — Frosted glass effect
+- `high-contrast-accessible` — WCAG AAA compliant
+
+### Dark Themes
+- `material-dark` — Material Design dark mode
+- `ant-design-dark` — Ant Design dark variant
+- `blueprint-dark` — Blueprint.js dark theme
+- `tailwind-dark` — Tailwind dark mode
+- `midnight-dark` — Deep midnight blue
+- `neon-cyber-dark` — Cyberpunk neon aesthetic
+
+### Size Variants
+- `compact-variant` — Reduced spacing for dense layouts
+- `spacious-variant` — Generous spacing for accessibility
+
+## Using Themes
+
+### 1. Import Theme CSS
+
+Import the theme stylesheet in your application entry point or component:
+
+```tsx
+// Single theme
+import 'reactaform/themes/material.css';
+
+// Multiple themes for switching
+import 'reactaform/themes/material.css';
+import 'reactaform/themes/material-dark.css';
+```
+
+### 2. Set Theme Prop
+
+Pass the theme name to the `ReactaForm` component:
+
+```tsx
+<ReactaForm 
+  theme="material" 
+  definitionData={definition}
+/>
+```
+
+### 3. Dynamic Theme Switching
+
+```tsx
+const [theme, setTheme] = useState('material');
+
+return (
+  <>
+    <button onClick={() => setTheme('material')}>Light</button>
+    <button onClick={() => setTheme('material-dark')}>Dark</button>
+    
+    <ReactaForm theme={theme} definitionData={definition} />
+  </>
+);
+```
+
+## Theme Architecture
+
+### Data Attribute Selector
+
+ReactaForm applies a `data-reactaform-theme` attribute to the form container:
+
+```html
+<div data-reactaform-theme="material" class="reactaform-container">
+  <!-- form content -->
+</div>
+```
+
+Theme stylesheets use this attribute for scoped styling:
+
+```css
+[data-reactaform-theme="material"] {
+  --reactaform-primary-bg: #ffffff;
+  --reactaform-text-color: #1f2937;
+  /* ... more variables */
+}
+```
+
+### Dark Theme Detection
+
+ReactaForm automatically detects dark themes using the `isDarkTheme()` utility:
+
+```tsx
+import { isDarkTheme } from 'reactaform';
+
+const darkMode = isDarkTheme('material-dark'); // true
+const lightMode = isDarkTheme('material'); // false
+```
+
+Any theme name containing "dark" is treated as a dark theme for component behavior adjustments.
+
+## CSS Variables Reference
+
+All themes use the same CSS variable system. Override these for custom styling:
+
+### Colors & Surfaces
+```css
+--reactaform-primary-bg        /* Main container background */
+--reactaform-secondary-bg      /* Card/surface background */
+--reactaform-input-bg          /* Input field background */
+--reactaform-text-color        /* Primary text color */
+--reactaform-text-muted        /* Secondary/muted text */
+--reactaform-border-color      /* Default border */
+--reactaform-border-hover      /* Hover border */
+--reactaform-border-focus      /* Focus border */
+--reactaform-error-color       /* Error state */
+--reactaform-success-color     /* Success state */
+--reactaform-link-color        /* Link color */
+```
+
+### Spacing & Layout
+```css
+--reactaform-space             /* Base spacing unit */
+--reactaform-space-lg          /* Large spacing */
+--reactaform-field-gap         /* Gap between fields */
+--reactaform-column-gap        /* Gap between columns */
+--reactaform-inline-gap        /* Inline element gap */
+--reactaform-label-gap         /* Label to input gap */
+--reactaform-container-padding /* Container padding */
+--reactaform-input-padding     /* Input padding */
+```
+
+### Typography
+```css
+--reactaform-font-family       /* Font stack */
+--reactaform-font-size         /* Base font size */
+--reactaform-font-weight       /* Font weight */
+--reactaform-line-height       /* Line height */
+```
+
+### Shape & Borders
+```css
+--reactaform-border-radius     /* Border radius */
+--reactaform-border-width      /* Border width */
+```
+
+### Buttons & Controls
+```css
+--reactaform-button-bg         /* Button background */
+--reactaform-button-text       /* Button text color */
+--reactaform-button-hover-bg   /* Button hover state */
+--reactaform-button-padding    /* Button padding */
+--reactaform-button-font-size  /* Button font size */
+```
+
+### Tooltips
+```css
+--reactaform-tooltip-bg        /* Tooltip background */
+--reactaform-tooltip-color     /* Tooltip text color */
+```
+
+## Custom Styling
+
+### Option 1: Override CSS Variables (Recommended)
+
+Create a custom stylesheet that overrides specific variables:
+
+```css
+/* custom-theme.css */
+[data-reactaform-theme="material"] {
+  --reactaform-primary-bg: #f0f9ff;
+  --reactaform-border-focus: #0284c7;
+  --reactaform-button-bg: #0284c7;
+}
+```
+
+Import both the base theme and your customizations:
+
+```tsx
+import 'reactaform/themes/material.css';
+import './custom-theme.css';
+```
+
+### Option 2: Create Complete Custom Theme
+
+Create a new theme file with all variables:
+
+```css
+/* themes/my-brand.css */
+[data-reactaform-theme="my-brand"] {
+  /* Colors */
+  --reactaform-primary-bg: #ffffff;
+  --reactaform-secondary-bg: #f8fafc;
+  --reactaform-text-color: #1e293b;
+  --reactaform-border-color: #cbd5e1;
+  --reactaform-border-focus: #3b82f6;
+  
+  /* Spacing */
+  --reactaform-space: 0.5rem;
+  --reactaform-space-lg: 1rem;
+  --reactaform-field-gap: 1rem;
+  
+  /* Typography */
+  --reactaform-font-family: 'Inter', system-ui, sans-serif;
+  --reactaform-font-size: 0.875rem;
+  
+  /* Shape */
+  --reactaform-border-radius: 0.5rem;
+  
+  /* Buttons */
+  --reactaform-button-bg: #3b82f6;
+  --reactaform-button-text: #ffffff;
+  
+  /* ... additional variables */
+}
+```
+
+Use your custom theme:
+
+```tsx
+import './themes/my-brand.css';
+
+<ReactaForm theme="my-brand" definitionData={definition} />
+```
+
+### Option 3: Inline Styles for Layout
+
+Use `defaultStyle` prop for structural adjustments only:
 
 ```tsx
 <ReactaFormProvider
-  defaultDarkMode={false}
-  defaultStyle={{ width: '900px', fontFamily: 'Inter, system-ui' }}
+  defaultTheme="material"
+  defaultStyle={{ 
+    width: '900px', 
+    fontFamily: 'Inter, system-ui' 
+  }}
 >
   <App />
 </ReactaFormProvider>
 ```
 
-## Focus, Accessibility & Contrast
+**Note:** Prefer CSS variables for colors and theming. Use inline styles only for layout-specific overrides.
 
-- The core stylesheet applies an explicit focus ring derived from `--reactaform-border-focus`.
-- When overriding variables, ensure sufficient contrast for text and focus outlines in both light and dark themes.
+## Advanced Customization
 
-## Responsive Behavior
+### Scope Themes to Specific Forms
 
-- The stylesheet provides responsive rules that switch to a single-column layout on smaller screens and increase touch-target sizes. These rules respect the same CSS variables, so spacing changes propagate to mobile behavior.
+Use wrapper classes to apply different themes to different forms:
+
+```css
+.form-admin [data-reactaform-theme="blueprint"] {
+  --reactaform-primary-bg: #f5f8fa;
+}
+
+.form-user [data-reactaform-theme="blueprint"] {
+  --reactaform-primary-bg: #ffffff;
+}
+```
+
+```tsx
+<div className="form-admin">
+  <ReactaForm theme="blueprint" definitionData={adminDef} />
+</div>
+
+<div className="form-user">
+  <ReactaForm theme="blueprint" definitionData={userDef} />
+</div>
+```
+
+### Combine Base Theme with Variant
+
+Import both a color theme and size variant:
+
+```tsx
+import 'reactaform/themes/material.css';
+import 'reactaform/themes/compact-variant.css';
+
+// Material colors with compact spacing
+<ReactaForm theme="material" definitionData={definition} />
+```
+
+### System Theme Detection
+
+Detect user's OS theme preference:
+
+```tsx
+function App() {
+  const [theme, setTheme] = useState(() => {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return isDark ? 'material-dark' : 'material';
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e) => setTheme(e.matches ? 'material-dark' : 'material');
+    
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  return <ReactaForm theme={theme} definitionData={definition} />;
+}
+```
+
+## Accessibility & Contrast
+
+### High Contrast Theme
+
+Use the built-in high-contrast theme for accessibility:
+
+```tsx
+import 'reactaform/themes/high-contrast-accessible.css';
+
+<ReactaForm theme="high-contrast-accessible" definitionData={definition} />
+```
+
+### Focus Indicators
+
+All themes include visible focus rings using `--reactaform-border-focus`. When creating custom themes, ensure:
+
+- Minimum 3:1 contrast ratio for focus indicators (WCAG 2.1 Level AA)
+- Focus ring is clearly visible against background
+- Focus ring thickness is at least 2px
+
+```css
+[data-reactaform-theme="custom"] {
+  --reactaform-border-focus: #0066cc;  /* 4.5:1 contrast */
+  --reactaform-border-width: 2px;
+}
+```
+
+### Text Contrast
+
+Ensure text meets WCAG contrast requirements:
+
+- **Normal text:** 4.5:1 contrast ratio (AA) or 7:1 (AAA)
+- **Large text:** 3:1 contrast ratio (AA) or 4.5:1 (AAA)
+
+## Responsive Design
+
+All themes include responsive adjustments:
+
+- **Mobile (<640px):** Single-column layout, larger touch targets
+- **Tablet (640-1024px):** Adaptive column count
+- **Desktop (>1024px):** Full multi-column support
+
+Responsive behavior respects theme CSS variables, so spacing changes automatically propagate.
+
+## Performance Tips
+
+### Only Import Used Themes
+
+Each theme file is ~1-1.5KB gzipped. Only import themes you actually use:
+
+```tsx
+// ❌ Don't import unused themes
+import 'reactaform/themes/material.css';
+import 'reactaform/themes/ant-design.css';
+import 'reactaform/themes/blueprint.css';
+
+// ✅ Import only what you need
+import 'reactaform/themes/material.css';
+```
+
+### Lazy Load Themes
+
+For applications with theme switching, consider lazy loading:
+
+```tsx
+async function loadTheme(themeName: string) {
+  await import(`reactaform/themes/${themeName}.css`);
+}
+
+// Usage
+const handleThemeChange = async (newTheme) => {
+  await loadTheme(newTheme);
+  setTheme(newTheme);
+};
+```
+
+### CSS Variable Performance
+
+Modern browsers optimize CSS variable lookup. Avoid deeply nested overrides:
+
+```css
+/* ❌ Too specific */
+.app .container .form [data-reactaform-theme="material"] {
+  --reactaform-primary-bg: white;
+}
+
+/* ✅ Keep selectors simple */
+[data-reactaform-theme="material"] {
+  --reactaform-primary-bg: white;
+}
+```
 
 ## Best Practices
 
-- Prefer CSS variable overrides so every component (current and future) inherits your theme consistently.
-- Use `defaultStyle` for layout-level adjustments only (width, container paddings, fonts).
-- For per-form variants, wrap the provider with a class and scope CSS variable overrides to that wrapper.
+1. **Use pre-built themes** as a starting point, override only what you need
+2. **Prefer CSS variables** for all color and spacing customizations
+3. **Test in both light and dark themes** if supporting theme switching
+4. **Verify accessibility** with contrast checkers and keyboard navigation
+5. **Keep theme files separate** from component logic for maintainability
+6. **Document custom variables** if creating team-wide themes
+7. **Use inline styles sparingly** — only for layout-specific adjustments
+
+## Migration from darkMode Prop
+
+If upgrading from an older version that used `darkMode` boolean prop:
+
+```tsx
+// Old API ❌
+<ReactaForm darkMode={true} definitionData={definition} />
+
+// New API ✅
+import 'reactaform/themes/material-dark.css';
+<ReactaForm theme="material-dark" definitionData={definition} />
+```
+
+The `theme` prop provides more flexibility and access to 20 pre-built themes instead of just light/dark.
 
 ## References
 
-- Core provider: [src/components/ReactaFormProvider.tsx](https://github.com/yanggmtl/reactaform/blob/master/src/components/ReactaFormProvider.tsx)
-- Core stylesheet and variables: [src/core/reactaform.css](https://github.com/yanggmtl/reactaform/blob/master/src/core/reactaform.css)
-
+- **Theme Integration Guide:** [theme-integration.md](./theme-integration.md)
+- **Theme Catalog:** [src/themes/README.md](../src/themes/README.md)
+- **Core Provider:** [src/components/ReactaFormProvider.tsx](../src/components/ReactaFormProvider.tsx)
+- **Theme Detection:** [src/utils/themeUtils.ts](../src/utils/themeUtils.ts)
 
 ---

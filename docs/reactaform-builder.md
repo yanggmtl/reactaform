@@ -30,6 +30,6 @@ The ReactaForm Builder is a visual, drag-and-drop editor for creating and editin
 
 **Resources**
 
-- Builder tool: https://reactaform.vercel.app/builder
-- Templates: https://reactaform.vercel.app/templates
-- Documentation: https://reactaform.vercel.app/doc
+- [Builder tool](https://reactaform.vercel.app/builder)
+- [Templates](https://reactaform.vercel.app/templates)
+- [Documentation](https://reactaform.vercel.app/docs/index.html)

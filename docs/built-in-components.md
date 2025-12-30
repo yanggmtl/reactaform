@@ -60,8 +60,6 @@ Reactaform provides a comprehensive set of built-in form components designed to 
 | --- | --- | --- | --- |
 | ➖ **Separator** | `separator` | Visual divider for form sections | [View](/schema/separator.schema.json) |
 
-[Browse UI Elements →](/component-gallery?category=UI%20Elements){.md-button}
-
 ---
 
 !!! tip "Component Features"

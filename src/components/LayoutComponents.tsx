@@ -1,6 +1,6 @@
 import * as React from "react";
 import useReactaFormContext from "../hooks/useReactaFormContext";
-import { CSS_CLASSES } from "../utils/cssClasses";
+import { combineClasses, CSS_CLASSES } from "../utils/cssClasses";
 import Tooltip from "./Tooltip";
 import type { DefinitionPropertyField } from "../core/reactaFormTypes";
 
@@ -253,17 +253,8 @@ export const InstanceName = React.memo(({ name, onChange }: { name: string; onCh
           id="instance-name-input"
           type="text"
           value={name}
+          className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
           onChange={(e) => onChange(e.target.value)}
-          style={{
-            width: '100%',
-            padding: 'var(--reactaform-input-padding, 8px 12px)',
-            fontSize: 'var(--reactaform-input-font-size, 14px)',
-            border: '1px solid var(--reactaform-input-border, #ddd)',
-            borderRadius: 'var(--reactaform-border-radius, 4px)',
-            backgroundColor: 'var(--reactaform-input-bg, #fff)',
-            color: 'var(--reactaform-text-color, #333)',
-            boxSizing: 'border-box'
-          }}
           placeholder={t('Enter instance name')}
         />
       </div>

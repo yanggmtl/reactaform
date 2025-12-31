@@ -84,16 +84,10 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
 
   const mergedControlStyle = React.useMemo<React.CSSProperties>(() => ({
     height: "var(--reactaform-input-height, 2.5rem)",
-    padding: "var(--reactaform-input-padding, 8px)",
     display: "flex",
     alignItems: "center",
-    boxSizing: "border-box",
     cursor: "pointer",
     position: "relative",
-    borderRadius: "var(--reactaform-border-radius, 4px)",
-    border: "1px solid var(--reactaform-border-color, #ccc)",
-    background: "var(--reactaform-secondary-bg, #fff)",
-    color: "var(--reactaform-text-color, #000)",
     ...styleFrom(formStyle, 'multiSelect', 'control'),
     ...styleFrom(fieldStyle, undefined, 'control'),
   }), [formStyle, fieldStyle]);
@@ -133,7 +127,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
         <div style={{ width: "100%" }}>
               <div
                 ref={controlRef}
-                className={`reactaform-multiselection-control`}
+                className={`reactaform-multiselection-control reactaform-input`}
                 style={mergedControlStyle}
                 onClick={handleControlClick}
                 tabIndex={0}
@@ -215,6 +209,29 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   const { formStyle, fieldStyle } = useReactaFormContext();
 
   const isThemeDark = isDarkTheme(theme ?? 'light');
+
+  React.useLayoutEffect(() => {
+    if (!controlRef.current) return;
+    
+    const form = controlRef.current.closest('[data-reactaform-theme]');
+    const popupRoot = document.getElementById('popup-root');
+
+    if (form && popupRoot) {
+      const styles = getComputedStyle(form);
+      popupRoot.style.setProperty(
+        '--reactaform-secondary-bg',
+        styles.getPropertyValue('--reactaform-secondary-bg')
+      );
+      popupRoot.style.setProperty(
+        '--reactaform-text-color',
+        styles.getPropertyValue('--reactaform-text-color')
+      );
+      popupRoot.style.setProperty(
+        '--reactaform-hover-bg',
+        styles.getPropertyValue('--reactaform-hover-bg')
+      );
+    }
+  }, [controlRef]);
 
   const styleFrom = (
     source: unknown,

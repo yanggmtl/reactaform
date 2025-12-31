@@ -16,6 +16,15 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     onErrorRef.current = onError;
   }, [onError]);
 
+  const isDuplicateFile = (file: File, fileList: File[]) => {
+    return fileList.some(
+      (existing) =>
+        existing.name === file.name &&
+        existing.size === file.size &&
+        existing.lastModified === file.lastModified
+    );
+  };
+
   const validate = React.useCallback(
     (input: File | File[] | null): string | null => {
       if (
@@ -52,13 +61,19 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
       if (field.multiple) {
         // Merge with existing files when multiple is true
         const existingFiles = Array.isArray(value) ? value : [];
-        selected = [...existingFiles, ...newFiles];
+        const uniqueNewFiles = newFiles.filter(f => !isDuplicateFile(f, existingFiles));
+        selected = [...existingFiles, ...uniqueNewFiles];
       } else {
         selected = newFiles[0];
       }
     }
     const err = validate(selected);
     onChange?.(selected, err);
+    
+    // Reset input value to allow selecting the same file again if needed
+    if (e.target) {
+      e.target.value = '';
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -74,7 +89,8 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
       if (field.multiple) {
         // Merge with existing files when multiple is true
         const existingFiles = Array.isArray(value) ? value : [];
-        selected = [...existingFiles, ...newFiles];
+        const uniqueNewFiles = newFiles.filter(f => !isDuplicateFile(f, existingFiles));
+        selected = [...existingFiles, ...uniqueNewFiles];
       } else {
         selected = newFiles[0];
       }
@@ -123,17 +139,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
         {files.map((file, index) => (
           <div
             key={`${file.name}-${index}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '6px 10px',
-              backgroundColor: 'var(--reactaform-input-bg, #fff)',
-              border: '1px solid var(--reactaform-border-color, #d1d5db)',
-              borderRadius: '4px',
-              fontSize: '0.875rem',
-              gap: '8px'
-            }}
+            className="reactaform-chip"
           >
             <div style={{ 
               flex: 1, 
@@ -179,24 +185,25 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     <StandardFieldLayout field={field} error={error}>
       <div style={{ width: '100%' }}>
         <div
+          className="reactaform-input"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           style={{
             position: 'relative',
-            border: `1px dashed ${
-              isDragging 
+            borderStyle: 'dashed',
+            borderColor: isDragging 
                 ? 'var(--reactaform-color-primary, #2563eb)' 
                 : error 
                   ? 'var(--reactaform-color-error, #ef4444)'
-                  : 'var(--reactaform-border-color, #d1d5db)'
-            }`,
+                  : undefined,
+            borderWidth: '1px',
             borderRadius: 'var(--reactaform-border-radius, 4px)',
             padding: '8px 12px',
             textAlign: 'center',
             backgroundColor: isDragging 
               ? 'var(--reactaform-bg-hover, #f0f9ff)' 
-              : 'var(--reactaform-input-bg, #fff)',
+              : undefined,
             transition: 'all 0.2s ease',
             cursor: 'pointer',
             minHeight: 'var(--reactaform-input-height, 34px)',

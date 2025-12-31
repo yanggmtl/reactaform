@@ -214,6 +214,19 @@
   box-sizing: border-box;
 }
 
+.reactaform-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background-color: var(--reactaform-input-bg);
+  border: 1px solid var(--reactaform-border-color);
+  border-radius: var(--reactaform-border-radius);
+  color: var(--reactaform-text-color);
+  font-size: 0.875rem;
+  gap: 8px;
+}
+
 
 
 /* Responsive Design */

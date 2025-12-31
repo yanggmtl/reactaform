@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type {
   BaseInputProps,
@@ -6,7 +7,7 @@ import type {
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateFieldValue } from "../../core/validation";
-import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { isDarkTheme } from "../../utils/themeUtils";
 
 type DropdownField = DefinitionPropertyField & {
   options: NonNullable<DefinitionPropertyField['options']>;
@@ -20,10 +21,10 @@ export type DropdownInputProps = BaseInputProps<
 /**
  * DropdownInput
  *
- * Renders a select dropdown for selecting a single value from options.
+ * Renders a custom dropdown for selecting a single value from options.
  * - Validates that the selected value is in the options list
  * - Auto-corrects to first option if invalid value provided
- * - Uses custom styling from fieldStyle.optionInput
+ * - Uses custom styling from fieldStyle.dropdown
  */
 const DropdownInput: React.FC<DropdownInputProps> = ({
   field,
@@ -31,10 +32,11 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   onChange,
   onError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-
-  const selectRef = React.useRef<HTMLSelectElement | null>(null);
+  const { t, definitionName, theme, formStyle, fieldStyle } = useReactaFormContext();
+  const controlRef = React.useRef<HTMLDivElement>(null);
   const onErrorRef = React.useRef<DropdownInputProps["onError"] | undefined>(onError);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [popupPos, setPopupPos] = React.useState<{ x: number; y: number } | null>(null);
 
   React.useEffect(() => {
     onErrorRef.current = onError;
@@ -45,8 +47,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
       if (val === "" || val === null || val === undefined) {
         return t("Value required");
       }
-      // Options are guaranteed to exist due to type constraint
-      if (!field.options.some((opt) => opt.value === val)) {
+      if (!field.options.some((opt) => String(opt.value) === val)) {
         return t("Invalid option selected");
       }
       const err = validateFieldValue(definitionName, field, val, t);
@@ -57,47 +58,368 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
 
   React.useEffect(() => {
     const safeVal = value != null ? String(value) : "";
-    // If incoming value is invalid and there is at least one option, pick the first option
     const err = validate(safeVal);
     if (err && field.options.length > 0) {
       const first = String(field.options[0].value);
-      if (selectRef.current) selectRef.current.value = first;
-      // notify parent that we normalized the value
       onChange?.(first, null);
       onErrorRef.current?.(null);
     } else {
-      if (selectRef.current) selectRef.current.value = safeVal;
       onErrorRef.current?.(err ?? null);
     }
   }, [value, validate, onChange, field.options]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value;
-    const err = validate(val);
-    onChange?.(val, err);
+  const handleControlClick = () => {
+    if (!controlRef.current) return;
+    const rect = controlRef.current.getBoundingClientRect();
+    setPopupPos({ x: rect.left, y: rect.bottom });
+    setMenuOpen((prev) => !prev);
   };
 
+  const handleOptionClick = (val: string) => {
+    const err = validate(val);
+    onChange?.(val, err);
+    setMenuOpen(false);
+  };
+
+  const selectedLabel = React.useMemo(() => {
+    const opt = field.options.find(o => String(o.value) === String(value));
+    return opt ? t(opt.label) : "";
+  }, [field.options, value, t]);
+
+  const styleFrom = (source: unknown, section?: string, key?: string): React.CSSProperties => {
+    if (!section) return {};
+    const src = source as Record<string, unknown> | undefined;
+    const sec = src?.[section] as Record<string, unknown> | undefined;
+    const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
+    return (val ?? {}) as React.CSSProperties;
+  };
+
+  const mergedControlStyle = React.useMemo<React.CSSProperties>(() => ({
+    height: "var(--reactaform-input-height, 2.5rem)",
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
+    position: "relative",
+    ...styleFrom(formStyle, 'dropdown', 'control'),
+    ...styleFrom(fieldStyle, undefined, 'control'),
+  }), [formStyle, fieldStyle]);
+
+  const mergedArrowStyle = React.useMemo<React.CSSProperties>(() => ({
+    position: "absolute",
+    right: "0.7em",
+    top: "50%",
+    transform: "translateY(-50%)",
+    pointerEvents: "none",
+    fontSize: "0.8em",
+    color: "var(--reactaform-text-muted, #999)",
+    ...styleFrom(formStyle, 'dropdown', 'arrow'),
+    ...styleFrom(fieldStyle, undefined, 'arrow'),
+  }), [formStyle, fieldStyle]);
+
+  const error = validate(String(value ?? ""));
+
   return (
-    <StandardFieldLayout field={field} error={validate(String(value ?? ""))}>
-      <select
-        id={field.name}
-        aria-invalid={!!validate(String(value ?? ""))}
-        aria-describedby={validate(String(value ?? "")) ? `${field.name}-error` : undefined}
-        defaultValue={String(value ?? "")}
-        ref={selectRef}
-        onChange={handleChange}
-        className={combineClasses(
-          CSS_CLASSES.input,
-          CSS_CLASSES.inputSelect
-        )}
-      >
-        {field.options.map((opt) => (
-          <option key={String(opt.value)} value={String(opt.value)}>
+    <div>
+      <StandardFieldLayout field={field} error={error}>
+        <div
+          ref={controlRef}
+          className="reactaform-input"
+          style={mergedControlStyle}
+          onClick={handleControlClick}
+          tabIndex={0}
+          role="combobox"
+          aria-haspopup="listbox"
+          aria-expanded={menuOpen}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${field.name}-error` : undefined}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleControlClick();
+            }
+          }}
+        >
+          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {selectedLabel}
+          </span>
+          <span style={mergedArrowStyle} aria-hidden>&#x25BC;</span>
+        </div>
+      </StandardFieldLayout>
+
+      {menuOpen && popupPos && (
+        <DropdownPopup
+          position={popupPos}
+          options={field.options}
+          selectedValue={String(value)}
+          onSelect={handleOptionClick}
+          onClose={() => setMenuOpen(false)}
+          controlRef={controlRef}
+          theme={theme}
+          t={t}
+        />
+      )}
+    </div>
+  );
+};
+
+interface PopupProps {
+  position: { x: number; y: number };
+  options: NonNullable<DefinitionPropertyField['options']>;
+  selectedValue: string;
+  onSelect: (v: string) => void;
+  onClose: () => void;
+  controlRef: React.RefObject<HTMLDivElement | null>;
+  theme?: string;
+  t: (key: string) => string;
+}
+
+const DropdownPopup: React.FC<PopupProps> = ({
+  position,
+  options,
+  selectedValue,
+  onSelect,
+  onClose,
+  controlRef,
+  theme,
+  t,
+}) => {
+  const popupRef = React.useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = React.useState<number>(-1);
+  const { formStyle, fieldStyle } = useReactaFormContext();
+
+  const isThemeDark = isDarkTheme(theme ?? 'light');
+
+  React.useLayoutEffect(() => {
+    if (!controlRef.current) return;
+    
+    const form = controlRef.current.closest('[data-reactaform-theme]');
+    const popupRoot = document.getElementById('popup-root');
+
+    if (form && popupRoot) {
+      const styles = getComputedStyle(form);
+      popupRoot.style.setProperty(
+        '--reactaform-secondary-bg',
+        styles.getPropertyValue('--reactaform-secondary-bg')
+      );
+      popupRoot.style.setProperty(
+        '--reactaform-text-color',
+        styles.getPropertyValue('--reactaform-text-color')
+      );
+      popupRoot.style.setProperty(
+        '--reactaform-hover-bg',
+        styles.getPropertyValue('--reactaform-hover-bg')
+      );
+    }
+  }, [controlRef]);
+
+  const styleFrom = (
+    source: unknown,
+    section?: string,
+    key?: string
+  ): React.CSSProperties => {
+    if (!section) return {} as React.CSSProperties;
+    const src = source as Record<string, unknown> | undefined;
+    const sec = src?.[section] as Record<string, unknown> | undefined;
+    const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
+    return (val ?? {}) as React.CSSProperties;
+  };
+
+  const mergedPopupStyles = React.useMemo<React.CSSProperties>(() => ({
+    maxHeight: 200,
+    overflowY: "auto",
+    background: "var(--reactaform-secondary-bg, #fff)",
+    border: "1px solid var(--reactaform-border-color, #ccc)",
+    borderRadius: 4,
+    zIndex: 2000,
+    boxShadow: "var(--reactaform-shadow, 0 2px 8px rgba(0,0,0,0.15))",
+    pointerEvents: "auto",
+    color: "var(--reactaform-text-color, #000)",
+    fontSize: "var(--reactaform-popup-font-size, 0.875rem)",
+    ...styleFrom(formStyle, 'dropdown', 'popup'),
+    ...styleFrom(fieldStyle, undefined, 'popup'),
+  }), [formStyle, fieldStyle]);
+
+  const mergedPopupOptionStyles = React.useMemo<React.CSSProperties>(() => ({
+    padding: "6px 8px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    background: "transparent",
+    color: "var(--reactaform-text-color, #000)",
+    ...styleFrom(formStyle, 'dropdown', 'option'),
+    ...styleFrom(fieldStyle, undefined, 'option'),
+  }), [formStyle, fieldStyle]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        !popupRef.current?.contains(target) &&
+        !controlRef.current?.contains(target)
+      ) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose, controlRef]);
+
+  React.useEffect(() => {
+    if (!popupRef.current) return;
+    if (options.length > 0) {
+      const idx = options.findIndex(o => String(o.value) === selectedValue);
+      requestAnimationFrame(() => setActiveIndex(idx >= 0 ? idx : 0));
+    }
+  }, [options, selectedValue]);
+
+  React.useEffect(() => {
+    if (!popupRef.current || activeIndex < 0) return;
+    const el = popupRef.current.querySelector(`#opt-${activeIndex}`) as HTMLElement | null;
+    if (el) {
+      // Only scroll into view if needed, don't steal focus
+      el.scrollIntoView?.({ block: 'nearest' });
+    }
+  }, [activeIndex]);
+
+  const baseWidth = 250;
+  const maxHeight = 200;
+
+  const [livePos, setLivePos] = React.useState<{ left: number; top: number } | null>(null);
+  const [popupWidth, setPopupWidth] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const updatePosition = () => {
+      let left = position.x;
+      let top = position.y;
+      let w = baseWidth;
+
+      const ctrl = controlRef?.current;
+      if (ctrl) {
+        const rect = ctrl.getBoundingClientRect();
+        left = rect.left;
+        top = rect.bottom;
+        w = Math.max(80, Math.round(rect.width));
+      }
+
+      left = Math.min(left, window.innerWidth - w);
+      top = Math.min(top, window.innerHeight - maxHeight);
+      setLivePos({ left, top });
+      setPopupWidth(w);
+    };
+
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+
+    let ro: ResizeObserver | null = null;
+    const observed = controlRef?.current;
+    if (typeof ResizeObserver !== "undefined" && observed) {
+      ro = new ResizeObserver(() => updatePosition());
+      ro.observe(observed as Element);
+    }
+
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+      if (ro && observed) ro.unobserve(observed);
+    };
+  }, [controlRef, position.x, position.y]);
+
+  if (typeof window === "undefined") return null;
+
+  let root = document.getElementById("popup-root");
+  if (!root) {
+    root = document.createElement("div");
+    root.id = "popup-root";
+    document.body.appendChild(root);
+  }
+
+  return ReactDOM.createPortal(
+    <div
+      ref={popupRef}
+      role="listbox"
+      aria-activedescendant={activeIndex >= 0 ? `opt-${activeIndex}` : undefined}
+      style={{
+        position: "fixed",
+        top: livePos ? livePos.top : position.y,
+        left: livePos ? livePos.left : position.x,
+        width: popupWidth ?? baseWidth,
+        ...mergedPopupStyles,
+      }}
+      data-reactaform-theme={theme ?? 'light'}
+    >
+      {options.map((opt, idx) => {
+        const isSelected = String(opt.value) === selectedValue;
+        const hoverBg = isThemeDark
+          ? "var(--reactaform-hover-bg, rgba(255,255,255,0.01))"
+          : "var(--reactaform-hover-bg, #eee)";
+        const optionStyle: React.CSSProperties = {
+          ...mergedPopupOptionStyles,
+          background: idx === activeIndex ? hoverBg : mergedPopupOptionStyles.background,
+          fontWeight: isSelected ? 'bold' : 'normal',
+        };
+
+        return (
+          <div
+            id={`opt-${idx}`}
+            key={String(opt.value)}
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              onSelect(String(opt.value));
+            }}
+            onKeyDown={(e) => {
+              const len = options.length;
+              switch (e.key) {
+                case 'ArrowDown':
+                  e.preventDefault();
+                  setActiveIndex((i) => (i + 1) % len);
+                  break;
+                case 'ArrowUp':
+                  e.preventDefault();
+                  setActiveIndex((i) => (i - 1 + len) % len);
+                  break;
+                case 'Home':
+                  e.preventDefault();
+                  setActiveIndex(0);
+                  break;
+                case 'End':
+                  e.preventDefault();
+                  setActiveIndex(len - 1);
+                  break;
+                case 'Enter':
+                case ' ':
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onSelect(String(opt.value));
+                  break;
+                case 'Escape':
+                  e.preventDefault();
+                  onClose();
+                  controlRef?.current?.focus();
+                  break;
+              }
+            }}
+            tabIndex={idx === activeIndex ? 0 : -1}
+            role="option"
+            aria-selected={isSelected}
+            style={optionStyle}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = hoverBg;
+              setActiveIndex(idx);
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              setActiveIndex((cur) => (cur === idx ? -1 : cur));
+            }}
+          >
             {t(opt.label)}
-          </option>
-        ))}
-      </select>
-    </StandardFieldLayout>
+          </div>
+        );
+      })}
+    </div>,
+    root
   );
 };
 

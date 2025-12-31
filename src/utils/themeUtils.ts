@@ -25,3 +25,53 @@ export function isDarkTheme(themeName: string): boolean {
   // Simple rule: if theme name contains "dark", it's a dark theme
   return themeName.toLowerCase().includes('dark');
 }
+
+/**
+ * Determines if a color string represents a dark color.
+ * Supports hex (3, 4, 6, 8 digits) and rgb/rgba formats.
+ * 
+ * @param color - The color string to check
+ * @returns true if the color is considered dark (luminance < 128)
+ */
+export function isDarkColor(color: string): boolean {
+  if (!color) return false;
+  
+  // Remove whitespace
+  const c = color.trim();
+  
+  let r = 0, g = 0, b = 0;
+
+  // Handle hex
+  if (c.startsWith('#')) {
+    const hex = c.substring(1);
+    if (hex.length === 3 || hex.length === 4) {
+      r = parseInt(hex[0] + hex[0], 16);
+      g = parseInt(hex[1] + hex[1], 16);
+      b = parseInt(hex[2] + hex[2], 16);
+    } else if (hex.length === 6 || hex.length === 8) {
+      r = parseInt(hex.substring(0, 2), 16);
+      g = parseInt(hex.substring(2, 4), 16);
+      b = parseInt(hex.substring(4, 6), 16);
+    }
+  } 
+  // Handle rgb/rgba
+  else if (c.startsWith('rgb')) {
+    const match = c.match(/\d+(\.\d+)?/g);
+    if (match && match.length >= 3) {
+      r = parseFloat(match[0]);
+      g = parseFloat(match[1]);
+      b = parseFloat(match[2]);
+    }
+  }
+  // Handle named colors (basic support) or fallback
+  else {
+    // For unknown formats, we can't reliably determine. 
+    // Returning false (light) is a safe default or we could try to use a canvas to determine.
+    // For this utility, we'll stick to simple parsing.
+    return false;
+  }
+
+  // Calculate luminance (YIQ formula)
+  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return yiq < 128;
+}

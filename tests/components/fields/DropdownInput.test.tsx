@@ -20,15 +20,23 @@ describe('DropdownInput', () => {
     expect(screen.getByText('Select Option')).toBeInTheDocument();
   });
 
-  it('displays all options in dropdown', () => {
+  it('displays all options in dropdown', async () => {
+    const user = userEvent.setup();
     const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="opt1" />);
 
     const select = screen.getByRole('combobox');
     expect(select).toBeInTheDocument();
     
+    // Open dropdown
+    await user.click(select);
+
     mockOptions.forEach(opt => {
-      expect(screen.getByText(opt.label)).toBeInTheDocument();
+      // Use getAllByText because the selected value is also displayed
+      const options = screen.getAllByText(opt.label);
+      expect(options.length).toBeGreaterThan(0);
+      // Or better, check specifically for the option role
+      expect(screen.getByRole('option', { name: opt.label })).toBeInTheDocument();
     });
   });
 
@@ -36,8 +44,8 @@ describe('DropdownInput', () => {
     const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="opt2" />);
 
-    const select = screen.getByRole('combobox') as HTMLSelectElement;
-    expect(select.value).toBe('opt2');
+    const select = screen.getByRole('combobox');
+    expect(select).toHaveTextContent('Option 2');
   });
 
   it('calls onChange when option is selected', async () => {
@@ -49,7 +57,10 @@ describe('DropdownInput', () => {
     );
 
     const select = screen.getByRole('combobox');
-    await user.selectOptions(select, 'opt3');
+    await user.click(select);
+    
+    const option = screen.getByRole('option', { name: 'Option 3' });
+    await user.click(option);
 
     expect(onChange).toHaveBeenCalledWith('opt3', null);
   });
@@ -86,17 +97,30 @@ describe('DropdownInput', () => {
 
     // Change to valid option
     const select = screen.getByRole('combobox');
-    await user.selectOptions(select, 'opt2');
+    await user.click(select);
+    
+    const option = screen.getByRole('option', { name: 'Option 2' });
+    await user.click(option);
 
     expect(onChange).toHaveBeenCalledWith('opt2', null);
   });
 
-  it('handles empty options array', () => {
+  it('handles empty options array', async () => {
+    const user = userEvent.setup();
     const field = createMockField<DefinitionPropertyField>({ displayName: 'Empty Dropdown', options: [] });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="" />);
 
     const select = screen.getByRole('combobox');
-    expect(select.children.length).toBe(0);
+    await user.click(select);
+    
+    // Should not find any options
+    const listbox = screen.queryByRole('listbox');
+    if (listbox) {
+        expect(listbox.children.length).toBe(0);
+    } else {
+        // If listbox is not rendered when empty, that's also fine, or check for no options
+        expect(screen.queryByRole('option')).not.toBeInTheDocument();
+    }
   });
 
   it('handles numeric option values', async () => {
@@ -113,7 +137,10 @@ describe('DropdownInput', () => {
     );
 
     const select = screen.getByRole('combobox');
-    await user.selectOptions(select, '2');
+    await user.click(select);
+    
+    const option = screen.getByRole('option', { name: 'Two' });
+    await user.click(option);
 
     expect(onChange).toHaveBeenCalledWith('2', null);
   });
@@ -132,13 +159,13 @@ describe('DropdownInput', () => {
       <DropdownInput {...baseFieldProps} field={field} value="opt2" />
     );
 
-    let select = screen.getByRole('combobox') as HTMLSelectElement;
-    expect(select.value).toBe('opt2');
+    let select = screen.getByRole('combobox');
+    expect(select).toHaveTextContent('Option 2');
 
     rerender(<DropdownInput {...baseFieldProps} field={field} value="opt2" />);
     
-    select = screen.getByRole('combobox') as HTMLSelectElement;
-    expect(select.value).toBe('opt2');
+    select = screen.getByRole('combobox');
+    expect(select).toHaveTextContent('Option 2');
   });
 
   it('updates when value prop changes', () => {
@@ -147,12 +174,12 @@ describe('DropdownInput', () => {
       <DropdownInput {...baseFieldProps} field={field} value="opt1" />
     );
 
-    let select = screen.getByRole('combobox') as HTMLSelectElement;
-    expect(select.value).toBe('opt1');
+    let select = screen.getByRole('combobox');
+    expect(select).toHaveTextContent('Option 1');
 
     rerender(<DropdownInput {...baseFieldProps} field={field} value="opt3" />);
     
-    select = screen.getByRole('combobox') as HTMLSelectElement;
-    expect(select.value).toBe('opt3');
+    select = screen.getByRole('combobox');
+    expect(select).toHaveTextContent('Option 3');
   });
 });

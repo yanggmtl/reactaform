@@ -72,7 +72,11 @@ describe('Form integration: rendering and submission', () => {
     await user.type(nameInput, 'Alice');
     // For date input, type the yyyy-MM-dd value
     await user.type(dateInput, '1990-05-15');
-    await user.selectOptions(select, 'two');
+    
+    // For dropdown, click to open and select option
+    await user.click(select);
+    const optionTwo = await screen.findByText('Two');
+    await user.click(optionTwo);
 
     // Wait for debounced onChange handlers to flush (components use debounce by default)
     await act(async () => {

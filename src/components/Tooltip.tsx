@@ -1,7 +1,23 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import useReactaFormContext from "../hooks/useReactaFormContext";
-import { isDarkTheme } from "../utils/themeUtils";
+import { isDarkTheme, isDarkColor } from "../utils/themeUtils";
+
+const QuestionMark = () => (
+  <svg
+    width="1em"
+    height="1em"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+    <line x1="12" y1="17" x2="12.01" y2="17" />
+  </svg>
+);
 
 type TooltipProps = {
   content: string;
@@ -18,8 +34,23 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
   const tooltipRef = React.useRef<HTMLDivElement | null>(null);
   const iconRectRef = React.useRef<DOMRect | null>(null);
   const tooltipId = React.useId();
-
   const isThemeDark = isDarkTheme(theme);
+
+  const [iconBg, setIconBg] = React.useState<string | undefined>(undefined);
+
+  React.useLayoutEffect(() => {
+    if (!ref.current) return;
+    const fallback = "rgba(255,255,255,0.1)";
+    const styles = getComputedStyle(ref.current);
+    const primaryBg = styles.getPropertyValue('--reactaform-primary-bg').trim();
+
+    if (primaryBg && typeof CSS !== "undefined" && CSS.supports?.("color: color-mix(in srgb, red, blue)")) {
+        const baseColor = isDarkColor(primaryBg) ? "black" : "white";
+        setIconBg(`color-mix(in srgb, var(--reactaform-primary-bg) 85%, ${baseColor} 15%)`);
+    } else {
+        setIconBg(fallback);
+    }
+  }, []);
 
   const tooltipStyles = React.useMemo(() => {
     const sizeConfig: Record<string, React.CSSProperties> = {
@@ -38,8 +69,8 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
         fontSize: "0.9em",
         fontWeight: "bold",
         borderRadius: "50%",
-        backgroundColor: isThemeDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)",
-        color: isThemeDark ? "#f0f0f0" : "#333",
+        backgroundColor: iconBg ?? (isThemeDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"),
+        color: `var(--reactaform-text-color, ${isThemeDark ? "#f0f0f0" : "#333"})`,
         border: `1px solid ${isThemeDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"}`,
         cursor: "pointer",
         transition: animation ? "all 0.2s ease" : undefined,
@@ -85,7 +116,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
     };
 
     return merged;
-  }, [isThemeDark, size, animation, formStyle, fieldStyle]);
+  }, [isThemeDark, size, animation, formStyle, fieldStyle, iconBg]);
 
   React.useLayoutEffect(() => {
     if (!hover || !ref.current || !tooltipRef.current) {
@@ -176,7 +207,7 @@ const Tooltip: React.FC<TooltipProps> = ({ content, size = "medium", animation =
           ...tooltipStyles.icon,
         }}
       >
-        ?
+        <QuestionMark />
       </span>
       {hover &&
         (popupRoot

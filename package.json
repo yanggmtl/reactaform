@@ -1,6 +1,6 @@
 {
   "name": "reactaform",
-  "version": "1.5.0",
+  "version": "1.8.0",
   "description": "A powerful, type-safe React form builder library with dynamic field rendering, conditional visibility, multi-language support, and extensible validation",
   "keywords": [
     "react",
@@ -35,48 +35,28 @@
       "require": "./dist/reactaform.cjs.js"
     },
     "./style.css": "./dist/reactaform.css",
-    "./themes/*.css": "./dist/themes/*.css",
-    "./themes/ant-design.css": "./dist/themes/ant-design.css",
-    "./themes/ant-design-dark.css": "./dist/themes/ant-design-dark.css",
-    "./themes/blueprint.css": "./dist/themes/blueprint.css",
-    "./themes/blueprint-dark.css": "./dist/themes/blueprint-dark.css",
-    "./themes/compact-variant.css": "./dist/themes/compact-variant.css",
-    "./themes/fluent.css": "./dist/themes/fluent.css",
-    "./themes/glass-morphism.css": "./dist/themes/glass-morphism.css",
-    "./themes/high-contrast-accessible.css": "./dist/themes/high-contrast-accessible.css",
-    "./themes/ios-mobile.css": "./dist/themes/ios-mobile.css",
-    "./themes/macos-native.css": "./dist/themes/macos-native.css",
-    "./themes/material.css": "./dist/themes/material.css",
-    "./themes/material-dark.css": "./dist/themes/material-dark.css",
-    "./themes/midnight-dark.css": "./dist/themes/midnight-dark.css",
-    "./themes/modern-light.css": "./dist/themes/modern-light.css",
-    "./themes/neon-cyber-dark.css": "./dist/themes/neon-cyber-dark.css",
-    "./themes/shadcn.css": "./dist/themes/shadcn.css",
-    "./themes/soft-pastel.css": "./dist/themes/soft-pastel.css",
-    "./themes/spacious-variant.css": "./dist/themes/spacious-variant.css",
-    "./themes/tailwind.css": "./dist/themes/tailwind.css",
-    "./themes/tailwind-dark.css": "./dist/themes/tailwind-dark.css"
+    "./themes/*.css": "./dist/themes/*.css"
   },
   "files": [
-    "dist/*.js",
-    "dist/*.mjs",
-    "dist/*.cjs.js",
-    "dist/*.es.js",
-    "dist/*.css",
-    "dist/*.map",
-    "dist/*.d.ts",
-    "dist/themes/*.css",
+    "dist",
     "README.md",
     "LICENSE"
+  ],
+  "sideEffects": [
+    "*.css",
+    "dist/**/*.css"
   ],
   "peerDependencies": {
     "react": ">=18.0.0 <20",
     "react-dom": ">=18.0.0 <20"
   },
   "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist', {recursive: true, force: true})\"",
     "build:types": "tsc -p tsconfig.build.json --noEmit false",
-    "build:lib": "vite build --config vite.lib.config.ts && npm run build:types && node scripts/copy-themes.js",
-    "build:pack": "npm run build:lib && npm pack",
+    "build:lib": "cross-env NODE_ENV=development vite build --mode development --config vite.lib.config.ts && npm run build:types && node scripts/copy-themes.js",
+    "build:prod": "cross-env NODE_ENV=production vite build --config vite.lib.config.ts && npm run build:types && node scripts/copy-themes.js",
+    "build:pack": "npm run build:prod && npm pack",
+    "prepublishOnly": "npm run build:prod",
     "test": "vitest run --config ./vitest.config.ts",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "lint": "eslint -c eslint.config.mjs \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\" --max-warnings=0"
@@ -93,6 +73,7 @@
     "@typescript-eslint/parser": "^8.49.0",
     "@vitejs/plugin-react": "^5.1.2",
     "c8": "^10.1.3",
+    "cross-env": "^7.0.3",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
@@ -101,8 +82,7 @@
     "typescript": "^5.9.3",
     "vite": "^7.2.7",
     "vitest": "^4.0.15"
-  }
-  ,
+  },
   "optionalDependencies": {},
   "engines": {
     "node": ">=18"

@@ -14,7 +14,7 @@
     "rootDir": "src",
 
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
     "jsx": "react-jsx",

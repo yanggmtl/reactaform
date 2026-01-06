@@ -5,11 +5,14 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   build: {
+    emptyOutDir: true,
+    sourcemap: process.env.NODE_ENV !== 'production',
     lib: {
       entry: resolve(process.cwd(), "src/index.ts"),
       name: "ReactaForm",
     },
     outDir: "dist",
+    cssCodeSplit: false,
     rollupOptions: {
       external: [
         "react",

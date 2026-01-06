@@ -42,7 +42,7 @@ jobs:
         run: npm run lint
 
       - name: Build library (reactaform)
-        run: npm run build:lib
+        run: npm run build:prod
 
       - name: Run tests
         run: npm test

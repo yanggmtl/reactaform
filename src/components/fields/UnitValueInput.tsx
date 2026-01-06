@@ -232,7 +232,7 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo((
 
   const onValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
-    const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
+    const unit = selectRef.current?.value ?? unitFactors.default;
     const err = validate(input, unit);
     setLocalInput(input);
     if (err !== prevErrorRef.current) {
@@ -245,9 +245,8 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo((
 
   const onUnitChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const newUnit = e.target.value;
-    const valueStr = inputRef.current ? inputRef.current.value : String(value0 ?? "");
+    const valueStr = inputRef.current?.value ?? String(value0 ?? "");
     const err = validate(valueStr, newUnit);
-    if (selectRef.current) selectRef.current.value = newUnit;
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       setError(err);
@@ -257,19 +256,15 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo((
   }, [value0, validate, responseParentOnChange]);
 
   const onConvertButtonClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    // Guard: don't open the conversion menu when conversion is disabled
-    const val = inputRef.current ? inputRef.current.value : String(value0 ?? "");
+    const val = inputRef.current?.value ?? String(value0 ?? "");
     const parsedValue = parseFloat(val);
-    const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
+    const unit = selectRef.current?.value ?? unitFactors.default;
     const localErr = validate(val, unit);
     if (localErr || !val.trim() || !Number.isFinite(parsedValue)) {
       return;
     }
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = rect.left;
-    const y = rect.bottom;
-
-    setMenuPosition({ x, y });
+    setMenuPosition({ x: rect.left, y: rect.bottom });
 
     const convertedOptions = getConvertedOptions(parsedValue, unit, unitFactors, dimension === "temperature");
     if (convertedOptions.length === 0) {
@@ -285,32 +280,19 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo((
   const onConversionMenuSelect = React.useCallback((option: UnitOption) => {
     const { value: newVal, unit: newUnit } = option;
 
-    // Close menu first
     setShowMenu(false);
     setMenuPosition(null);
 
-    // Update DOM elements (since this is an uncontrolled component)
-    if (inputRef.current) {
-      inputRef.current.value = newVal;
-    }
-    if (selectRef.current) {
-      selectRef.current.value = newUnit;
-    }
+    // Update DOM elements
+    if (inputRef.current) inputRef.current.value = newVal;
+    if (selectRef.current) selectRef.current.value = newUnit;
 
-    // Update local state to track the conversion
     setLocalInput(newVal);
-
-    // Validate the new values
     const err = validate(newVal, newUnit);
-
-    // Notify parent of the change
     responseParentOnChange(newVal, newUnit, err);
   }, [validate, responseParentOnChange]);
 
-  const propInputForValidation = String(value[0] ?? "");
-
-  const inputForValidation = localInput ?? propInputForValidation;
-  // unitForValidation intentionally unused after moving validation to `error` state
+  const inputForValidation = localInput ?? String(value[0] ?? "");
   const disableConversion = Boolean(error) || !inputForValidation.trim();
 
   // Dark mode aware button styling
@@ -333,7 +315,7 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo((
 
   const normalizedDefaultUnit = React.useMemo(() => {
     const rawUnit = String(value1 ?? unitFactors.default);
-    return normalizeUnit(rawUnit, unitFactors, reverseLabels) || rawUnit;
+    return normalizeUnit(rawUnit, unitFactors, reverseLabels) ?? rawUnit;
   }, [value1, unitFactors, reverseLabels]);
 
   return (
@@ -345,7 +327,7 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo((
           ref={inputRef}
           defaultValue={String(value[0] ?? "")}
           onChange={onValueChange}
-          style={{ width: "var(--reactaform-unit-input-width, 100px)" }}
+          style={{ flex: "2 1 0" }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
           aria-invalid={!!error}
           aria-describedby={error ? `${field.name}-error` : undefined}
@@ -357,6 +339,7 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo((
           ref={selectRef}
           defaultValue={normalizedDefaultUnit}
           onChange={onUnitChange}
+          style={{ flex: "1 1 0" }}
           className={combineClasses(
             CSS_CLASSES.input,
             CSS_CLASSES.inputSelect

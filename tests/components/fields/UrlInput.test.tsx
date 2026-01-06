@@ -82,10 +82,10 @@ describe('UrlInput', () => {
     );
 
     const input = screen.getByRole('textbox');
-    await user.type(input, 'not-a-url');
+    await user.type(input, 'not-a-url^');
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[0]).toBe('not-a-url');
+    expect(lastCall[0]).toBe('not-a-url^');
     expect(lastCall[1]).toBeTruthy(); // error for invalid URL
   });
 

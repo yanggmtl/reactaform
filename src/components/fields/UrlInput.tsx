@@ -1,11 +1,11 @@
 import * as React from "react";
-import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 
 /**
  * UrlInput component
@@ -24,20 +24,6 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
  */
 export type UrlInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
-// Simple URL validation (accepts http(s), ftp, file, etc.)
-const urlRegex =
-  /^(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|]$/i;
-
-// Alternative: also validate via URL constructor for stricter checks
-const isValidUrl = (s: string): boolean => {
-  try {
-    new URL(s);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 const UrlInput: React.FC<UrlInputProps> = ({
   field,
   value,
@@ -45,85 +31,34 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  // uncontrolled input: DOM holds transient user edits; use a ref
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   // Validation logic
-  const validateCb = React.useCallback(
+  const validate = React.useCallback(
     (input: string): string | null => {
-      const trimmed = input.trim();
-
-      if (trimmed === "") {
-        return field.required ? t("Value required") : null;
-      }
-
-      if (!urlRegex.test(trimmed) && !isValidUrl(trimmed)) {
-        // Allow relative URLs when field.allowRelative is true. Use the URL
-        // constructor with a base to validate relative paths safely.
-        const allowRelative = field.allowRelative === true;
-        let valid = false;
-        if (urlRegex.test(trimmed) || isValidUrl(trimmed)) {
-          valid = true;
-        } else if (allowRelative) {
-          try {
-            new URL(trimmed, "http://example.com");
-            valid = true;
-          } catch {
-            valid = false;
-          }
-        }
-
-        if (!valid) return t("Must be a valid URL");
-      }
-
-      const err = validateFieldValue(definitionName, field, trimmed, t);
-      return err ?? null;
+      return validateField(definitionName, field, input, t);
     },
     [definitionName, field, t]
   );
 
-  // Handle user typing
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newVal = e.target.value;
-
-    const err = validateCb(newVal);
-    onChange?.(newVal.trim(), err);
-  };
-
-  // Sync value changes from parent
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<UrlInputProps["onError"] | undefined>(onError);
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
-
-  React.useEffect(() => {
-    const v = value ?? "";
-    const err = validateCb(v);
-    if (inputRef.current && inputRef.current.value !== String(v)) {
-      inputRef.current.value = String(v);
-    }
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
-    }
-    return undefined;
-  }, [value, validateCb]);
-
-  const error = React.useMemo(
-    () => validateCb(String(value ?? "")),
-    [value, validateCb]
-  );
+  // Use shared uncontrolled + validated input hook
+  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
+    value,
+    onChange,
+    onError,
+    validate,
+  });
 
   return (
     <StandardFieldLayout field={field} error={error}>
       <input
         id={field.name}
         type="url"
+        // IMPORTANT:
+        // This input is intentionally UNCONTROLLED for typing performance.
+        // - `defaultValue` is only used on mount.
         defaultValue={String(value ?? "")}
         ref={inputRef}
         onChange={handleChange}
-        style={{ alignItems: "left" }}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         placeholder="https://example.com"
         aria-invalid={!!error}

@@ -90,7 +90,7 @@ describe('FileInput', () => {
       new File(['content2'], 'file2.pdf', { type: 'application/pdf' }),
       new File(['content3'], 'file3.jpg', { type: 'image/jpeg' })
     ];
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Upload', accept: '*', multiple: true });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', displayName: 'Upload', accept: '*', multiple: true });
     
     renderWithProvider(
       <FileInput {...baseFieldProps} field={field} value={mockFiles} onChange={onChange} />
@@ -104,7 +104,7 @@ describe('FileInput', () => {
   it('merges newly selected files with existing files when multiple is true', async () => {
     const onChange = vi.fn();
     const existingFile = new File(['content1'], 'existing.txt', { type: 'text/plain' });
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Upload', accept: '*', multiple: true });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', displayName: 'Upload', accept: '*', multiple: true });
     
     const { container } = renderWithProvider(
       <FileInput {...baseFieldProps} field={field} value={[existingFile]} onChange={onChange} />
@@ -131,7 +131,7 @@ describe('FileInput', () => {
 
   it('validates required field', () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Required Upload', accept: '*', required: true });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', displayName: 'Required Upload', accept: '*', required: true });
     renderWithProvider(
       <FileInput {...baseFieldProps} field={field} value={null} onChange={onChange} />
     );
@@ -142,7 +142,7 @@ describe('FileInput', () => {
 
   it('accepts valid file for required field', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Required Upload', accept: '*', required: true });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', displayName: 'Required Upload', accept: '*', required: true });
     const { container } = renderWithProvider(
       <FileInput {...baseFieldProps} field={field} value={null} onChange={onChange} />
     );
@@ -159,7 +159,7 @@ describe('FileInput', () => {
   });
 
   it('sets accept attribute', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Upload', accept: 'image/*,.pdf' });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', label: 'Upload', accept: 'image/*,.pdf' });
     const { container } = renderWithProvider(
       <FileInput {...baseFieldProps} field={field} value={null} />
     );
@@ -169,7 +169,7 @@ describe('FileInput', () => {
   });
 
   it('sets multiple attribute when multiple is true', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Upload', accept: '*', multiple: true });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', label: 'Upload', accept: '*', multiple: true });
     const { container } = renderWithProvider(
       <FileInput {...baseFieldProps} field={field} value={null} />
     );
@@ -179,7 +179,7 @@ describe('FileInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Upload', accept: '*', tooltip: 'Select a file to upload' });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', displayName: 'Upload', accept: '*', tooltip: 'Select a file to upload' });
     renderWithProvider(<FileInput {...baseFieldProps} field={field} value={null} />);
 
     const icons = screen.getAllByTestId('tooltip-icon');
@@ -187,7 +187,7 @@ describe('FileInput', () => {
   });
 
   it('has accessible id matching field name', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Upload', name: 'fileUpload', accept: '*' });
+    const field = createMockField<DefinitionPropertyField>({type: 'file', displayName: 'Upload', name: 'fileUpload', accept: '*' });
     const { container } = renderWithProvider(
       <FileInput {...baseFieldProps} field={field} value={null} />
     );

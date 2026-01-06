@@ -5,7 +5,7 @@ import type {
   DefinitionPropertyField,
   BaseInputProps,
 } from "../../core/reactaFormTypes";
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
@@ -15,38 +15,9 @@ export type FloatArrayInputProps = BaseInputProps<
   DefinitionPropertyField
 >;
 
-const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
-function isValidFloatArray(input: string) {
-  return input
-    .split(",")
-    .map((item) => item.trim())
-    .every((val) => validFloatRegex.test(val));
-}
-
 /**
  * FloatArrayInput component
- *
- * A controlled input component for editing an array of floating-point numbers represented as
- * a delimiter-separated string. It supports:
- * - Parsing and validating each float value.
- * - Required field validation.
- * - Min/max validation for the number of values.
- * - Lower and upper limit constraints (inclusive or exclusive) per value.
- *
- * Props:
- * - field: Metadata describing the input field, including validation rules and display info.
- * - value: The float array.
- * - onChange: Callback invoked when input changes, returning the parsed float array and validation error.
  */
-
-const parseArray = (text: string): number[] => {
-  if (!text || text.trim() === "") return [];
-  return text
-    .split(",")
-    .map((v) => v.trim())
-    .filter(Boolean)
-    .map(Number);
-};
 
 const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   field,
@@ -59,54 +30,8 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
     Array.isArray(value) ? value.join(", ") : String(value ?? "")
   );
   const validate = React.useCallback(
-    (inputValue: string): string | null => {
-      if (inputValue.trim() === "") {
-        return field.required ? t("Value required") : null;
-      }
-
-      if (!isValidFloatArray(inputValue)) {
-        return t("Each value must be a valid float");
-      }
-
-      const numbers = parseArray(inputValue);
-      if (field.minCount !== undefined && numbers.length < field.minCount) {
-        return t("Minimum number of values: {{1}}", field.minCount);
-      }
-
-      if (field.maxCount !== undefined && numbers.length > field.maxCount) {
-        return t("Maximum number of values: {{1}}", field.maxCount);
-      }
-
-      for (const num of numbers) {
-        if (field.min !== undefined) {
-          const belowLimit = field.minInclusive
-            ? num < field.min
-            : num <= field.min;
-          if (belowLimit) {
-            return t(
-              "Each value must be {{1}} {{2}}",
-              field.minInclusive ? "≥" : ">",
-              field.min
-            );
-          }
-        }
-
-        if (field.max !== undefined) {
-          const aboveLimit = field.maxInclusive
-            ? num > field.max
-            : num >= field.max;
-          if (aboveLimit) {
-            return t(
-              "Each value must be {{1}} {{2}}",
-              field.maxInclusive ? "≤" : "<",
-              field.max
-            );
-          }
-        }
-      }
-
-      const err = validateFieldValue(definitionName, field, numbers, t);
-      return err ?? null;
+    (input: string): string | null => {
+      return validateField(definitionName, field, input, t);
     },
     [definitionName, field, t]
   );
@@ -128,18 +53,21 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
+  const [error, setError] = React.useState<string | null>(null);
+
   // synchronize validation when external value or field metadata change
   React.useEffect(() => {
     const input = Array.isArray(value) ? value.join(", ") : String(value ?? "");
     const err = validate(input);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
+      setError(err);
       onErrorRef.current?.(err ?? null);
     }
   }, [value, field.required, validate, t]);
 
   return (
-    <StandardFieldLayout field={field} error={validate(inputValue)}>
+    <StandardFieldLayout field={field} error={error}>
       <input
         id={field.name}
         type="text"
@@ -147,10 +75,8 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         style={{ flex: 1 }}
-        aria-invalid={!!validate(inputValue)}
-        aria-describedby={
-          validate(inputValue) ? `${field.name}-error` : undefined
-        }
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

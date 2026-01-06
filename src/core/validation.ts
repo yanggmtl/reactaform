@@ -7,6 +7,7 @@ import type {
   TranslationFunction,
 } from "./reactaFormTypes";
 import {
+  getBuiltinFieldValidationHandler,
   getFieldValidationHandler,
   getFormValidationHandler,
 } from "./registries/validationHandlerRegistry";
@@ -25,10 +26,10 @@ const formHandlerCache = new Map<string, FormValidationHandler | null>();
 
 // Validate a single field value using its validation handler
 // Returns first error string or null if valid
-export function validateFieldValue(
+export function validateFieldWithHandler(
   definitionName: string,
   field: DefinitionPropertyField,
-  value: FieldValueType | unknown,
+  value: FieldValueType,
   t: TranslationFunction
 ): string | null {
   if (!field || !field.validationHandlerName) {
@@ -77,6 +78,40 @@ export function validateFieldValue(
   }
   return null;
 }
+
+// Deprecated: use validateFieldWithHandler instead
+export function validateFieldValue(
+  definitionName: string,
+  field: DefinitionPropertyField,
+  value: FieldValueType | unknown,
+  t: TranslationFunction
+): string | null {
+  return validateFieldWithHandler(definitionName, field, value as FieldValueType, t);
+}
+
+export function validateField(
+  definitionName: string,
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction
+): string | null {
+  const buildtinValidator = getBuiltinFieldValidationHandler(field.type);
+  if (buildtinValidator) {
+    const err = buildtinValidator(field, input, t);
+    if (err) {
+      return err;
+    }
+  } else {
+    // Fallback to required check if no builtin validator
+    const inputStr = String(input ?? "").trim();
+    if (inputStr === "") {
+      return field.required ? t("Value required") : null;
+    }
+  }
+
+  return validateFieldWithHandler(definitionName, field, input, t);
+}
+
 
 // Validate entire form values using form-level validation handler
 // Returns array of error strings or null if valid

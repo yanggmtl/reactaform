@@ -2,6 +2,8 @@ import BaseRegistry from "./baseRegistry";
 import * as React from "react";
 import type { DefinitionPropertyField } from "../reactaFormTypes";
 import { useDebouncedCallback } from "../../hooks/useDebouncedCallback";
+import { DEBOUNCE_CONFIG, DebounceConfig } from "./debounceConfig";
+import { IS_TEST_ENV } from "./debounceEnv";
 
 import CheckboxInput from "../../components/fields/CheckboxInput";
 import ColorInput from "../../components/fields/ColorInput";
@@ -29,6 +31,7 @@ import TimeInput from "../../components/fields/TimeInput";
 import UnitValueInput from "../../components/fields/UnitValueInput";
 import UrlInput from "../../components/fields/UrlInput";
 
+
 // IMPORTANT: This registry is part of the public API surface.
 // Do not expose React types (e.g. `React.ComponentType`) from here, because
 // the emitted `.d.ts` can become coupled to the consumer's React typings
@@ -36,20 +39,6 @@ import UrlInput from "../../components/fields/UrlInput";
 type RegisteredComponent = unknown;
 
 const registry = new BaseRegistry<RegisteredComponent>();
-
-// Only apply debouncing for a subset of interactive input types where
-// rapid or repeated events are common and we want to stabilize updates.
-const NON_DEBOUNCED_TYPES = new Set([
-  "checkbox",
-  "switch",
-  "dropdown",
-  "radio",
-  "multi-selection",
-  "slider",
-  "stepper",
-  "color",
-  "rating",
-]);
 
 const baseComponents: Record<string, RegisteredComponent> = {
   checkbox: CheckboxInput,
@@ -79,59 +68,78 @@ const baseComponents: Record<string, RegisteredComponent> = {
   unit: UnitValueInput,
   url: UrlInput,
 };
+
+type WrappedProps = {
+  field?: Partial<DefinitionPropertyField>;
+  onChange?: ((...args: unknown[]) => void) | undefined;
+} & Record<string, unknown>;
+
+function wrapWithDebounce(
+  Component: RegisteredComponent,
+  config: Exclude<DebounceConfig, false>
+): RegisteredComponent {
+  if (IS_TEST_ENV) {
+    // No debounce in test environment
+    return Component;
+  }
+  
+  const { wait = 200, leading, trailing } = config;
+
+  const Wrapped = React.memo((props: WrappedProps) => {
+    const onChangeRef = React.useRef(props.onChange);
+
+    React.useEffect(() => {
+      onChangeRef.current = props.onChange;
+    }, [props.onChange]);
+
+    const { callback, cancel } = useDebouncedCallback(
+      (...args: unknown[]) => {
+        onChangeRef.current?.(...args);
+      },
+      wait,
+      { leading, trailing }
+    );
+
+    React.useEffect(() => cancel, [cancel]);
+
+    return React.createElement(
+      Component as React.ElementType,
+      { ...props, onChange: callback }
+    );
+  });
+
+  Wrapped.displayName = "DebouncedFieldWrapper";
+  return Wrapped;
+}
+
 export function registerComponentInternal(
   type: string,
   component: unknown,
   isBaseComponent: boolean
 ): void {
-
   const typedComponent = component as RegisteredComponent;
 
   if (!isBaseComponent && type in baseComponents) {
-    console.warn(
-      `Can't Overwrite Base Component type "${type}".`
-    );
+    console.warn(`Can't overwrite base component type "${type}".`);
     return;
   }
 
-  if (NON_DEBOUNCED_TYPES.has(type)) {
+  const debounceConfig = DEBOUNCE_CONFIG[type];
+
+  // No debounce → register directly
+  if (debounceConfig === false) {
     registry.register(type, typedComponent);
     return;
   }
 
-  type WrappedProps = {
-    field?: Partial<DefinitionPropertyField>;
-    onChange?: ((...args: unknown[]) => void) | undefined;
-  } & Record<string, unknown>;
+  // Debounced (explicit or default)
+  const effectiveConfig =
+    debounceConfig ?? { wait: 200 };
 
-  const Wrapped = (props: WrappedProps) => {
-    // Default debounce to 200ms
-    const wait = 200;
-    const { callback: debouncedOnChange, cancel } = useDebouncedCallback(
-      (...args: unknown[]) => {
-        const onChange = props.onChange;
-        if (typeof onChange === "function") {
-          onChange(...args);
-        }
-      },
-      wait
-    );
-
-    React.useEffect(() => {
-      return () => {
-        // ensure we cancel pending debounced calls on unmount
-        cancel();
-      };
-    }, [cancel]);
-
-    return React.createElement(
-      // Registry stores arbitrary component shapes; runtime expects a valid React element type.
-      typedComponent as React.ElementType,
-      { ...props, onChange: debouncedOnChange }
-    );
-  };
-
-  registry.register(type, Wrapped);
+  registry.register(
+    type,
+    wrapWithDebounce(typedComponent, effectiveConfig)
+  );
 }
 
 export function registerComponent(type: string, component: unknown): void {

@@ -38,7 +38,7 @@ export const loadCommon = async (
   language: string
 ): Promise<TranslationLoadResult> => {
   try {
-    let translations: TranslationMap;
+    let translations: TranslationMap = {};
 
     switch (language.toLowerCase()) {
       case "fr":
@@ -84,12 +84,11 @@ export const loadCommonTranslation = async (
     return { success: false, translations: {}, error: "Language is required" };
   }
 
-  const normalizedLang = language.toLowerCase();
-
-  if (normalizedLang === "en") {
+  if (!language || language.toLowerCase() === "en") {
     return { success: true, translations: {}, fromCache: false };
   }
 
+  const normalizedLang = language.toLowerCase();
   // Check cache first
   if (commonTranslationCache.has(normalizedLang)) {
     return {
@@ -130,10 +129,10 @@ export const loadUserTranslation = async (
     };
   }
 
-  const cacheKey = `${language.toLowerCase()}/${localizeName}`;
+  const key = `${language.toLowerCase()}/${localizeName}`;
 
   // Check failed cache
-  if (userFailedSet.has(cacheKey)) {
+  if (userFailedSet.has(key)) {
     return {
       success: false,
       translations: {},
@@ -143,10 +142,10 @@ export const loadUserTranslation = async (
   }
 
   // Check successful cache
-  if (userTranslationCache.has(cacheKey)) {
+  if (userTranslationCache.has(key)) {
     return {
       success: true,
-      translations: userTranslationCache.get(cacheKey) || {},
+      translations: userTranslationCache.get(key) || {},
       fromCache: true,
     };
   }
@@ -160,12 +159,10 @@ export const loadUserTranslation = async (
     const response = await fetch(url);
 
     if (!response.ok) {
-      const error = `HTTP ${response.status}: ${response.statusText}`;
-
       if (response.status === 404) {
         // 404 is not a failure, just no translations available
-        userTranslationCache.set(cacheKey, {});
-        cacheMetadata.set(cacheKey, {
+        userTranslationCache.set(key, {});
+        cacheMetadata.set(key, {
           loadedAt: new Date(),
           size: 0,
           source: "user",
@@ -178,11 +175,12 @@ export const loadUserTranslation = async (
         };
       }
 
-      userFailedSet.add(cacheKey);
+      userFailedSet.add(key);
       return {
         success: false,
         translations: {},
-        error,
+        error: `HTTP ${response.status}`,
+        fromCache: false 
       };
     }
 
@@ -204,7 +202,7 @@ export const loadUserTranslation = async (
 
     if (!text) {
       const error = "Empty translation file";
-      userFailedSet.add(cacheKey);
+      userFailedSet.add(key);
       return { success: false, translations: {}, error };
     }
 
@@ -215,14 +213,14 @@ export const loadUserTranslation = async (
       const error = `Invalid JSON in translation file: ${
         e instanceof Error ? e.message : String(e)
       }`;
-      userFailedSet.add(cacheKey);
+      userFailedSet.add(key);
       return { success: false, translations: {}, error };
     }
 
     // Ensure we received an object and normalize values to strings.
     if (!parsed || typeof parsed !== "object") {
       const error = "Invalid translation file format";
-      userFailedSet.add(cacheKey);
+      userFailedSet.add(key);
       return {
         success: false,
         translations: {},
@@ -238,8 +236,8 @@ export const loadUserTranslation = async (
     );
 
     // Cache successful result
-    userTranslationCache.set(cacheKey, userTranslations);
-    cacheMetadata.set(cacheKey, {
+    userTranslationCache.set(key, userTranslations);
+    cacheMetadata.set(key, {
       loadedAt: new Date(),
       size: Object.keys(userTranslations).length,
       source: "user",
@@ -254,7 +252,7 @@ export const loadUserTranslation = async (
     const errorMessage = `Failed to load user translations: ${
       error instanceof Error ? error.message : "Unknown error"
     }`;
-    userFailedSet.add(cacheKey);
+    userFailedSet.add(key);
 
     return {
       success: false,
@@ -297,24 +295,11 @@ export function isDebugMode(): boolean {
  * Interpolation text
  */
 function interpolateText(text: string, args: unknown[]): string {
-  if (args.length === 0 || !text.includes('{{')) {
-    return text;
-  }
-  
-  return text.replace(/\{\{(\d+)\}\}/g, (match: string, index: string) => {
+  if (args.length === 0) return text;
+  return text.replace(/\{\{(\d+)\}\}/g, (match, index) => {
     const i = parseInt(index, 10) - 1;
-    const replacement = args[i];
-    
-    if (replacement === undefined || replacement === null) {
-      return match; // Keep original placeholder if no replacement
-    }
-    
-    // Convert to string safely
-    try {
-      return String(replacement);
-    } catch {
-      return match;
-    }
+    const val = args[i];
+    return val == null ? match : String(val);
   });
 }
 

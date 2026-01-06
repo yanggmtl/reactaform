@@ -3,8 +3,9 @@ import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 
 type DateInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -37,9 +38,10 @@ const formatDateForInput = (dateValue?: string): string => {
   const parsed = parseDate(dateValue);
   if (parsed) {
     // Format as yyyy-MM-dd
-    const year = parsed.getFullYear();
-    const month = String(parsed.getMonth() + 1).padStart(2, "0");
-    const day = String(parsed.getDate()).padStart(2, "0");
+    // Use UTC getters to avoid timezone shifts when formatting ISO timestamps
+    const year = parsed.getUTCFullYear();
+    const month = String(parsed.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(parsed.getUTCDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
 
@@ -58,80 +60,37 @@ const DateInput: React.FC<DateInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const { name, required } = field;
 
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<DateInputProps["onError"] | undefined>(onError);
+  const validate = React.useCallback(
+    (input: string): string | null => {
+      return validateField(definitionName, field, input, t) ?? null;
+    },
+    [field, definitionName, t]
+  );
 
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
+  // Use our shared uncontrolled + validated input hook
+  const formattedValue = formatDateForInput(value);
 
-  /**
-   * Validate the current value.
-   */
-  const validate = React.useCallback((dateValue: string): string | null => {
-    if (!dateValue || dateValue.trim() === "") {
-      return required ? t("Value required") : null;
-    }
-
-    if (dateValue) {
-      const parsed = parseDate(dateValue);
-      if (!parsed) return t("Invalid date format");
-      // enforce min/max if configured on the field
-      if (field.minDate) {
-        const minParsed = parseDate(field.minDate);
-        if (minParsed && parsed.getTime() < minParsed.getTime()) {
-          return t("Date must be on or after {{1}}", field.minDate);
-        }
-      }
-
-      if (field.maxDate) {
-        const maxParsed = parseDate(field.maxDate);
-        if (maxParsed && parsed.getTime() > maxParsed.getTime()) {
-          return t("Date must be on or before {{1}}", field.maxDate);
-        }
-      }
-    }
-
-    // run any field-level validation handler
-    const err = validateFieldValue(definitionName, field, dateValue, t);
-    return err ?? null;
-  }, [field, definitionName, t, required]);
-
-  /**
-   * Handle user input change.
-   */
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = e.target.value;
-    const err = validate(newDate);
-    onChange?.(newDate, err);
-  };
-
-  /**
-   * Revalidate when external value or field rules change.
-   */
-  React.useEffect(() => {
-    // Re-validate when external value or required constraint changes.
-    const err = validate(value);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
-    }
-  }, [value, validate]);
+  const { inputRef, error, handleChange } = useUncontrolledValidatedInput<HTMLInputElement>({
+    value: formattedValue,
+    onChange,
+    onError,
+    validate,
+  });
 
   return (
-    <StandardFieldLayout field={field} error={validate(value)}>
+    <StandardFieldLayout field={field} error={error}>
       <input
-        id={name}
+        id={field.name}
         type="date"
-        value={formatDateForInput(value)}
+        ref = {inputRef}
+        defaultValue={formatDateForInput(value)}
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         {...(field.minDate ? { min: field.minDate } : {})}
         {...(field.maxDate ? { max: field.maxDate } : {})}
-        aria-invalid={!!validate(value)}
-        aria-describedby={validate(value) ? `${name}-error` : undefined}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
       />
     </StandardFieldLayout>
   );

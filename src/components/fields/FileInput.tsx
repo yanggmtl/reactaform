@@ -1,7 +1,7 @@
 import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 
 export type FileInputProps = BaseInputProps<File | File[] | null, DefinitionPropertyField>;
@@ -11,6 +11,8 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const onErrorRef = React.useRef<FileInputProps["onError"] | undefined>(onError);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     onErrorRef.current = onError;
@@ -26,29 +28,23 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
   };
 
   const validate = React.useCallback(
-    (input: File | File[] | null): string | null => {
-      if (
-        field.required &&
-        (!input || (Array.isArray(input) && input.length === 0))
-      ) {
-        return t("Value required");
-      }
-
-      const err = validateFieldValue(definitionName, field, input, t);
-      return err ?? null;
+    (input: File | File[]): string | null => {
+      return validateField(definitionName, field, input, t);
     },
     [field, definitionName, t]
   );
 
-  const error = React.useMemo(() => validate(value), [value, validate]);
-
   React.useEffect(() => {
-    const err = validate(value);
+    const err = validate(value ?? []);
     // Call onChange for initial validation so consumers/tests receive the
     // current validation state on mount. This mirrors previous behavior and
     // keeps test expectations stable.
     onChange?.(value, err);
-    onErrorRef.current?.(err ?? null);
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, validate]);
 
@@ -67,7 +63,12 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
         selected = newFiles[0];
       }
     }
-    const err = validate(selected);
+    const err = validate(selected ?? []);
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
     onChange?.(selected, err);
     
     // Reset input value to allow selecting the same file again if needed
@@ -96,6 +97,11 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
       }
       
       const err = validate(selected);
+      if (err !== prevErrorRef.current) {
+        prevErrorRef.current = err;
+        setError(err);
+        onErrorRef.current?.(err ?? null);
+      }
       onChange?.(selected, err);
     }
   };
@@ -116,10 +122,20 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     if (Array.isArray(value) && typeof index === 'number') {
       const newFiles = value.filter((_, i) => i !== index);
       const selected = newFiles.length > 0 ? newFiles : null;
-      const err = validate(selected);
+      const err = validate(selected ?? []);
+      if (err !== prevErrorRef.current) {
+        prevErrorRef.current = err;
+        setError(err);
+        onErrorRef.current?.(err ?? null);
+      }
       onChange?.(selected, err);
     } else {
-      const err = validate(null);
+      const err = validate([]);
+      if (err !== prevErrorRef.current) {
+        prevErrorRef.current = err;
+        setError(err);
+        onErrorRef.current?.(err ?? null);
+      }
       onChange?.(null, err);
     }
   };
@@ -192,9 +208,9 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
           style={{
             position: 'relative',
             borderStyle: 'dashed',
-            borderColor: isDragging 
-                ? 'var(--reactaform-color-primary, #2563eb)' 
-                : error 
+            borderColor: isDragging
+                ? 'var(--reactaform-color-primary, #2563eb)'
+                : error
                   ? 'var(--reactaform-color-error, #ef4444)'
                   : undefined,
             borderWidth: '1px',

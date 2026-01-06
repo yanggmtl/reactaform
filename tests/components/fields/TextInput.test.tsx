@@ -12,7 +12,7 @@ describe('TextInput', () => {
   });
 
   it('renders with basic props', () => {
-    const field = createMockField<DefinitionPropertyField>({ name: 'text', type: 'string' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'text', type: 'text' });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" />
     );
@@ -23,7 +23,7 @@ describe('TextInput', () => {
   });
 
   it('displays initial value', () => {
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ type: 'text' });
     const { getByDisplayValue } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="initial value" />
     );
@@ -33,7 +33,7 @@ describe('TextInput', () => {
 
   it('calls onChange when user types', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ type: 'text' });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -46,7 +46,7 @@ describe('TextInput', () => {
 
   it('shows error for required field when empty', async () => {
     const onError = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'text', required: true });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" onError={onError} />
     );
@@ -61,7 +61,7 @@ describe('TextInput', () => {
 
   it('respects maxLength validation', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ maxLength: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'text', maxLength: 5 });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -73,7 +73,7 @@ describe('TextInput', () => {
   });
 
   it('handles tooltip display when tooltip is provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ tooltip: 'This is a tooltip' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'text', tooltip: 'This is a tooltip' });
     const { getByTestId } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" />
     );
@@ -84,7 +84,7 @@ describe('TextInput', () => {
   });
 
   it('renders with expected CSS classes', () => {
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ type: 'text' });
     const { getByRole } = renderWithProvider(
       <TextInput {...baseFieldProps} field={field} value="" />
     );

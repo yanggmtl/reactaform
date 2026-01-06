@@ -7,7 +7,7 @@ import { renderWithProvider, createMockField, baseFieldProps } from '../../test-
 
 describe('ColorInput', () => {
   it('renders select and color picker', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Choose Color' });
+    const field = createMockField<DefinitionPropertyField>({type : 'color', displayName: 'Choose Color' });
     renderWithProvider(<ColorInput {...baseFieldProps} field={field} value="#ff0000" />);
 
     expect(screen.getByRole('combobox')).toBeInTheDocument();
@@ -15,7 +15,7 @@ describe('ColorInput', () => {
   });
 
   it('displays initial color value in select', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', label: 'Color' });
     renderWithProvider(<ColorInput {...baseFieldProps} field={field} value="#ff0000" />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
@@ -25,7 +25,7 @@ describe('ColorInput', () => {
   it('calls onChange when selecting a predefined color', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ label: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', label: 'Color' });
     renderWithProvider(
       <ColorInput {...baseFieldProps} field={field} value="#000000" onChange={onChange} />
     );
@@ -37,7 +37,7 @@ describe('ColorInput', () => {
   });
 
   it('displays all predefined colors in select', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', label: 'Color' });
     renderWithProvider(<ColorInput {...baseFieldProps} field={field} value="#000000" />);
 
     const select = screen.getByRole('combobox');
@@ -51,7 +51,7 @@ describe('ColorInput', () => {
   });
 
   it('normalizes 3-digit hex colors to 6 digits', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', label: 'Color' });
     renderWithProvider(<ColorInput {...baseFieldProps} field={field} value="#abc" />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
@@ -69,7 +69,7 @@ describe('ColorInput', () => {
   });
 
   it('handles invalid hex color by defaulting to black', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', label: 'Color' });
     renderWithProvider(<ColorInput {...baseFieldProps} field={field} value="invalid" />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;
@@ -85,7 +85,7 @@ describe('ColorInput', () => {
   });
 
   it('displays color preview box with correct background', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', displayName: 'Color' });
     const { container } = renderWithProvider(
       <ColorInput {...baseFieldProps} field={field} value="#ff0000" />
     );
@@ -99,7 +99,7 @@ describe('ColorInput', () => {
 
   it('updates color when using color picker', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', displayName: 'Color' });
     const { container } = renderWithProvider(
       <ColorInput {...baseFieldProps} field={field} value="#000000" onChange={onChange} />
     );
@@ -120,7 +120,7 @@ describe('ColorInput', () => {
   });
 
   it('has accessible id matching field name', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Color', name: 'bgColor' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', displayName: 'Color', name: 'bgColor' });
     renderWithProvider(<ColorInput {...baseFieldProps} field={field} value="#000000" />);
 
     const select = screen.getByRole('combobox');
@@ -136,7 +136,7 @@ describe('ColorInput', () => {
   });
 
   it('handles uppercase hex colors', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Color' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'color', displayName: 'Color' });
     renderWithProvider(<ColorInput {...baseFieldProps} field={field} value="#FF0000" />);
 
     const select = screen.getByRole('combobox') as HTMLSelectElement;

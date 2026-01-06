@@ -24,7 +24,9 @@ describe('EmailInput', () => {
 
   it('validates email format on blur', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>(
+      { name: 'email', type: 'email' }
+    );
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" onChange={onChange} />
     );
@@ -42,7 +44,7 @@ describe('EmailInput', () => {
   it('accepts valid email addresses', async () => {
     const onChange = vi.fn();
     const onError = vi.fn();
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ name: 'email', type: 'email' });
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
@@ -57,7 +59,7 @@ describe('EmailInput', () => {
 
   it('shows error for required field when empty', async () => {
     const onError = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'email', required: true });
     const { getByRole } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" onError={onError} />
     );
@@ -72,7 +74,7 @@ describe('EmailInput', () => {
 
   it('handles edge case email formats', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({type: 'email'});
     const { getByLabelText } = renderWithProvider(
       <EmailInput field={field} value="" onChange={onChange} {...baseFieldProps} />
     );
@@ -105,7 +107,7 @@ describe('EmailInput', () => {
   });
 
   it('handles tooltip display when tooltip is provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ tooltip: 'Enter a valid email address' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'email', tooltip: 'Enter a valid email address' });
     const { getByTestId } = renderWithProvider(
       <EmailInput {...baseFieldProps} field={field} value="" />
     );

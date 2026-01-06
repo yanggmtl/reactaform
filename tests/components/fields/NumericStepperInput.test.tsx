@@ -7,7 +7,7 @@ import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes'
 
 describe('NumericStepperInput', () => {
   it('renders number input with label', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Quantity', defaultValue: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Quantity', defaultValue: 5 });
     renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={5} />);
 
     expect(screen.getByRole('spinbutton')).toBeInTheDocument();
@@ -15,7 +15,7 @@ describe('NumericStepperInput', () => {
   });
 
   it('displays initial value', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Count', defaultValue: 10 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Count', defaultValue: 10 });
     renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={10} />);
 
     const input = screen.getByRole('spinbutton') as HTMLInputElement;
@@ -25,7 +25,7 @@ describe('NumericStepperInput', () => {
   it('calls onChange when user types', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Number', defaultValue: 0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 0 });
     renderWithProvider(
       <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -36,13 +36,13 @@ describe('NumericStepperInput', () => {
 
     expect(onChange).toHaveBeenCalled();
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[0]).toBe(25);
+    expect(lastCall[0]).toBe("25");
   });
 
   it('validates min constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Number', defaultValue: 10, min: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 10, min: 5 });
     renderWithProvider(
       <NumericStepperInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
     );
@@ -58,7 +58,7 @@ describe('NumericStepperInput', () => {
   it('validates max constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Number', defaultValue: 10, max: 20 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 10, max: 20 });
     renderWithProvider(
       <NumericStepperInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
     );
@@ -74,7 +74,7 @@ describe('NumericStepperInput', () => {
   it('accepts valid number within min/max range', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ label: 'Number', defaultValue: 0, min: 1, max: 100 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 0, min: 1, max: 100 });
     renderWithProvider(
       <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -84,12 +84,12 @@ describe('NumericStepperInput', () => {
     await user.type(input, '50');
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[0]).toBe(50);
+    expect(lastCall[0]).toBe("50");
     expect(lastCall[1]).toBeNull(); // no error
   });
 
   it('sets min attribute when min is provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Number', defaultValue: 10, min: 5 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 10, min: 5 });
     renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={10} />);
 
     const input = screen.getByRole('spinbutton');
@@ -97,7 +97,7 @@ describe('NumericStepperInput', () => {
   });
 
   it('sets max attribute when max is provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Number', defaultValue: 10, max: 20 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 10, max: 20 });
     renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={10} />);
 
     const input = screen.getByRole('spinbutton');
@@ -113,7 +113,7 @@ describe('NumericStepperInput', () => {
   });
 
   it('defaults step to 1 when not provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Number', defaultValue: 0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 0 });
     renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={0} />);
 
     const input = screen.getByRole('spinbutton');
@@ -123,7 +123,7 @@ describe('NumericStepperInput', () => {
   it('rejects decimal values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Integer', defaultValue: 0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Integer', defaultValue: 0 });
     renderWithProvider(
       <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -139,7 +139,7 @@ describe('NumericStepperInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Required Number', defaultValue: 0, required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Required Number', defaultValue: 0, required: true });
     renderWithProvider(
       <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
     );
@@ -152,7 +152,7 @@ describe('NumericStepperInput', () => {
   });
 
   it('has accessible id matching field name', () => {
-    const field = createMockField<DefinitionPropertyField>({ type: 'numericStepper', label: 'Count', name: 'itemCount', defaultValue: 0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Count', name: 'itemCount', defaultValue: 0 });
     renderWithProvider(<NumericStepperInput {...baseFieldProps} field={field} value={0} />);
 
     const input = screen.getByRole('spinbutton');

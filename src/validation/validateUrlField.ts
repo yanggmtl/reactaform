@@ -1,0 +1,57 @@
+import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
+import { registerBuiltinFieldValidationHandler } from "../core/registries/validationHandlerRegistry";
+
+// Simple URL validation (accepts http(s), ftp, file, etc.)
+const urlRegex =
+  /^(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|]$/i;
+
+// Alternative: also validate via URL constructor for stricter checks
+const isValidUrl = (s: string): boolean => {
+  try {
+    new URL(s);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export function validateUrlField(
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction
+): string | null {
+  const trimmed = String(input ?? "").trim();
+
+  if (trimmed === "") {
+    return field.required ? t("Value required") : null;
+  }
+
+  // Absolute URL
+  if (urlRegex.test(trimmed) || isValidUrl(trimmed)) {
+    return null;
+  }
+
+  // Relative URL (only if allowed)
+  if (field.allowRelative === true) {
+    if (!trimmed.startsWith("/")) {
+      return t("Must be a valid URL");
+    }
+    
+    // Reject characters that must be percent-encoded
+    if (encodeURI(trimmed) !== trimmed) {
+      return t("Must be a valid URL");
+    }
+
+    try {
+      new URL(trimmed, "http://example.com");
+      return null;
+    } catch {
+      return t("Must be a valid URL");
+    }
+  }
+
+  return t("Must be a valid URL");
+}
+
+
+registerBuiltinFieldValidationHandler("url", validateUrlField);

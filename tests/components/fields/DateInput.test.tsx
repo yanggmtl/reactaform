@@ -15,7 +15,7 @@ describe('DateInput', () => {
   });
 
   it('displays initial value formatted for input', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Date' });
+    const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Date' });
     const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="2024-03-15" />);
 
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
+import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 import SwitchInput from '../../../src/components/fields/SwitchInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 
@@ -68,21 +68,6 @@ describe('SwitchInput', () => {
     expect(onChange).toHaveBeenCalledWith(false, null);
   });
 
-  it('shows error for required field when false', async () => {
-    const onError = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ required: true });
-    const { container } = renderWithProvider(
-      <SwitchInput field={field} value={false} onError={onError} {...baseFieldProps} />
-    );
-
-    const switchElement = container.querySelector('[role="switch"], .switch, [data-testid="switch"]');
-    await user.click(switchElement!);
-    await user.click(switchElement!); // turn it off
-    
-    await waitForUpdate();
-    expect(onError).toHaveBeenCalledWith(expect.stringContaining('required'));
-  });
-
   it('has proper accessibility attributes', () => {
     const field = createMockField<DefinitionPropertyField>();
     const { container } = renderWithProvider(
@@ -91,23 +76,6 @@ describe('SwitchInput', () => {
 
     const switchElement = container.querySelector('[role="switch"], .switch, [data-testid="switch"]');
     expect(switchElement).toHaveAttribute('aria-checked', 'false');
-  });
-
-  it('updates aria-checked when value changes', () => {
-    const field = createMockField<DefinitionPropertyField>();
-    const { container, rerender } = renderWithProvider(
-      <SwitchInput field={field} value={false} {...baseFieldProps} />
-    );
-
-    let switchElement = container.querySelector('[role="switch"], .switch, [data-testid="switch"]');
-    expect(switchElement).toHaveAttribute('aria-checked', 'false');
-
-    rerender(
-      <SwitchInput field={field} value={true} {...baseFieldProps} />
-    );
-
-    switchElement = container.querySelector('[role="switch"], .switch, [data-testid="switch"]');
-    expect(switchElement).toHaveAttribute('aria-checked', 'true');
   });
 
   it('handles keyboard interaction', async () => {

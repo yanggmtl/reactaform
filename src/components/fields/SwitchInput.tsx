@@ -6,7 +6,6 @@ import type {
 } from "../../core/reactaFormTypes";
 
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateFieldValue } from "../../core/validation";
 import { CSS_CLASSES } from "../../utils";
 
 // Props expected by SwitchInput component
@@ -24,9 +23,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
   field,
   value,
   onChange,
-  onError,
 }) => {
-  const { t, formStyle, fieldStyle, definitionName } = useReactaFormContext();
+  const { t, formStyle, fieldStyle } = useReactaFormContext();
   const fs = formStyle as Record<string, unknown> | undefined;
   const ffs = fieldStyle as Record<string, unknown> | undefined;
 
@@ -98,44 +96,19 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     ...styleFrom(ffs, undefined, 'knob'),
   }), [fs, ffs]);
   const isOn = Boolean(value);
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<typeof onError | undefined>(onError);
-
-  const validate = React.useCallback((val: boolean) => {
-    if (!val) {
-      return field.required ? t('Value required') : null;
-    }
-    const err = validateFieldValue(definitionName, field, val, t);
-    return err ?? null;
-  }, [field, t, definitionName]);
 
   // Toggles boolean value on click
   const handleToggle = () => {
     const newVal = !isOn;
-    const err = validate(newVal);
-    onChange?.(newVal, err);
+    onChange?.(newVal, null);
   };
 
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
-
-  React.useEffect(() => {
-    const err = validate(isOn);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
-    }
-  }, [isOn, field, validate]);
-
-  const inputId = field.name;
-  
   return (
-    <StandardFieldLayout field={field} error={validate(isOn)} rightAlign={false}>
+    <StandardFieldLayout field={field} error={null} rightAlign={false}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <label 
           className={CSS_CLASSES.label}
-          htmlFor={inputId}
+          htmlFor={field.name}
           style={{ textAlign: 'left' as const, justifyContent: 'flex-start' }}
         >
           {t(field.displayName)}
@@ -147,8 +120,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
             checked={isOn}
             readOnly={true}
             aria-label={t(field.displayName)}
-            aria-invalid={!!validate(isOn)}
-            aria-describedby={validate(isOn) ? `${field.name}-error` : undefined}
+            aria-invalid={false}
+            aria-describedby={undefined}
             style={hiddenInputStyle}
             tabIndex={-1}
           />
@@ -157,8 +130,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
             data-testid="switch"
             tabIndex={0}
             aria-checked={isOn}
-            aria-invalid={!!validate(isOn)}
-            aria-describedby={validate(isOn) ? `${field.name}-error` : undefined}
+            aria-invalid={false}
+            aria-describedby={undefined}
             onClick={handleToggle}
             onKeyDown={(e) => {
               if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Space' || e.key === 'Enter') {

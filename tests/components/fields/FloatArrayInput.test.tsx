@@ -7,7 +7,7 @@ import { renderWithProvider, createMockField, baseFieldProps } from '../../test-
 
 describe('FloatArrayInput', () => {
   it('renders text input with label', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(<FloatArrayInput {...baseFieldProps} field={field} value={[]} />);
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
@@ -15,7 +15,7 @@ describe('FloatArrayInput', () => {
   });
 
   it('displays initial array value as comma-separated string', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [1.5, 2.7, 3.9] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [1.5, 2.7, 3.9] });
     renderWithProvider(<FloatArrayInput {...baseFieldProps} field={field} value={[1.5, 2.7, 3.9]} />);
 
     const input = screen.getByRole('textbox') as HTMLInputElement;
@@ -25,7 +25,7 @@ describe('FloatArrayInput', () => {
   it('calls onChange when user types', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -39,7 +39,7 @@ describe('FloatArrayInput', () => {
   it('validates float format', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -54,7 +54,7 @@ describe('FloatArrayInput', () => {
   it('accepts integer values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -69,7 +69,7 @@ describe('FloatArrayInput', () => {
   it('accepts scientific notation', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -84,7 +84,7 @@ describe('FloatArrayInput', () => {
   it('rejects non-numeric values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -98,7 +98,7 @@ describe('FloatArrayInput', () => {
 
   it('validates required field', async () => {
     const onError = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Required Floats', defaultValue: [], required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Required Floats', defaultValue: [], required: true });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onError={onError} />
     );
@@ -112,7 +112,7 @@ describe('FloatArrayInput', () => {
   it('validates minCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [], minCount: 3 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], minCount: 3 });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -127,7 +127,7 @@ describe('FloatArrayInput', () => {
   it('validates maxCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [], maxCount: 3 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], maxCount: 3 });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -142,7 +142,7 @@ describe('FloatArrayInput', () => {
   it('validates min value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [], min: 5.0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], min: 5.0 });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -157,7 +157,7 @@ describe('FloatArrayInput', () => {
   it('validates max value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [], max: 10.0 });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], max: 10.0 });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -187,7 +187,7 @@ describe('FloatArrayInput', () => {
   it('handles negative floats', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(
       <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
     );
@@ -200,7 +200,7 @@ describe('FloatArrayInput', () => {
   });
 
   it('displays tooltip icon when provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Floats', defaultValue: [], tooltip: 'Enter comma-separated floats' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], tooltip: 'Enter comma-separated floats' });
     renderWithProvider(<FloatArrayInput {...baseFieldProps} field={field} value={[]} />);
 
     const icons = screen.getAllByTestId('tooltip-icon');

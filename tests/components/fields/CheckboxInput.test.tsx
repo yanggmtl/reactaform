@@ -12,7 +12,7 @@ describe('CheckboxInput', () => {
   });
 
   it('renders with checkbox type', () => {
-    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'boolean' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'checkbox' });
     const { getByRole } = renderWithProvider(
       <CheckboxInput field={field} value={false} {...baseFieldProps} />
     );
@@ -23,7 +23,7 @@ describe('CheckboxInput', () => {
   });
 
   it('shows checked state correctly', () => {
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'checkbox' });
     const { getByRole } = renderWithProvider(
       <CheckboxInput field={field} value={true} {...baseFieldProps} />
     );
@@ -42,7 +42,7 @@ describe('CheckboxInput', () => {
 
   it('calls onChange when clicked', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'checkbox' });
     const { getByRole } = renderWithProvider(
       <CheckboxInput field={field} value={false} onChange={onChange} {...baseFieldProps} />
     );
@@ -55,7 +55,7 @@ describe('CheckboxInput', () => {
 
   it('toggles from checked to unchecked', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>( { name: 'checkbox', type: 'checkbox' });
     const { getByRole } = renderWithProvider(
       <CheckboxInput {...baseFieldProps} field={field} value={true} onChange={onChange} />
     );
@@ -67,7 +67,7 @@ describe('CheckboxInput', () => {
   });
 
   it('has proper accessibility attributes', () => {
-    const field = createMockField<DefinitionPropertyField>({ tooltip: 'This is a helpful checkbox' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'checkbox', tooltip: 'This is a helpful checkbox' });
     const { getByRole } = renderWithProvider(
       <CheckboxInput field={field} value={false} {...baseFieldProps} />
     );
@@ -78,7 +78,7 @@ describe('CheckboxInput', () => {
 
   it('handles keyboard interaction', async () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'checkbox' });
     const { getByRole } = renderWithProvider(
       <CheckboxInput field={field} value={false} onChange={onChange} {...baseFieldProps} />
     );
@@ -91,7 +91,7 @@ describe('CheckboxInput', () => {
   });
 
   it('shows tooltip when configured', () => {
-    const field = createMockField<DefinitionPropertyField>({ tooltip: 'This is a checkbox tooltip' });
+    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'checkbox', tooltip: 'This is a checkbox tooltip' });
     const { getByTestId } = renderWithProvider(
       <CheckboxInput field={field} value={false} {...baseFieldProps} />
     );
@@ -100,7 +100,7 @@ describe('CheckboxInput', () => {
   });
 
   it('handles undefined/null values as false', () => {
-    const field = createMockField<DefinitionPropertyField>();
+    const field = createMockField<DefinitionPropertyField>({ name: 'checkbox', type: 'checkbox' });
     const { getByRole } = renderWithProvider(
       <CheckboxInput {...baseFieldProps} field={field} value={false} />
     );

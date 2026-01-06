@@ -6,10 +6,10 @@ import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
 
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 
 import PopupOptionMenu from "../PopupOptionMenu";
-import type { PopupOption, PopupOptionMenuPosition } from "../PopupOptionMenu";
+import type { PopupOptionMenuPosition } from "../PopupOptionMenu";
 import { unitsByDimension } from "../../utils/unitValueMapper";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
@@ -25,20 +25,20 @@ type Dimension =
 
 type UnitFactors = {
   default: string;
+  units: string[];
   factors: Record<string, number>;
-  labels: Record<string, string>;
-  reverseLabels?: Record<string, string>;
 };
 
 type UnitValueInputProps = BaseInputProps<[string | number, string], DefinitionPropertyField>;
 
-interface UnitOption extends PopupOption {
+interface UnitOption {
   label: string;
   value: string;
   unit: string;
 }
 
 interface GenericUnitValueInputProps extends UnitValueInputProps {
+  dimension: Dimension;
   unitFactors: UnitFactors;
 }
 
@@ -47,7 +47,7 @@ interface GenericUnitValueInputProps extends UnitValueInputProps {
 const unitFactorsMap: Record<string, UnitFactors> = {};
 
 // populate unitFactorsMap for the given dimension
-function loadUnitFactorsMap(dimension: string, t: (key: string) => string): void {
+function loadUnitFactorsMap(dimension: string): void {
   if (dimension in unitFactorsMap) {
     return;
   }
@@ -55,23 +55,19 @@ function loadUnitFactorsMap(dimension: string, t: (key: string) => string): void
   const unitsForDim = unitsByDimension[dimension] ?? {};
 
   const factorsMap: Record<string, number> = {};
-  const labelsMap: Record<string, string> = {};
-  const reverseLabelsMap: Record<string, string> = {};
+  const unitKeys: string[] = [];
 
   // Preserve ordering from the original `dimensionUnitsMap` when possible by iterating unitsForDim in insertion order
   for (const [u, info] of Object.entries(unitsForDim)) {
     if (typeof info.factor === "number") factorsMap[u] = info.factor;
-    // labelsMap holds the friendly display name for the unit
-    labelsMap[u] =  t(u);
-    reverseLabelsMap[t(u)] = u;
+    unitKeys.push(u);
   }
 
   const preferredDefault = Object.keys(unitsForDim)[0] ?? "";
   unitFactorsMap[dimension as Dimension] = {
     default: preferredDefault,
+    units: unitKeys,
     factors: factorsMap,
-    labels: labelsMap,
-    reverseLabels: reverseLabelsMap,
   };
 }
 
@@ -97,15 +93,15 @@ function getTemperatureConvertValue(
 function getConvertedOptions(
   value: number,
   unit: string,
-  unitFactors: UnitFactors
+  unitFactors: UnitFactors,
+  isTemperature: boolean
 ): UnitOption[] {
   // If input value is not a finite number, no conversion can be performed
   if (!Number.isFinite(value)) return [];
-  const isTemperature = unitFactors === unitFactorsMap.temperature;
 
   if (isTemperature) {
     // For temperature, iterate over available units (labels) and use special conversion
-    return Object.keys(unitFactors.labels).map((toUnit) => {
+    return unitFactors.units.map((toUnit) => {
       const convertedValue = getTemperatureConvertValue(unit, toUnit, value);
       if (!Number.isFinite(convertedValue)) {
         return { label: `${String(convertedValue)} ${toUnit}`, value: String(convertedValue), unit: toUnit };
@@ -128,18 +124,18 @@ function getConvertedOptions(
 
 function normalizeUnit(
   inputUnit: string,
-  unitFactors: UnitFactors
+  unitFactors: UnitFactors,
+  reverseLabels: Record<string, string>
 ): string | null {
   // If input matches a unit key, accept it
-  if (inputUnit in unitFactors.labels) return inputUnit;
+  if (unitFactors.factors[inputUnit] !== undefined || unitFactors.units.includes(inputUnit)) return inputUnit;
   // If input matches a friendly display name, map it back to the unit key
-  if (unitFactors.reverseLabels && unitFactors.reverseLabels[inputUnit]) return unitFactors.reverseLabels[inputUnit];
+  if (reverseLabels[inputUnit]) return reverseLabels[inputUnit];
   return null;
 }
 
-const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
-
-const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
+const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = React.memo(({
+  dimension,
   unitFactors,
   field,
   value,
@@ -147,39 +143,66 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
+  const value0 = value?.[0];
+  const value1 = value?.[1];
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const selectRef = React.useRef<HTMLSelectElement | null>(null);
   const [localInput, setLocalInput] = React.useState<string | null>(null);
-  const [localUnit, setLocalUnit] = React.useState<string | null>(null);
   const [showMenu, setShowMenu] = React.useState<boolean>(false);
   const [menuPosition, setMenuPosition] =
     React.useState<PopupOptionMenuPosition | null>(null);
-  const [menuOptions, setMenuOptions] = React.useState<UnitOption[] | []>([]);
+  const [menuOptions, setMenuOptions] = React.useState<UnitOption[]>([]);
 
   const validate = React.useCallback(
     (input: string, unit: string): string | null => {
-      if (!input || input.trim() === "")
-        return field.required ? t("Value required") : null;
-
-      if (!validFloatRegex.test(input)) return t("Must be a valid number");
-
-      const err = validateFieldValue(definitionName, field, [input, unit], t);
-      return err ? err : null;
+      return validateField(definitionName, field, [input, unit], t);
     },
     [definitionName, field, t]
   );
-  // Create reverseLabels locally to avoid mutating the shared unitFactors object
-  const reverseLabels = (() => {
-    if (unitFactors.reverseLabels !== undefined)
-      return unitFactors.reverseLabels;
-    return Object.fromEntries(
-      Object.entries(unitFactors.labels).map(([label, code]) => [code, label])
-    );
-  })();
+
+  // Locale-safe labels: computed from unit codes and current `t`.
+  const unitLabels = React.useMemo<Record<string, string>>(() => {
+    return Object.fromEntries(unitFactors.units.map((u) => [u, t(u)]));
+  }, [unitFactors.units, t]);
+
+  // Reverse lookup from translated label -> unit code (for backwards-compat inputs)
+  const reverseLabels = React.useMemo<Record<string, string>>(() => {
+    return Object.fromEntries(unitFactors.units.map((u) => [t(u), u]));
+  }, [unitFactors.units, t]);
+
+  const unitOptionElements = React.useMemo(
+    () =>
+      unitFactors.units.map((u) => (
+        <option key={u} value={u}>
+          {unitLabels[u] ?? u}
+        </option>
+      )),
+    [unitFactors.units, unitLabels]
+  );
+
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef<GenericUnitValueInputProps["onError"] | undefined>(
+    onError
+  );
+  const [error, setError] = React.useState<string | null>(null);
+  
   React.useEffect(() => {
-    const val = String(value[0]);
-    let unit = value[1] ?? unitFactors.default;
-    unit = normalizeUnit(unit, unitFactors) || unit;
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  // Single effect to sync props, validate, and update DOM - prevents duplicate validation
+  React.useEffect(() => {
+    const val = String(value0 ?? "");
+    const rawUnit = String(value1 ?? unitFactors.default);
+    const unit = normalizeUnit(rawUnit, unitFactors, reverseLabels) || rawUnit;
+
+    // Validate only once per props change
+    const err = validate(val, unit);
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
 
     // If the user is currently interacting with the input/select (focused),
     // avoid overwriting their edits. Otherwise update DOM values directly.
@@ -188,67 +211,54 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
       return;
     }
 
-    if (inputRef.current) inputRef.current.value = val;
-    if (selectRef.current) selectRef.current.value = unit;
+    if (inputRef.current && inputRef.current.value !== val) inputRef.current.value = val;
+    if (selectRef.current && selectRef.current.value !== unit) selectRef.current.value = unit;
     
     // Clear transient local edits when props change
     setLocalInput(null);
-    setLocalUnit(null);
-  }, [value, unitFactors]);
-
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<GenericUnitValueInputProps["onError"] | undefined>(
-    onError
-  );
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
-
-  // separate effect to report error changes when props sync runs
-  React.useEffect(() => {
-    const val = String(value[0]);
-    let unit = value[1] ?? unitFactors.default;
-    unit = normalizeUnit(unit, unitFactors) || unit;
-    const err = validate(val, unit);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
-    }
-  }, [value, unitFactors, validate]);
+  }, [value0, value1, unitFactors, reverseLabels, validate]);
   // Do NOT call onChange here: this effect synchronizes internal state from props.
   // Calling onChange would notify parent and can cause an update loop when parent
   // echoes the value back into props. Only user interactions should call onChange.
 
-  const responseParentOnChange = (
-    value: string,
-    unit: string,
-    error: string | null
-  ) => {
-    const finalUnit = reverseLabels[unit] || unit;
-    const finalValue: [string, string] = [value, finalUnit];
-    onChange?.(finalValue, error);
-  };
+  const responseParentOnChange = React.useCallback(
+    (value: string, unit: string, error: string | null) => {
+      const finalUnit = reverseLabels[unit] || unit;
+      const finalValue: [string, string] = [value, finalUnit];
+      onChange?.(finalValue, error);
+    },
+    [reverseLabels, onChange]
+  );
 
-  const onValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onValueChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
     const err = validate(input, unit);
     setLocalInput(input);
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
     responseParentOnChange(input, unit, err);
-  };
+  }, [unitFactors.default, validate, responseParentOnChange]);
 
-  const onUnitChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const onUnitChange = React.useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
     const newUnit = e.target.value;
-    const valueStr = inputRef.current ? inputRef.current.value : String(value[0] ?? "");
+    const valueStr = inputRef.current ? inputRef.current.value : String(value0 ?? "");
     const err = validate(valueStr, newUnit);
-    setLocalUnit(newUnit);
     if (selectRef.current) selectRef.current.value = newUnit;
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
     responseParentOnChange(valueStr, newUnit, err);
-  };
+  }, [value0, validate, responseParentOnChange]);
 
-  const onConvertButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const onConvertButtonClick = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     // Guard: don't open the conversion menu when conversion is disabled
-    const val = inputRef.current ? inputRef.current.value : String(value[0] ?? "");
+    const val = inputRef.current ? inputRef.current.value : String(value0 ?? "");
     const parsedValue = parseFloat(val);
     const unit = selectRef.current ? selectRef.current.value : unitFactors.default;
     const localErr = validate(val, unit);
@@ -261,7 +271,7 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
 
     setMenuPosition({ x, y });
 
-    const convertedOptions = getConvertedOptions(parsedValue, unit, unitFactors);
+    const convertedOptions = getConvertedOptions(parsedValue, unit, unitFactors, dimension === "temperature");
     if (convertedOptions.length === 0) {
       setMenuOptions([]);
       setShowMenu(false);
@@ -270,9 +280,9 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
 
     setMenuOptions(convertedOptions);
     setShowMenu((prev) => !prev);
-  };
+  }, [value0, unitFactors, validate, dimension]);
 
-  const onConversionMenuSelect = (option: UnitOption) => {
+  const onConversionMenuSelect = React.useCallback((option: UnitOption) => {
     const { value: newVal, unit: newUnit } = option;
 
     // Close menu first
@@ -289,26 +299,22 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
 
     // Update local state to track the conversion
     setLocalInput(newVal);
-    setLocalUnit(newUnit);
 
     // Validate the new values
     const err = validate(newVal, newUnit);
 
     // Notify parent of the change
     responseParentOnChange(newVal, newUnit, err);
-  };
+  }, [validate, responseParentOnChange]);
 
   const propInputForValidation = String(value[0] ?? "");
-  const propUnitForValidation = normalizeUnit(value[1] ?? unitFactors.default, unitFactors) || (value[1] ?? unitFactors.default);
 
   const inputForValidation = localInput ?? propInputForValidation;
-  const unitForValidation = localUnit ?? propUnitForValidation;
-
-  const disableConversion =
-    Boolean(validate(inputForValidation, unitForValidation)) || !inputForValidation.trim();
+  // unitForValidation intentionally unused after moving validation to `error` state
+  const disableConversion = Boolean(error) || !inputForValidation.trim();
 
   // Dark mode aware button styling
-  const convertButtonStyle = {
+  const convertButtonStyle = React.useMemo(() => ({
     width: "var(--reactaform-unit-btn-width, 2.5em)",
     height: "var(--reactaform-unit-btn-height, 2.5em)",
     padding: "var(--reactaform-unit-btn-padding, 0)",
@@ -323,43 +329,42 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-  } as const;
+  } as const), [disableConversion]);
 
-  const currentError = validate(propInputForValidation, propUnitForValidation);
+  const normalizedDefaultUnit = React.useMemo(() => {
+    const rawUnit = String(value1 ?? unitFactors.default);
+    return normalizeUnit(rawUnit, unitFactors, reverseLabels) || rawUnit;
+  }, [value1, unitFactors, reverseLabels]);
 
   return (
-  <StandardFieldLayout field={field} error={currentError}>
+    <StandardFieldLayout field={field} error={error}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--reactaform-unit-gap, 8px)", width: "100%" }}>
         <input
           id={field.name}
           type="text"
-              ref={inputRef}
-              defaultValue={String(value[0] ?? "")}
+          ref={inputRef}
+          defaultValue={String(value[0] ?? "")}
           onChange={onValueChange}
           style={{ width: "var(--reactaform-unit-input-width, 100px)" }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
-          aria-invalid={!!currentError}
-          aria-describedby={currentError ? `${field.name}-error` : undefined}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${field.name}-error` : undefined}
         />
 
         {/* Units dropdown */}
         <select
           id={`${field.name}-unit`}
           ref={selectRef}
-          defaultValue={normalizeUnit(value[1] ?? unitFactors.default, unitFactors) || (value[1] ?? unitFactors.default)}
+          defaultValue={normalizedDefaultUnit}
           onChange={onUnitChange}
           className={combineClasses(
             CSS_CLASSES.input,
             CSS_CLASSES.inputSelect
           )}
-          aria-invalid={!!currentError}
-          aria-describedby={currentError ? `${field.name}-error` : undefined}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${field.name}-error` : undefined}
         >
-          {Object.keys(unitFactors.labels).map((u) => (
-            <option key={u} value={u}>
-              {unitFactors.labels[u] ?? u}
-            </option>
-          ))}
+          {unitOptionElements}
         </select>
 
         {/* Conversion button */}
@@ -383,7 +388,7 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
             </span>
           </button>
 
-          {showMenu && menuOptions && (
+          {showMenu && menuOptions.length > 0 && (
             <PopupOptionMenu<UnitOption>
               pos={menuPosition}
               options={menuOptions}
@@ -398,14 +403,13 @@ const GenericUnitValueInput: React.FC<GenericUnitValueInputProps> = ({
       </div>
     </StandardFieldLayout>
   );
-};
+});
 
-function UnitValueInput({ field, value, onChange }: UnitValueInputProps) {
-  const { t } = useReactaFormContext();
+const UnitValueInput = React.memo(({ field, value, onChange }: UnitValueInputProps) => {
   const dimension = (field as DefinitionPropertyField & { dimension?: Dimension }).dimension;
   if (!dimension) return null;
   if (!unitFactorsMap[dimension]) {
-    loadUnitFactorsMap(dimension, t);
+    loadUnitFactorsMap(dimension);
   }
 
   const unitFactors = unitFactorsMap[dimension];
@@ -415,12 +419,13 @@ function UnitValueInput({ field, value, onChange }: UnitValueInputProps) {
 
   return (
     <GenericUnitValueInput
+      dimension={dimension}
       unitFactors={unitFactors}
       field={field}
       value={value}
       onChange={onChange}
     />
   );
-}
+});
 
 export default UnitValueInput;

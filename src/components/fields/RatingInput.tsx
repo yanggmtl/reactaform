@@ -1,25 +1,32 @@
-// components/RatingInput.tsx
 import * as React from "react";
-// Inlined styles (moved from RatingInput.css)
+import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { validateField } from "../../core/validation";
+import type {
+  BaseInputProps,
+  DefinitionPropertyField,
+} from "../../core/reactaFormTypes";
+import { StandardFieldLayout } from "../LayoutComponents";
+
+/* ------------------------------------------------------------------ */
+/* Styles                                                             */
+/* ------------------------------------------------------------------ */
+
 const ratingWrapperStyle: React.CSSProperties = {
-  display: 'flex',
+  display: "flex",
   gap: 4,
 };
 
 const starBaseStyle: React.CSSProperties = {
-  cursor: 'pointer',
-  fontSize: '1.5rem',
+  cursor: "pointer",
+  fontSize: "1.5rem",
   lineHeight: 1,
-  display: 'inline-block',
-  marginRight: '0.25rem',
-  userSelect: 'none',
-  transition: 'color 0.12s ease',
+  display: "inline-block",
+  marginRight: "0.25rem",
+  userSelect: "none",
+  transition: "color 0.12s ease",
 };
-import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateFieldValue } from "../../core/validation";
-import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
-import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { StandardFieldLayout } from "../LayoutComponents";
+
+/* ------------------------------------------------------------------ */
 
 type RatingField = DefinitionPropertyField & {
   max?: number;
@@ -35,102 +42,138 @@ const RatingInput: React.FC<RatingInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
+
+  const max = field.max ?? 5;
+  const iconChar =
+    field.icon && String(field.icon).trim()
+      ? String(field.icon)
+      : "★";
+
   const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
   const starRefs = React.useRef<Array<HTMLSpanElement | null>>([]);
 
-  const max = field.max || 5;
+  /* ------------------------------------------------------------------ */
+  /* Validation                                                         */
+  /* ------------------------------------------------------------------ */
 
   const validate = React.useCallback(
-    (val: number): string | null => {
-      if (field.required && val === 0) return t("Value required");
-      const err = validateFieldValue(definitionName, field, val, t);
-      return err ?? null;
+    (input: number): string | null => {
+      return validateField(definitionName, field, input, t) ?? null;
     },
-    [field, t, definitionName]
+    [definitionName, field, t]
   );
 
+  const normalizeValue = React.useCallback(
+    (val?: number) => {
+      const v = val ?? 0;
+      return Math.min(Math.max(v, 0), max);
+    },
+    [max]
+  );
+
+  const [error, setError] = React.useState<string | null>(null);
   const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<RatingInputProps["onError"] | undefined>(onError);
+  const onErrorRef = React.useRef(onError);
+
   React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
+  const updateError = React.useCallback((next: string | null) => {
+    if (next !== prevErrorRef.current) {
+      prevErrorRef.current = next;
+      setError(next);
+      onErrorRef.current?.(next);
+    }
+  }, []);
+
+  /* ------------------------------------------------------------------ */
+  /* Sync external value                                                */
+  /* ------------------------------------------------------------------ */
+
+  const ratingValue = normalizeValue(value);
+
   React.useEffect(() => {
-    let v = value || 0;
-    if (value < 0) {
-      v = 0;
-    }
-    if (value > max) {
-      v = max;
-    }
-    const err = validate(v);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
-    }
-  }, [value, validate, max]);
+    updateError(validate(ratingValue));
+  }, [ratingValue, validate, updateError]);
+
+  /* ------------------------------------------------------------------ */
+  /* Events                                                             */
+  /* ------------------------------------------------------------------ */
 
   const handleSelect = (val: number) => {
-    // Rendered from `value` prop; do not store local rating state.
-    const err = validate(val);
-    onChange?.(val, err);
+    const normalized = normalizeValue(val);
+    const err = validate(normalized);
+
+    updateError(err);
+    onChange?.(normalized, err);
   };
 
-  const ratingValue = (() => {
-    let v = value || 0;
-    if (v < 0) v = 0;
-    if (v > max) v = max;
-    return v;
-  })();
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    switch (e.key) {
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        handleSelect(index + 1);
+        break;
+      case "ArrowRight":
+      case "ArrowUp": {
+        e.preventDefault();
+        starRefs.current[Math.min(max - 1, index + 1)]?.focus();
+        break;
+      }
+      case "ArrowLeft":
+      case "ArrowDown": {
+        e.preventDefault();
+        starRefs.current[Math.max(0, index - 1)]?.focus();
+        break;
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------------ */
 
   return (
-    <StandardFieldLayout field={field} error={validate(ratingValue)}>
+    <StandardFieldLayout field={field} error={error}>
       <div
         role="radiogroup"
         aria-labelledby={`${field.name}-label`}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${field.name}-error` : undefined}
         style={ratingWrapperStyle}
-        aria-invalid={!!validate(ratingValue)}
-        aria-describedby={validate(ratingValue) ? `${field.name}-error` : undefined}
       >
-        {(() => {
-          const iconChar = field.icon && String(field.icon).trim() ? String(field.icon) : "★";
-          return [...Array(max)].map((_, i) => {
-            const isActive = i < ratingValue;
-            const isHover = hoverIndex !== null && i <= hoverIndex;
-            const color = isHover || isActive ? 'gold' : 'lightgray';
-            return (
-              <span
-                key={i}
-                ref={(el) => (starRefs.current[i] = el)}
-                role="radio"
-                tabIndex={ratingValue > 0 ? (i === ratingValue - 1 ? 0 : -1) : (i === 0 ? 0 : -1)}
-                aria-checked={isActive}
-                onClick={() => handleSelect(i + 1)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ' ) {
-                    e.preventDefault();
-                    handleSelect(i + 1);
-                  } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    const next = Math.min(max - 1, i + 1);
-                    starRefs.current[next]?.focus();
-                  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    const prev = Math.max(0, i - 1);
-                    starRefs.current[prev]?.focus();
-                  }
-                }}
-                onMouseEnter={() => setHoverIndex(i)}
-                onMouseLeave={() => setHoverIndex(null)}
-                style={{ ...starBaseStyle, color }}
-                aria-label={`Rating ${i + 1}`}
-                title={t(`${field.displayName} ${i + 1}`)}
-              >
-                {iconChar}
-              </span>
-            );
-          });
-        })()}
+        {Array.from({ length: max }, (_, i) => {
+          const isActive = i < ratingValue;
+          const isHover = hoverIndex !== null && i <= hoverIndex;
+          const color = isHover || isActive ? "gold" : "lightgray";
+
+          return (
+            <span
+              key={i}
+              ref={(el) => (starRefs.current[i] = el)}
+              role="radio"
+              tabIndex={
+                ratingValue > 0
+                  ? i === ratingValue - 1
+                    ? 0
+                    : -1
+                  : i === 0
+                  ? 0
+                  : -1
+              }
+              aria-checked={isActive}
+              aria-label={`Rating ${i + 1}`}
+              title={t(`${field.displayName} ${i + 1}`)}
+              onClick={() => handleSelect(i + 1)}
+              onKeyDown={(e) => handleKeyDown(e, i)}
+              onMouseEnter={() => setHoverIndex(i)}
+              onMouseLeave={() => setHoverIndex(null)}
+              style={{ ...starBaseStyle, color }}
+            >
+              {iconChar}
+            </span>
+          );
+        })}
       </div>
     </StandardFieldLayout>
   );

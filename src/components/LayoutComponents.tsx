@@ -4,6 +4,8 @@ import { combineClasses, CSS_CLASSES } from "../utils/cssClasses";
 import Tooltip from "./Tooltip";
 import type { DefinitionPropertyField } from "../core/reactaFormTypes";
 
+const TooltipMemo = React.memo(Tooltip);
+
 /**
  * ColumnFieldLayout - Vertical layout wrapper for form fields
  * 
@@ -30,50 +32,56 @@ export const ColumnFieldLayout = React.memo(({
   showLabel?: boolean;
 }) => {
   const { t } = useReactaFormContext();
-  
+
   // Determine label alignment based on labelLayout
-  const labelAlignment = field?.labelLayout === 'column-center' ? 'center' : 'left';
+  const labelAlignment = field.labelLayout === 'column-center' ? 'center' : 'left';
+
+  const rootStyle = React.useMemo<React.CSSProperties>(() => {
+    const s: React.CSSProperties = {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 'var(--reactaform-label-gap, 4px)',
+    };
+    (s as Record<string, string>)['--label-align'] = labelAlignment;
+    return s;
+  }, [labelAlignment]);
+
+  const labelStyle = React.useMemo<React.CSSProperties>(() => ({
+    textAlign: labelAlignment as 'left' | 'center',
+    width: '100%',
+    minWidth: 'unset',
+    display: 'block',
+    marginBottom: '10px',
+  }), [labelAlignment]);
+
+  const rowStyle = React.useMemo<React.CSSProperties>(() => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 'var(--reactaform-inline-gap, 8px)',
+    width: '100%',
+  }), []);
 
   return (
-    <div
-      className={`${CSS_CLASSES.field} column-layout`}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--reactaform-label-gap, 4px)",
-        '--label-align': labelAlignment,
-      } as React.CSSProperties & { '--label-align': string }}
-    >
-      {showLabel && <div style={{ textAlign: labelAlignment, width: "100%" }}>
+    <div className={`${CSS_CLASSES.field} column-layout`} style={rootStyle}>
+      {showLabel && (
         <label
           id={`${field.name}-label`}
           className={CSS_CLASSES.label}
           htmlFor={field.name}
-          style={{
-            textAlign: labelAlignment as 'left' | 'center',
-            width: '100%',
-            minWidth: 'unset',
-            display: 'block',
-            marginBottom: "10px"
-          }}
+          style={labelStyle}
         >
           {t(field.displayName)}
         </label>
-      </div>}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--reactaform-inline-gap, 8px)",
-          width: "100%",
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 0, maxWidth: "100%" }}>
-          <div style={{ width: "100%" }}>{children}</div>
+      )}
+
+      <div style={rowStyle}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {children}
         </div>
-        {field.tooltip && <Tooltip content={field.tooltip} />}
+        {field.tooltip && <TooltipMemo content={field.tooltip} />}
       </div>
-        {error && <ErrorDiv id={`${field.name}-error`}>{error}</ErrorDiv>}
+
+      {error && <ErrorDiv id={`${field.name}-error`}>{error}</ErrorDiv>}
     </div>
   );
 });
@@ -103,19 +111,12 @@ export const RowFieldLayout = React.memo(({
   field: DefinitionPropertyField;
   error?: string | null;
   children: React.ReactNode;
-  rightAlign?: boolean; // For checkbox, switch, etc.
+  rightAlign?: boolean;
 }) => {
   const { t } = useReactaFormContext();
 
-  const valueColumnStyle = React.useMemo<React.CSSProperties>(() => ({
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 0,
-  }), []);
-
   const valueRowStyle = React.useMemo<React.CSSProperties>(() => ({
     display: 'flex',
-    flexDirection: 'row',
     alignItems: 'center',
     gap: '3px',
   }), []);
@@ -126,29 +127,22 @@ export const RowFieldLayout = React.memo(({
         id={`${field.name}-label`}
         className={CSS_CLASSES.label}
         htmlFor={field.name}
-        style={{ textAlign: 'left' as const, justifyContent: 'flex-start' }}
       >
         {t(field.displayName)}
       </label>
-      <div style={valueColumnStyle}>
+
+      <div>
         <div style={valueRowStyle}>
           {rightAlign ? (
-            <div
-              style={{
-                display: "flex",
-                flex: 1,
-                justifyContent: "flex-end",
-                alignItems: "center",
-                gap: "var(--reactaform-inline-gap, 8px)",
-              }}
-            >
+            <div style={{ display: 'flex', flex: 1, justifyContent: 'flex-end' }}>
               {children}
             </div>
           ) : (
             children
           )}
-          {field.tooltip && <Tooltip content={field.tooltip} />}
+          {field.tooltip && <TooltipMemo content={field.tooltip} />}
         </div>
+
         {error && <ErrorDiv id={`${field.name}-error`}>{error}</ErrorDiv>}
       </div>
     </div>
@@ -170,7 +164,7 @@ RowFieldLayout.displayName = 'RowFieldLayout';
  *   <input ... />
  * </StandardFieldLayout>
  */
-export const StandardFieldLayout = ({
+export const StandardFieldLayout = React.memo(({
   field,
   error,
   children,
@@ -185,12 +179,13 @@ export const StandardFieldLayout = ({
   if (field.labelLayout === 'column-left' || field.labelLayout === 'column-center') {
     // For column layout, always show label
     return (
-      <ColumnFieldLayout field={field} error={error} showLabel={true}>
+      <ColumnFieldLayout field={field} error={error} showLabel>
         {children}
       </ColumnFieldLayout>
     );
   }
-  else if (field.type === 'checkbox' || field.type === 'switch') {
+
+  if (field.type === 'checkbox' || field.type === 'switch') {
     // For checkbox and switch, omit label in column layout
     return (
       <ColumnFieldLayout field={field} error={error} showLabel={false}>
@@ -205,7 +200,9 @@ export const StandardFieldLayout = ({
       {children}
     </RowFieldLayout>
   );
-};
+});
+
+StandardFieldLayout.displayName = 'StandardFieldLayout';
 
 export const ErrorDiv = React.memo(({ children, id }: { children: React.ReactNode; id?: string }) => {
   const style = React.useMemo<React.CSSProperties>(() => ({

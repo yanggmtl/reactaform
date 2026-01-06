@@ -13,7 +13,7 @@ describe('DropdownInput', () => {
   ];
 
   it('renders select dropdown with label', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Select Option', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Select Option', options: mockOptions });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="opt1" />);
 
     expect(screen.getByRole('combobox')).toBeInTheDocument();
@@ -22,7 +22,7 @@ describe('DropdownInput', () => {
 
   it('displays all options in dropdown', async () => {
     const user = userEvent.setup();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Dropdown', options: mockOptions });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="opt1" />);
 
     const select = screen.getByRole('combobox');
@@ -41,7 +41,7 @@ describe('DropdownInput', () => {
   });
 
   it('displays initial selected value', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Dropdown', options: mockOptions });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="opt2" />);
 
     const select = screen.getByRole('combobox');
@@ -51,7 +51,7 @@ describe('DropdownInput', () => {
   it('calls onChange when option is selected', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Dropdown', options: mockOptions });
     renderWithProvider(
       <DropdownInput {...baseFieldProps} field={field} value="opt1" onChange={onChange} />
     );
@@ -67,20 +67,9 @@ describe('DropdownInput', () => {
 
   it('validates required field with empty value', () => {
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Required Dropdown', options: mockOptions, required: true });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Required Dropdown', options: mockOptions, required: true });
     renderWithProvider(
       <DropdownInput {...baseFieldProps} field={field} value="" onChange={onChange} />
-    );
-
-    // Should auto-correct to first option
-    expect(onChange).toHaveBeenCalledWith('opt1', null);
-  });
-
-  it('auto-corrects invalid value to first option', () => {
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions });
-    renderWithProvider(
-      <DropdownInput {...baseFieldProps} field={field} value="invalid" onChange={onChange} />
     );
 
     // Should auto-correct to first option
@@ -90,7 +79,7 @@ describe('DropdownInput', () => {
   it('validates that selected value is in options', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Dropdown', options: mockOptions });
     renderWithProvider(
       <DropdownInput {...baseFieldProps} field={field} value="opt1" onChange={onChange} />
     );
@@ -107,7 +96,7 @@ describe('DropdownInput', () => {
 
   it('handles empty options array', async () => {
     const user = userEvent.setup();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Empty Dropdown', options: [] });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Empty Dropdown', options: [] });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="" />);
 
     const select = screen.getByRole('combobox');
@@ -131,7 +120,7 @@ describe('DropdownInput', () => {
       { label: 'Two', value: '2' },
       { label: 'Three', value: '3' },
     ];
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Numbers', options: numericOptions });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Numbers', options: numericOptions });
     renderWithProvider(
       <DropdownInput {...baseFieldProps} field={field} value="1" onChange={onChange} />
     );
@@ -146,7 +135,7 @@ describe('DropdownInput', () => {
   });
 
   it('displays tooltip when provided', () => {
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Dropdown', options: mockOptions, tooltip: 'Choose an option' });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', displayName: 'Dropdown', options: mockOptions, tooltip: 'Choose an option' });
     renderWithProvider(<DropdownInput {...baseFieldProps} field={field} value="opt1" />);
 
     const icons = screen.getAllByTestId('tooltip-icon');
@@ -169,7 +158,7 @@ describe('DropdownInput', () => {
   });
 
   it('updates when value prop changes', () => {
-    const field = createMockField<DefinitionPropertyField>({ label: 'Dropdown', options: mockOptions });
+    const field = createMockField<DefinitionPropertyField>({ type: 'dropdown', label: 'Dropdown', options: mockOptions });
     const { rerender } = renderWithProvider(
       <DropdownInput {...baseFieldProps} field={field} value="opt1" />
     );

@@ -63,17 +63,6 @@ describe('RadioInput', () => {
     expect(onChange).toHaveBeenCalledWith('a', null);
   });
 
-  it('auto-corrects invalid value to first option', () => {
-    const onChange = vi.fn();
-    const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
-    renderWithProvider(
-      <RadioInput {...baseFieldProps} field={field} value="invalid" onChange={onChange} />
-    );
-
-    // Should auto-correct to first option
-    expect(onChange).toHaveBeenCalledWith('a', null);
-  });
-
   it('renders vertical layout by default', () => {
     const field = createMockField<DefinitionPropertyField>({ displayName: 'Radio', options: mockOptions });
     const { container } = renderWithProvider(

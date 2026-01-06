@@ -1,11 +1,11 @@
 import * as React from "react";
-import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 
 type PasswordInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -16,63 +16,23 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   onError,
 }) => {
   const { t, definitionName } = useReactaFormContext();
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
-
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<PasswordInputProps["onError"] | undefined>(
-    onError
-  );
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
-
-  const patternRegex = React.useMemo(
-    () => (field.pattern ? new RegExp(field.pattern) : null),
-    [field.pattern]
-  );
-
+  
+  // Define validation logic
   const validate = React.useCallback(
-    (val: string): string | null => {
-      if (val === "") return field.required ? t("Value required") : null;
-      if (field.minLength !== undefined && val.length < field.minLength) {
-        return t("Must be at least {{1}} characters", field.minLength);
-      }
-      if (field.maxLength !== undefined && val.length > field.maxLength) {
-        return t("Must be at most {{1}} characters", field.maxLength);
-      }
-      if (patternRegex && !patternRegex.test(val)) {
-        return field.patternErrorMessage ? t(field.patternErrorMessage) : t("Input does not match pattern: {{1}}", field.pattern);
-      }
-      return validateFieldValue(definitionName, field, val, t);
-    },
-    [field, definitionName, t, patternRegex]
+    (val: string) => validateField(definitionName, field, val, t) ?? null,
+    [definitionName, field, t]
   );
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newVal = e.target.value;
-    const err = validate(newVal);
-    onChange?.(newVal, err);
-  };
-
-  React.useEffect(() => {
-    const err = validate(value ?? "");
-    if (inputRef.current && inputRef.current.value !== String(value ?? "")) {
-      inputRef.current.value = String(value ?? "");
-    }
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      onErrorRef.current?.(err ?? null);
-    }
-    return undefined;
-  }, [value, validate]);
+  // Use our shared uncontrolled + validated input hook
+  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
+    value,
+    onChange,
+    onError,
+    validate,
+  });
 
   const [showPassword, setShowPassword] = React.useState(false);
   const toggleShow = () => setShowPassword((s) => !s);
-
-  const error = React.useMemo(
-    () => validate(String(value ?? "")),
-    [value, validate]
-  );
 
   return (
     <StandardFieldLayout field={field} error={error}>

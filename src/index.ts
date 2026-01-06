@@ -59,8 +59,12 @@ export {
 
 // Validation Utilities for custom validation logic
 export {
-  validateFieldValue
+  validateFieldValue, // Deprecated, use validateFieldWithHandler instead
+  validateFieldWithHandler
 } from './core/validation';
+
+// Built-in field validators (import for side-effects to register handlers)
+import './validation';
 
 // Plugin System
 export {

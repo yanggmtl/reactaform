@@ -156,8 +156,6 @@ export const ReactaFormProvider = ({
   // and consumers pick up translations as soon as they load.
   const [commonMapState, setCommonMapState] = React.useState<TranslationMap>({});
   const [userMapState, setUserMapState] = React.useState<TranslationMap>({});
-  const [fieldStyle, setFieldStyle] = React.useState<Record<string, unknown>>({});
-  const [formStyle, setFormStyle] = React.useState<Record<string, unknown>>({});
 
   // Initialize localization map (cancellable)
   React.useEffect(() => {
@@ -197,10 +195,8 @@ export const ReactaFormProvider = ({
   }, [language, localizeName]);
 
   // Initialize form and field style
-  React.useEffect(() => {
-    setFormStyle(getFormStyle(stableDefaultStyle));
-    setFieldStyle(getFieldStyle(stableDefaultStyle));
-  }, [stableDefaultStyle]);
+  const formStyle = React.useMemo(() => getFormStyle(stableDefaultStyle), [stableDefaultStyle]);
+  const fieldStyle = React.useMemo(() => getFieldStyle(stableDefaultStyle), [stableDefaultStyle]);
 
   // Memoize the underlying translation function so `t` is stable and cheap to call
   const translationFn = React.useMemo(

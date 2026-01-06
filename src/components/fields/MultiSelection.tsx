@@ -4,16 +4,15 @@ import * as ReactDOM from "react-dom";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
 import { isDarkTheme } from "../../utils/themeUtils";
 
-export type OptionsField = DefinitionPropertyField & { options: NonNullable<DefinitionPropertyField['options']> }
+export type OptionsField = DefinitionPropertyField & {
+  options: NonNullable<DefinitionPropertyField["options"]>;
+};
 
-type MultiSelectionProps = BaseInputProps<
-  string[] | null,
-  OptionsField
->;
+type MultiSelectionProps = BaseInputProps<string[] | null, OptionsField>;
 
 // ---------------------------
 // MULTISELECT COMPONENT
@@ -24,7 +23,9 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   onChange,
   onError,
 }) => {
-  const onErrorRef = React.useRef<MultiSelectionProps["onError"] | undefined>(onError);
+  const onErrorRef = React.useRef<MultiSelectionProps["onError"] | undefined>(
+    onError
+  );
 
   React.useEffect(() => {
     onErrorRef.current = onError;
@@ -43,9 +44,10 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   };
   const controlRef = React.useRef<HTMLDivElement>(null);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [popupPos, setPopupPos] = React.useState<{ x: number; y: number } | null>(
-    null
-  );
+  const [popupPos, setPopupPos] = React.useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const options = React.useMemo(
     () => field.options.map((o) => ({ value: o.value, label: t(o.label) })),
@@ -58,12 +60,24 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     return arr.filter((v) => allowed.has(v));
   }, [value, options]);
 
-  const validate = (vals: string[] | null) => {
-    const arr = Array.isArray(vals) ? vals : [];
-    if (field.required && arr.length === 0) return t("Value required");
-    const handlerErr = validateFieldValue(definitionName, field, arr, t);
-    return handlerErr ?? null;
-  };
+  const validate = React.useCallback(
+    (input: string[]) => {
+      return validateField(definitionName, field, input, t);
+    },
+    [field, definitionName, t]
+  );
+
+  const [multiError, setMultiError] = React.useState<string | null>(null);
+  const prevErrorLocalRef = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    const err = validate(Array.isArray(value) ? value : []);
+    if (err !== prevErrorLocalRef.current) {
+      prevErrorLocalRef.current = err;
+      setMultiError(err);
+      onErrorRef.current?.(err ?? null);
+    }
+  }, [value, validate]);
 
   // Toggle menu open/close
   const handleControlClick = () => {
@@ -78,72 +92,84 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
       ? selectedValues.filter((v) => v !== val)
       : [...selectedValues, val];
     const err = validate(newValues);
-    onErrorRef.current?.(err ?? null);
+    if (err !== prevErrorLocalRef.current) {
+      prevErrorLocalRef.current = err;
+      setMultiError(err);
+      onErrorRef.current?.(err ?? null);
+    }
     onChange?.(newValues, err);
   };
 
-  const mergedControlStyle = React.useMemo<React.CSSProperties>(() => ({
-    height: "var(--reactaform-input-height, 2.5rem)",
-    display: "flex",
-    alignItems: "center",
-    cursor: "pointer",
-    position: "relative",
-    ...styleFrom(formStyle, 'multiSelect', 'control'),
-    ...styleFrom(fieldStyle, undefined, 'control'),
-  }), [formStyle, fieldStyle]);
+  const mergedControlStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      height: "var(--reactaform-input-height, 2.5rem)",
+      display: "flex",
+      alignItems: "center",
+      cursor: "pointer",
+      position: "relative",
+      ...styleFrom(formStyle, "multiSelect", "control"),
+      ...styleFrom(fieldStyle, undefined, "control"),
+    }),
+    [formStyle, fieldStyle]
+  );
 
-  const mergedClearButtonStyle = React.useMemo<React.CSSProperties>(() => ({
-    position: "absolute",
-    right: "1.5em",
-    top: "50%",
-    transform: "translateY(-50%)",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    fontSize: "0.8em",
-    color: "var(--reactaform-text-muted, #999)",
-    padding: 0,
-    ...styleFrom(formStyle, 'multiSelect', 'clearButton'),
-    ...styleFrom(fieldStyle, undefined, 'clearButton'),
-  }), [formStyle, fieldStyle]);
+  const mergedClearButtonStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      position: "absolute",
+      right: "1.5em",
+      top: "50%",
+      transform: "translateY(-50%)",
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      fontSize: "0.8em",
+      color: "var(--reactaform-text-muted, #999)",
+      padding: 0,
+      ...styleFrom(formStyle, "multiSelect", "clearButton"),
+      ...styleFrom(fieldStyle, undefined, "clearButton"),
+    }),
+    [formStyle, fieldStyle]
+  );
 
-  const mergedArrowStyle = React.useMemo<React.CSSProperties>(() => ({
-    position: "absolute",
-    right: "0.7em",
-    top: "50%",
-    transform: "translateY(-50%)",
-    pointerEvents: "none",
-    fontSize: "0.8em",
-    color: "var(--reactaform-text-muted, #999)",
-    ...styleFrom(formStyle, 'multiSelect', 'arrow'),
-    ...styleFrom(fieldStyle, undefined, 'arrow'),
-  }), [formStyle, fieldStyle]);
-
-  const multiError = validate(Array.isArray(value) ? value : []);
+  const mergedArrowStyle = React.useMemo<React.CSSProperties>(
+    () => ({
+      position: "absolute",
+      right: "0.7em",
+      top: "50%",
+      transform: "translateY(-50%)",
+      pointerEvents: "none",
+      fontSize: "0.8em",
+      color: "var(--reactaform-text-muted, #999)",
+      ...styleFrom(formStyle, "multiSelect", "arrow"),
+      ...styleFrom(fieldStyle, undefined, "arrow"),
+    }),
+    [formStyle, fieldStyle]
+  );
 
   return (
     <div>
-      <StandardFieldLayout field={field} error={null}>
+      <StandardFieldLayout field={field} error={multiError}>
         <div style={{ width: "100%" }}>
-              <div
-                ref={controlRef}
-                className={`reactaform-multiselection-control reactaform-input`}
-                style={mergedControlStyle}
-                onClick={handleControlClick}
-                tabIndex={0}
-                role="button"
-                aria-haspopup="listbox"
-                aria-expanded={menuOpen}
-                aria-invalid={!!multiError}
-                aria-describedby={multiError ? `${field.name}-error` : undefined}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleControlClick();
-                  }
-                }}
-              >
-                <span style={{ flex: 1, color: "var(--reactaform-text-muted, #888)" }}>
+          <div
+            ref={controlRef}
+            className={`reactaform-multiselection-control reactaform-input`}
+            style={mergedControlStyle}
+            onClick={handleControlClick}
+            role="button"
+            aria-haspopup="listbox"
+            aria-expanded={menuOpen}
+            aria-invalid={!!multiError}
+            aria-describedby={multiError ? `${field.name}-error` : undefined}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleControlClick();
+              }
+            }}
+          >
+            <span
+              style={{ flex: 1, color: "var(--reactaform-text-muted, #888)" }}
+            >
               {selectedValues.length} / {options.length} selected
             </span>
 
@@ -158,11 +184,15 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
                 style={mergedClearButtonStyle}
               >
                 {/* use HTML entity to avoid encoding issues on GitHub; use heavy X for delete */}
-                <span style={mergedClearButtonStyle} aria-hidden>&#x2716;</span>
+                <span style={mergedClearButtonStyle} aria-hidden>
+                  &#x2716;
+                </span>
               </button>
             )}
 
-            <span style={mergedArrowStyle} aria-hidden>&#x25BC;</span>
+            <span style={mergedArrowStyle} aria-hidden>
+              &#x25BC;
+            </span>
           </div>
         </div>
       </StandardFieldLayout>
@@ -187,7 +217,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
 // ---------------------------
 interface PopupProps {
   position: { x: number; y: number };
-  options: NonNullable<DefinitionPropertyField['options']>;
+  options: NonNullable<DefinitionPropertyField["options"]>;
   selectedValues: string[];
   onToggleOption: (v: string) => void;
   onClose: () => void;
@@ -208,27 +238,27 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   const [activeIndex, setActiveIndex] = React.useState<number>(-1);
   const { formStyle, fieldStyle } = useReactaFormContext();
 
-  const isThemeDark = isDarkTheme(theme ?? 'light');
+  const isThemeDark = isDarkTheme(theme ?? "light");
 
   React.useLayoutEffect(() => {
     if (!controlRef.current) return;
-    
-    const form = controlRef.current.closest('[data-reactaform-theme]');
-    const popupRoot = document.getElementById('popup-root');
+
+    const form = controlRef.current.closest("[data-reactaform-theme]");
+    const popupRoot = document.getElementById("popup-root");
 
     if (form && popupRoot) {
       const styles = getComputedStyle(form);
       popupRoot.style.setProperty(
-        '--reactaform-secondary-bg',
-        styles.getPropertyValue('--reactaform-secondary-bg')
+        "--reactaform-secondary-bg",
+        styles.getPropertyValue("--reactaform-secondary-bg")
       );
       popupRoot.style.setProperty(
-        '--reactaform-text-color',
-        styles.getPropertyValue('--reactaform-text-color')
+        "--reactaform-text-color",
+        styles.getPropertyValue("--reactaform-text-color")
       );
       popupRoot.style.setProperty(
-        '--reactaform-hover-bg',
-        styles.getPropertyValue('--reactaform-hover-bg')
+        "--reactaform-hover-bg",
+        styles.getPropertyValue("--reactaform-hover-bg")
       );
     }
   }, [controlRef]);
@@ -241,35 +271,42 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     if (!section) return {} as React.CSSProperties;
     const src = source as Record<string, unknown> | undefined;
     const sec = src?.[section] as Record<string, unknown> | undefined;
-    const val = key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
+    const val =
+      key && sec ? (sec[key] as React.CSSProperties | undefined) : undefined;
     return (val ?? {}) as React.CSSProperties;
   };
 
-  const mergedPopupStyles = React.useMemo<React.CSSProperties>(() => ({
-    maxHeight: 200,
-    overflowY: "auto",
-    background: "var(--reactaform-secondary-bg, #fff)",
-    border: "1px solid var(--reactaform-border-color, #ccc)",
-    borderRadius: 4,
-    zIndex: 2000,
-    boxShadow: "var(--reactaform-shadow, 0 2px 8px rgba(0,0,0,0.15))",
-    pointerEvents: "auto",
-    color: "var(--reactaform-text-color, #000)",
-    fontSize: "var(--reactaform-popup-font-size, 0.875rem)",
-    ...styleFrom(formStyle, 'multiSelect', 'popup'),
-    ...styleFrom(fieldStyle, undefined, 'popup'),
-  }), [formStyle, fieldStyle]);
+  const mergedPopupStyles = React.useMemo<React.CSSProperties>(
+    () => ({
+      maxHeight: 200,
+      overflowY: "auto",
+      background: "var(--reactaform-secondary-bg, #fff)",
+      border: "1px solid var(--reactaform-border-color, #ccc)",
+      borderRadius: 4,
+      zIndex: 2000,
+      boxShadow: "var(--reactaform-shadow, 0 2px 8px rgba(0,0,0,0.15))",
+      pointerEvents: "auto",
+      color: "var(--reactaform-text-color, #000)",
+      fontSize: "var(--reactaform-popup-font-size, 0.875rem)",
+      ...styleFrom(formStyle, "multiSelect", "popup"),
+      ...styleFrom(fieldStyle, undefined, "popup"),
+    }),
+    [formStyle, fieldStyle]
+  );
 
-  const mergedPopupOptionStyles = React.useMemo<React.CSSProperties>(() => ({
-    padding: "6px 8px",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    background: "transparent",
-    color: "var(--reactaform-text-color, #000)",
-    ...styleFrom(formStyle, 'multiSelect', 'option'),
-    ...styleFrom(fieldStyle, undefined, 'option'),
-  }), [formStyle, fieldStyle]);
+  const mergedPopupOptionStyles = React.useMemo<React.CSSProperties>(
+    () => ({
+      padding: "6px 8px",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      background: "transparent",
+      color: "var(--reactaform-text-color, #000)",
+      ...styleFrom(formStyle, "multiSelect", "option"),
+      ...styleFrom(fieldStyle, undefined, "option"),
+    }),
+    [formStyle, fieldStyle]
+  );
 
   // -----------------------
   // OUTSIDE CLICK HANDLER
@@ -293,14 +330,18 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     if (!popupRef.current) return;
     // initialize active index to first option (defer state update to avoid sync setState in effect)
     if (options.length > 0) {
-      requestAnimationFrame(() => setActiveIndex((idx) => (idx === -1 ? 0 : idx)));
+      requestAnimationFrame(() =>
+        setActiveIndex((idx) => (idx === -1 ? 0 : idx))
+      );
     }
   }, [options.length]);
 
   // when activeIndex changes, move focus to the corresponding option element
   React.useEffect(() => {
     if (!popupRef.current || activeIndex < 0) return;
-    const el = popupRef.current.querySelector(`#multi-opt-${activeIndex}`) as HTMLElement | null;
+    const el = popupRef.current.querySelector(
+      `#multi-opt-${activeIndex}`
+    ) as HTMLElement | null;
     if (el) {
       requestAnimationFrame(() => el.focus());
     }
@@ -313,9 +354,10 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   const baseWidth = 250;
   const maxHeight = 200;
 
-  const [livePos, setLivePos] = React.useState<{ left: number; top: number } | null>(
-    null
-  );
+  const [livePos, setLivePos] = React.useState<{
+    left: number;
+    top: number;
+  } | null>(null);
   const [popupWidth, setPopupWidth] = React.useState<number | null>(null);
 
   React.useEffect(() => {
@@ -375,7 +417,9 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
     <div
       ref={popupRef}
       role="listbox"
-      aria-activedescendant={activeIndex >= 0 ? `multi-opt-${activeIndex}` : undefined}
+      aria-activedescendant={
+        activeIndex >= 0 ? `multi-opt-${activeIndex}` : undefined
+      }
       style={{
         position: "fixed",
         top: livePos ? livePos.top : position.y,
@@ -384,16 +428,17 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
         // spread the static popup styles
         ...mergedPopupStyles,
       }}
-      data-reactaform-theme={theme ?? 'light'}
+      data-reactaform-theme={theme ?? "light"}
     >
-          {options.map((opt, idx) => {
+      { options.map((opt, idx) => {
         const selected = selectedValues.includes(opt.value);
         const hoverBg = isThemeDark
           ? "var(--reactaform-hover-bg, rgba(255,255,255,0.01))"
           : "var(--reactaform-hover-bg, #eee)";
         const optionStyle: React.CSSProperties = {
           ...mergedPopupOptionStyles,
-          background: idx === activeIndex ? hoverBg : mergedPopupOptionStyles.background,
+          background:
+            idx === activeIndex ? hoverBg : mergedPopupOptionStyles.background,
         };
 
         return (
@@ -407,29 +452,29 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
             onKeyDown={(e) => {
               const len = options.length;
               switch (e.key) {
-                case 'ArrowDown':
+                case "ArrowDown":
                   e.preventDefault();
                   setActiveIndex((i) => (i + 1) % len);
                   break;
-                case 'ArrowUp':
+                case "ArrowUp":
                   e.preventDefault();
                   setActiveIndex((i) => (i - 1 + len) % len);
                   break;
-                case 'Home':
+                case "Home":
                   e.preventDefault();
                   setActiveIndex(0);
                   break;
-                case 'End':
+                case "End":
                   e.preventDefault();
                   setActiveIndex(len - 1);
                   break;
-                case 'Enter':
-                case ' ':
+                case "Enter":
+                case " ":
                   e.preventDefault();
                   e.stopPropagation();
                   onToggleOption(opt.value);
                   break;
-                case 'Escape':
+                case "Escape":
                   e.preventDefault();
                   onClose();
                   controlRef?.current?.focus();

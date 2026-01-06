@@ -6,7 +6,7 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateFieldValue } from "../../core/validation";
+import { validateField } from "../../core/validation";
 import { isDarkTheme } from "../../utils/themeUtils";
 
 type DropdownField = DefinitionPropertyField & {
@@ -43,27 +43,26 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   }, [onError]);
 
   const validate = React.useCallback(
-    (val: string): string | null => {
-      if (val === "" || val === null || val === undefined) {
-        return t("Value required");
-      }
-      if (!field.options.some((opt) => String(opt.value) === val)) {
-        return t("Invalid option selected");
-      }
-      const err = validateFieldValue(definitionName, field, val, t);
-      return err ?? null;
+    (input: string): string | null => {
+      return validateField(definitionName, field, input, t) ?? null;
     },
     [field, t, definitionName]
   );
+  
+  const [error, setError] = React.useState<string | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    const safeVal = value != null ? String(value) : "";
-    const err = validate(safeVal);
+    const safeVal = String(value ?? "");
+    let err = validate(safeVal);
     if (err && field.options.length > 0) {
       const first = String(field.options[0].value);
       onChange?.(first, null);
-      onErrorRef.current?.(null);
-    } else {
+      err = null;
+    }
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
       onErrorRef.current?.(err ?? null);
     }
   }, [value, validate, onChange, field.options]);
@@ -77,6 +76,11 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
 
   const handleOptionClick = (val: string) => {
     const err = validate(val);
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
     onChange?.(val, err);
     setMenuOpen(false);
   };
@@ -115,8 +119,6 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     ...styleFrom(formStyle, 'dropdown', 'arrow'),
     ...styleFrom(fieldStyle, undefined, 'arrow'),
   }), [formStyle, fieldStyle]);
-
-  const error = validate(String(value ?? ""));
 
   return (
     <div>

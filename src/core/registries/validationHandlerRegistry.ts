@@ -1,5 +1,10 @@
-import type { FieldValidationHandler, FormValidationHandler } from "../reactaFormTypes";
+import type { DefinitionPropertyField, FieldValidationHandler, FieldValueType, FormValidationHandler, TranslationFunction } from "../reactaFormTypes";
 import BaseRegistry from "./baseRegistry";
+export type BuiltinFieldValidationHandler = (
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction,
+) => string | null;
 
 // Enhanced registry that supports categorized field validators
 class CategoryRegistry<T> extends BaseRegistry<Record<string, T>> {
@@ -26,6 +31,7 @@ class CategoryRegistry<T> extends BaseRegistry<Record<string, T>> {
 
 const formValidationRegistry = new BaseRegistry<FormValidationHandler>();
 const fieldValidationRegistry = new CategoryRegistry<FieldValidationHandler>();
+const builtinFieldValidationRegistry = new BaseRegistry<BuiltinFieldValidationHandler>();
 
 export function registerFormValidationHandler(
   name: string,
@@ -42,12 +48,23 @@ export function registerFieldValidationHandler(
   fieldValidationRegistry.registerInCategory(category, name, fn);
 }
 
+export function registerBuiltinFieldValidationHandler(
+  name: string,
+  fn: BuiltinFieldValidationHandler
+): void {
+  builtinFieldValidationRegistry.register(name, fn);
+}
+
 export function getFieldValidationHandler(category: string, name: string): FieldValidationHandler | null {
   return fieldValidationRegistry.getFromCategory(category, name) || null;
 }
 
 export function getFormValidationHandler(name: string): FormValidationHandler | null {
   return formValidationRegistry.get(name) || null;
+}
+
+export function getBuiltinFieldValidationHandler(name: string): BuiltinFieldValidationHandler | null {
+  return builtinFieldValidationRegistry.get(name) || null;
 }
 
 export function listFieldValidationHandlers(category?: string): string[] {

@@ -274,12 +274,12 @@ const DropdownPopup: React.FC<PopupProps> = ({
     }
   }, [options, selectedValue]);
 
+  // when activeIndex changes, move focus to the corresponding option element
   React.useEffect(() => {
     if (!popupRef.current || activeIndex < 0) return;
     const el = popupRef.current.querySelector(`#opt-${activeIndex}`) as HTMLElement | null;
     if (el) {
-      // Only scroll into view if needed, don't steal focus
-      el.scrollIntoView?.({ block: 'nearest' });
+      requestAnimationFrame(() => el.focus());
     }
   }, [activeIndex]);
 

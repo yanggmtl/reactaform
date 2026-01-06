@@ -1,7 +1,7 @@
 import * as React from "react";
 import useReactaFormContext from "../hooks/useReactaFormContext";
 import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../core/reactaFormTypes";
-import { getComponent } from "../core/registries";
+import { getComponent } from "../core/componentRegistry";
 import { groupConsecutiveFields } from "../utils/groupingHelpers";
 
 // Memoized field wrapper to prevent unnecessary re-renders

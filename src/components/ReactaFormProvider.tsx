@@ -6,7 +6,7 @@ import {
   loadUserTranslation,
   createTranslationFunction
 } from '../utils/translationCache';
-import { registerBaseComponents } from '../core/registries';
+import { registerBaseComponents } from '../core/componentRegistry';
 
 // Import CSS variables if needed
 import '../core/reactaform.css';

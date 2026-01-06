@@ -13,7 +13,7 @@ import {
   registerFormValidationHandler,
   getFieldValidationHandler,
   getFormValidationHandler,
-} from './validationHandlerRegistry';
+} from '../validation/validationHandlerRegistry';
 import {
   registerSubmissionHandler,
   getSubmissionHandler,
@@ -23,7 +23,7 @@ import type {
   FieldValidationHandler,
   FormValidationHandler,
   FormSubmissionHandler,
-} from '../reactaFormTypes';
+} from './reactaFormTypes';
 
 /** Conflict resolution strategies */
 export type ConflictResolution =

@@ -1,6 +1,6 @@
 import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 import type {
   BaseInputProps,
   DefinitionPropertyField,

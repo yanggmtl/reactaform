@@ -6,7 +6,7 @@ import type {
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 
 type ColorOption = {

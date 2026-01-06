@@ -2,7 +2,7 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 
 /**

@@ -1,7 +1,7 @@
 import { renderWithProvider, screen, waitFor, act } from '../test-utils';
 import userEvent from '@testing-library/user-event';
 import ReactaFormRenderer from '../../src/components/ReactaFormRenderer';
-import { registerSubmissionHandler } from '../../src/core/registries';
+import { registerSubmissionHandler } from '../../src/core/submissionHandlerRegistry';
 import type { ReactaDefinition } from '../../src/core/reactaFormTypes';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createInstanceFromDefinition } from '../../src/core/reactaFormModel';

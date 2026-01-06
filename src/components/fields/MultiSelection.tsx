@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
 import { isDarkTheme } from "../../utils/themeUtils";
 

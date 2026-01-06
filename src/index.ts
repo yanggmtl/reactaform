@@ -55,13 +55,13 @@ export type {
 export { 
   registerComponent,
   getComponent,
-} from './core/registries/componentRegistry';
+} from './core/componentRegistry';
 
 // Validation Utilities for custom validation logic
 export {
   validateFieldValue, // Deprecated, use validateFieldWithHandler instead
   validateFieldWithHandler
-} from './core/validation';
+} from './validation/validation';
 
 // Built-in field validators (import for side-effects to register handlers)
 import './validation';
@@ -74,14 +74,14 @@ export {
   getAllPlugins,
   hasPlugin,
   registerComponents,
-} from './core/registries/pluginRegistry';
+} from './core/pluginRegistry';
 
 export type { 
   ReactaFormPlugin,
   ConflictResolution,
   PluginRegistrationOptions,
   PluginConflict,
-} from './core/registries/pluginRegistry';
+} from './core/pluginRegistry';
 
 // Definition & Instance Management
 export type {
@@ -100,12 +100,12 @@ export {
 // Handler Registries
 export {
   registerSubmissionHandler,
-} from './core/registries/submissionHandlerRegistry';
+} from './core/submissionHandlerRegistry';
 
 export {
   registerFieldValidationHandler,
   registerFormValidationHandler,
-} from './core/registries/validationHandlerRegistry';
+} from './validation/validationHandlerRegistry';
 
 // Hooks
 export type {

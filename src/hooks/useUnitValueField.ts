@@ -1,6 +1,6 @@
 // hooks/useUnitValueField.ts
 import * as React from "react";
-import { validateField } from "../core/validation";
+import { validateField } from "../validation/validation";
 import type { DefinitionPropertyField } from "../core/reactaFormTypes";
 
 export function useUnitValueField(

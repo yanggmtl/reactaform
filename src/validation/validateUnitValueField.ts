@@ -1,5 +1,5 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "../core/registries/validationHandlerRegistry";
+import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 import { validateFloatField } from "./validateFloatField";
 
 export function validateUnitValueField(

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { registerSubmissionHandler } from '../../src/core/registries/submissionHandlerRegistry';
+import { registerSubmissionHandler } from '../../src/core/submissionHandlerRegistry';
 import { submitForm } from '../../src/core/submitForm';
 import type { ReactaDefinition, ReactaInstance } from '../../src/core/reactaFormTypes';
 

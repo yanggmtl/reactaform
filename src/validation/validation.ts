@@ -5,12 +5,12 @@ import type {
   FieldValueType,
   DefinitionPropertyField,
   TranslationFunction,
-} from "./reactaFormTypes";
+} from "../core/reactaFormTypes";
 import {
   getBuiltinFieldValidationHandler,
   getFieldValidationHandler,
   getFormValidationHandler,
-} from "./registries/validationHandlerRegistry";
+} from "./validationHandlerRegistry";
 
 function isThenable<T = unknown>(v: unknown): v is PromiseLike<T> {
   return (

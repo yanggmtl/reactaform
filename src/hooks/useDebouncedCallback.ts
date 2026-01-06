@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { IS_TEST_ENV } from "../core/registries/debounceEnv";
+import { IS_TEST_ENV } from "../core/debounceEnv";
 
 export type DebouncedCallback = {
   callback: (...args: unknown[]) => void;

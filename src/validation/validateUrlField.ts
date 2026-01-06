@@ -1,5 +1,5 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "../core/registries/validationHandlerRegistry";
+import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 // Simple URL validation (accepts http(s), ftp, file, etc.)
 const urlRegex =

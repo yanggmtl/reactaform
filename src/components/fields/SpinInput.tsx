@@ -4,7 +4,7 @@ import type { ChangeEvent } from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateFieldValue } from "../../core/validation";
+import { validateFieldValue } from "../../validation/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 

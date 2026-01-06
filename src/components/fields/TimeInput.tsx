@@ -3,7 +3,7 @@ import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 

@@ -3,7 +3,7 @@
 // "int" and "stepper" field types share the same validation logic
 
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "../core/registries/validationHandlerRegistry";
+import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 function isValidInteger(input: string) {
   // Regex to validate integer input (optional leading + or -)

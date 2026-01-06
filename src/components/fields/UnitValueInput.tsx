@@ -6,7 +6,7 @@ import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
 
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 
 import PopupOptionMenu from "../PopupOptionMenu";
 import type { PopupOptionMenuPosition } from "../PopupOptionMenu";

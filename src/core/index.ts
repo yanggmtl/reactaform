@@ -1,26 +1,31 @@
 // Core ReactaForm functionality exports
 
 export * from "./reactaFormTypes";
-export * from "./validation";
 export * from "./submitForm";
 export * from "./fieldVisibility";
 export * from "./reactaFormModel";
-export * from "./registries";
+export * from "./pluginRegistry";
+export * from "./componentRegistry";
+export * from "./submissionHandlerRegistry";
+export * from "./baseRegistry";
 
 // Default export convenience
-import * as registries from "./registries";
-import * as validation from "./validation";
 import * as submitForm from "./submitForm";
 import * as fieldVisibility from "./fieldVisibility";
 import * as reactaFormModel from "./reactaFormModel";
-import { registerBaseComponents } from "./registries";
+import * as pluginRegistry from "./pluginRegistry";
+import * as componentRegistry from "./componentRegistry";
+import * as submissionRegistry from "./submissionHandlerRegistry";
+
+import { registerBaseComponents } from "./componentRegistry";
 
 registerBaseComponents();
 
 export default {
-  registries,
-  validation,
   submitForm,
   fieldVisibility,
-  reactaFormModel
+  reactaFormModel,
+  pluginRegistry,
+  componentRegistry,
+  submissionRegistry,
 };

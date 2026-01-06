@@ -1,5 +1,5 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "../core/registries/validationHandlerRegistry";
+import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 const parseDateTime = (value?: string): number | null => {
   if (!value) return null;

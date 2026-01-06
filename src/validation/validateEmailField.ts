@@ -1,6 +1,6 @@
 
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "../core/registries/validationHandlerRegistry";
+import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 import validateFieldPattern from "./validateFieldPattern";
 
 function isValidEmail(email: string): boolean {

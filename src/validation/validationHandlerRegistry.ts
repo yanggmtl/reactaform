@@ -1,5 +1,5 @@
-import type { DefinitionPropertyField, FieldValidationHandler, FieldValueType, FormValidationHandler, TranslationFunction } from "../reactaFormTypes";
-import BaseRegistry from "./baseRegistry";
+import type { DefinitionPropertyField, FieldValidationHandler, FieldValueType, FormValidationHandler, TranslationFunction } from "../core/reactaFormTypes";
+import BaseRegistry from "../core/baseRegistry";
 export type BuiltinFieldValidationHandler = (
   field: DefinitionPropertyField,
   input: FieldValueType,

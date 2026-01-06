@@ -5,7 +5,7 @@ import type {
   DefinitionPropertyField,
   BaseInputProps,
 } from "../../core/reactaFormTypes";
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 

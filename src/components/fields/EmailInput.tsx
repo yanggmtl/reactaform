@@ -4,7 +4,7 @@ import useReactaFormContext from "../../hooks/useReactaFormContext";
 // Ensure built-in validators are registered when this component is imported in tests
 import '../../validation';
 import { StandardFieldLayout } from "../LayoutComponents";
-import { validateField } from "../../core/validation";
+import { validateField } from "../../validation/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 

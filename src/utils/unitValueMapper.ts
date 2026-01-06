@@ -171,3 +171,47 @@ for (const dim of allDimensions) {
   unitsByDimension[dim] = units;
 }
 
+// Temperature conversion (non-linear)
+export function convertTemperature(
+  fromUnit: string,
+  toUnit: string,
+  value: number
+): number {
+  if (fromUnit === "C") {
+    if (toUnit === "F") return value * (9 / 5) + 32;
+    if (toUnit === "K") return value + 273.15;
+  } else if (fromUnit === "F") {
+    if (toUnit === "C") return ((value - 32) * 5) / 9;
+    if (toUnit === "K") return ((value - 32) * 5) / 9 + 273.15;
+  } else if (fromUnit === "K") {
+    if (toUnit === "C") return value - 273.15;
+    if (toUnit === "F") return ((value - 273.15) * 9) / 5 + 32;
+  }
+  return value;
+}
+
+// Get unit conversion factors for a dimension
+export function getUnitFactors(dimension: string): {
+  default: string;
+  units: string[];
+  factors: Record<string, number>;
+} | null {
+  const unitsForDim = unitsByDimension[dimension];
+  if (!unitsForDim) return null;
+
+  const factorsMap: Record<string, number> = {};
+  const unitKeys: string[] = [];
+
+  for (const [u, info] of Object.entries(unitsForDim)) {
+    if (typeof info.factor === "number") factorsMap[u] = info.factor;
+    unitKeys.push(u);
+  }
+
+  const preferredDefault = Object.keys(unitsForDim)[0] ?? "";
+  return {
+    default: preferredDefault,
+    units: unitKeys,
+    factors: factorsMap,
+  };
+}
+

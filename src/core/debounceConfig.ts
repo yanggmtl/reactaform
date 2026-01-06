@@ -27,7 +27,7 @@ export const DEBOUNCE_CONFIG: Record<string, DebounceConfig> = {
   url: { wait: 200 },
   int: { wait: 200 },
   float: { wait: 200 },
-  unit: { wait: 200 },
+  unit: { wait: 100 },
 
   // Date / time
   date: { wait: 150 },

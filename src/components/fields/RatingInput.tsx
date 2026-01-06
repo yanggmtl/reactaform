@@ -1,15 +1,8 @@
 import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { validateField } from "../../validation/validation";
-import type {
-  BaseInputProps,
-  DefinitionPropertyField,
-} from "../../core/reactaFormTypes";
+import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
-
-/* ------------------------------------------------------------------ */
-/* Styles                                                             */
-/* ------------------------------------------------------------------ */
 
 const ratingWrapperStyle: React.CSSProperties = {
   display: "flex",
@@ -26,8 +19,6 @@ const starBaseStyle: React.CSSProperties = {
   transition: "color 0.12s ease",
 };
 
-/* ------------------------------------------------------------------ */
-
 type RatingField = DefinitionPropertyField & {
   max?: number;
   icon?: string;
@@ -35,103 +26,63 @@ type RatingField = DefinitionPropertyField & {
 
 export type RatingInputProps = BaseInputProps<number, RatingField>;
 
-const RatingInput: React.FC<RatingInputProps> = ({
-  field,
-  value,
-  onChange,
-  onError,
-}) => {
+const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onError }) => {
   const { t, definitionName } = useReactaFormContext();
 
   const max = field.max ?? 5;
-  const iconChar =
-    field.icon && String(field.icon).trim()
-      ? String(field.icon)
-      : "★";
+  const iconChar = field.icon?.trim() || "★";
 
   const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
   const starRefs = React.useRef<Array<HTMLSpanElement | null>>([]);
 
-  /* ------------------------------------------------------------------ */
-  /* Validation                                                         */
-  /* ------------------------------------------------------------------ */
+  // Normalize value
+  const ratingValue = React.useMemo(() => {
+    const v = value ?? 0;
+    return Math.min(Math.max(v, 0), max);
+  }, [value, max]);
 
-  const validate = React.useCallback(
-    (input: number): string | null => {
-      return validateField(definitionName, field, input, t) ?? null;
+  // Validation
+  const error = React.useMemo(() => {
+    return validateField(definitionName, field, ratingValue, t) ?? null;
+  }, [definitionName, field, ratingValue, t]);
+
+  // Notify parent of errors
+  React.useEffect(() => {
+    onError?.(error);
+  }, [error, onError]);
+
+  // Handlers
+  const handleSelect = React.useCallback(
+    (val: number) => {
+      const normalized = Math.min(Math.max(val, 0), max);
+      const err = validateField(definitionName, field, normalized, t) ?? null;
+      onChange?.(normalized, err);
     },
-    [definitionName, field, t]
+    [max, definitionName, field, t, onChange]
   );
 
-  const normalizeValue = React.useCallback(
-    (val?: number) => {
-      const v = val ?? 0;
-      return Math.min(Math.max(v, 0), max);
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent, index: number) => {
+      switch (e.key) {
+        case "Enter":
+        case " ":
+          e.preventDefault();
+          handleSelect(index + 1);
+          break;
+        case "ArrowRight":
+        case "ArrowUp":
+          e.preventDefault();
+          starRefs.current[Math.min(max - 1, index + 1)]?.focus();
+          break;
+        case "ArrowLeft":
+        case "ArrowDown":
+          e.preventDefault();
+          starRefs.current[Math.max(0, index - 1)]?.focus();
+          break;
+      }
     },
-    [max]
+    [max, handleSelect]
   );
-
-  const [error, setError] = React.useState<string | null>(null);
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef(onError);
-
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
-
-  const updateError = React.useCallback((next: string | null) => {
-    if (next !== prevErrorRef.current) {
-      prevErrorRef.current = next;
-      setError(next);
-      onErrorRef.current?.(next);
-    }
-  }, []);
-
-  /* ------------------------------------------------------------------ */
-  /* Sync external value                                                */
-  /* ------------------------------------------------------------------ */
-
-  const ratingValue = normalizeValue(value);
-
-  React.useEffect(() => {
-    updateError(validate(ratingValue));
-  }, [ratingValue, validate, updateError]);
-
-  /* ------------------------------------------------------------------ */
-  /* Events                                                             */
-  /* ------------------------------------------------------------------ */
-
-  const handleSelect = (val: number) => {
-    const normalized = normalizeValue(val);
-    const err = validate(normalized);
-
-    updateError(err);
-    onChange?.(normalized, err);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    switch (e.key) {
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        handleSelect(index + 1);
-        break;
-      case "ArrowRight":
-      case "ArrowUp": {
-        e.preventDefault();
-        starRefs.current[Math.min(max - 1, index + 1)]?.focus();
-        break;
-      }
-      case "ArrowLeft":
-      case "ArrowDown": {
-        e.preventDefault();
-        starRefs.current[Math.max(0, index - 1)]?.focus();
-        break;
-      }
-    }
-  };
-
-  /* ------------------------------------------------------------------ */
 
   return (
     <StandardFieldLayout field={field} error={error}>
@@ -152,15 +103,7 @@ const RatingInput: React.FC<RatingInputProps> = ({
               key={i}
               ref={(el) => (starRefs.current[i] = el)}
               role="radio"
-              tabIndex={
-                ratingValue > 0
-                  ? i === ratingValue - 1
-                    ? 0
-                    : -1
-                  : i === 0
-                  ? 0
-                  : -1
-              }
+              tabIndex={ratingValue > 0 ? (i === ratingValue - 1 ? 0 : -1) : i === 0 ? 0 : -1}
               aria-checked={isActive}
               aria-label={`Rating ${i + 1}`}
               title={t(`${field.displayName} ${i + 1}`)}

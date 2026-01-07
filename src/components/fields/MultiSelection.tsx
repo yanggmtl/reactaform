@@ -4,9 +4,9 @@ import * as ReactDOM from "react-dom";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../validation/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
 import { isDarkTheme } from "../../utils/themeUtils";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 export type OptionsField = DefinitionPropertyField & {
   options: NonNullable<DefinitionPropertyField["options"]>;
@@ -22,6 +22,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
   const onErrorRef = React.useRef<MultiSelectionProps["onError"] | undefined>(
     onError
@@ -30,7 +31,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
-  const { t, theme, formStyle, fieldStyle, definitionName } = useReactaFormContext();
+  const { t, theme, formStyle, fieldStyle } = useReactaFormContext();
   const styleFrom = (
     source: unknown,
     section?: string,
@@ -60,12 +61,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     return arr.filter((v) => allowed.has(v));
   }, [value, options]);
 
-  const validate = React.useCallback(
-    (input: string[]) => {
-      return validateField(definitionName, field, input, t);
-    },
-    [field, definitionName, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   const [multiError, setMultiError] = React.useState<string | null>(null);
   const prevErrorLocalRef = React.useRef<string | null>(null);

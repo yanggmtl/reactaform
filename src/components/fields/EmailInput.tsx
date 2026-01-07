@@ -1,12 +1,9 @@
 import * as React from "react";
 import type { DefinitionPropertyField, BaseInputProps } from "../../core/reactaFormTypes";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
-// Ensure built-in validators are registered when this component is imported in tests
-import '../../validation';
 import { StandardFieldLayout } from "../LayoutComponents";
-import { validateField } from "../../validation/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 export type EmailInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -15,15 +12,9 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { definitionName, t } = useReactaFormContext();
-
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t) ?? null;
-    },
-    [field, definitionName, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   // Use shared uncontrolled + validated input hook
   const { inputRef, error, handleChange } = useUncontrolledValidatedInput({

@@ -2,25 +2,12 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 /**
  * UrlInput component
- *
- * This component provides a controlled input field for URL values.
- * It validates required fields, URL format, and integrates with Reacta form context.
- *
- * Props:
- * - field: Field metadata (name, displayName, tooltip, validation rules).
- * - value: Current URL string.
- * - onChange: Callback called with (value, error).
- *
- * Features:
- * - Validates using a robust URL regex and `URL` constructor fallback.
- * - Supports tooltip, localization, and inline validation errors.
  */
 export type UrlInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -29,25 +16,19 @@ const UrlInput: React.FC<UrlInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
+  const validate = useFieldValidator(field);
 
-  // Validation logic
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t);
-    },
-    [definitionName, field, t]
-  );
-
-  // Use shared uncontrolled + validated input hook
-  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
-    value,
-    onChange,
-    onError,
-    validate,
-  });
-
+  const { inputRef, error: hookError, handleChange } = useUncontrolledValidatedInput({
+     value,
+     onChange,
+     onError,
+     validate,
+   });
+ 
+   const error = externalError ?? hookError;
+ 
   return (
     <StandardFieldLayout field={field} error={error}>
       <input

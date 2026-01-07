@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { ReactaFormProviderProps, TranslationMap } from '../core/reactaFormTypes';
+import type { FieldValidationMode, ReactaFormProviderProps, TranslationMap } from '../core/reactaFormTypes';
 import { ReactaFormContext } from '../hooks/useReactaFormContext';
 import {
   loadCommonTranslation,
@@ -7,11 +7,13 @@ import {
   createTranslationFunction
 } from '../utils/translationCache';
 import { registerBaseComponents } from '../core/componentRegistry';
+import { ensureBuiltinValidatorsRegistered } from '../validation/registerBuiltinTypeValidators';
 
 // Import CSS variables if needed
 import '../core/reactaform.css';
 
 registerBaseComponents();
+ensureBuiltinValidatorsRegistered();
 
 // Local copies of style generators previously in utils/styleConfig.ts
 const getFormStyle = (
@@ -138,8 +140,9 @@ export const ReactaFormProvider = ({
   defaultLanguage = 'en',
   defaultTheme = 'light',
   defaultLocalizeName = '',
+  defaultFieldValidationMode = 'realTime',
   className = 'reactaform-container',
-}: ReactaFormProviderProps) => {
+}: ReactaFormProviderProps & { defaultFieldValidationMode?: FieldValidationMode }) => {
   const providerDefinitionName = definitionName;
   const localizeName = defaultLocalizeName;
   const theme = defaultTheme;
@@ -217,8 +220,9 @@ export const ReactaFormProvider = ({
       formStyle,
       fieldStyle,
       t,
+      fieldValidationMode: defaultFieldValidationMode,
     }),
-    [providerDefinitionName, language, theme, fieldStyle, formStyle, t]
+    [providerDefinitionName, language, theme, fieldStyle, formStyle, t, defaultFieldValidationMode]
   );
 
   // Only apply height: 100% if the user provided a height in their style prop

@@ -49,6 +49,7 @@ export type {
   InputOnChange,
   BaseInputProps,
   TranslationFunction,
+  FieldValidationMode
 } from './core/reactaFormTypes';
 
 // Component Registry
@@ -62,9 +63,6 @@ export {
   validateFieldValue, // Deprecated, use validateFieldWithHandler instead
   validateFieldWithHandler
 } from './validation/validation';
-
-// Built-in field validators (import for side-effects to register handlers)
-import './validation';
 
 // Plugin System
 export {

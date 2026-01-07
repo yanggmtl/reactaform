@@ -1,13 +1,13 @@
 import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 export type FileInputProps = BaseInputProps<File | File[] | null, DefinitionPropertyField>;
 
-const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }) => {
-  const { t, definitionName } = useReactaFormContext();
+const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, error: externalError }) => {
+  const { t } = useReactaFormContext();
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const onErrorRef = React.useRef<FileInputProps["onError"] | undefined>(onError);
@@ -27,12 +27,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     );
   };
 
-  const validate = React.useCallback(
-    (input: File | File[]): string | null => {
-      return validateField(definitionName, field, input, t);
-    },
-    [field, definitionName, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   React.useEffect(() => {
     const err = validate(value ?? []);
@@ -148,24 +143,36 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError }
     return (
       <div style={{
         marginTop: '8px',
+        marginLeft: '20px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '6px'
+        gap: '6px',
+        maxHeight: '200px',
+        overflowY: 'auto'
       }}>
         {files.map((file, index) => (
           <div
             key={`${file.name}-${index}`}
-            className="reactaform-chip"
+            style={{ 
+              display: 'flex',
+              gap: '8px',
+              alignItems: 'center'
+            }}
           >
-            <div style={{ 
-              flex: 1, 
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
-              {file.name}
-            </div>
+            <input
+              type="text"
+              value={file.name}
+              disabled
+              readOnly
+              title={file.name}
+              className="reactaform-input"
+              style={{
+                flex: 1,
+                cursor: 'default',
+                opacity: 0.8,
+                minWidth: 0
+              }}
+            />
             <button
               type="button"
               onClick={() => handleRemoveFile(Array.isArray(value) ? index : undefined)}

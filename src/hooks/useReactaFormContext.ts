@@ -1,7 +1,7 @@
 import { useContext, createContext } from 'react';
 import type { ReactaFormContextType } from '../core/reactaFormTypes';
 
-// Create the context
+// Create the context including optional validation mode
 export const ReactaFormContext = createContext<ReactaFormContextType | undefined>(undefined);
 
 // Hook to use the context

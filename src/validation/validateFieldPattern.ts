@@ -10,6 +10,9 @@ export function validateFieldPattern(
   fallbackMessage?: string,
   ...args: unknown[]
 ): string | null {
+  if (field.pattern == null) {
+    return null;
+  }
   const inputStr = String(input);
 
   // Compile / reuse regex for this field when a pattern is provided

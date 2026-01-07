@@ -2,14 +2,13 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 // ------------------ Types ------------------
 
-type TextInputProps = BaseInputProps<string, DefinitionPropertyField>;
+type TextInputProps = BaseInputProps<string, DefinitionPropertyField> & { error?: string | null };
 
 // ------------------ Component ------------------
 
@@ -18,17 +17,10 @@ const TextInput: React.FC<TextInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
+  const validate = useFieldValidator(field, externalError);
 
-  const validate = React.useCallback(
-    (val: string): string | null => {
-      return validateField(definitionName, field, val, t);
-    },
-    [field, definitionName, t]
-  );
-
-  // Use our shared uncontrolled + validated input hook
   const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
     value,
     onChange,

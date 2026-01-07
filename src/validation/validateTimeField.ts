@@ -1,5 +1,4 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 export function validateTimeField(
   field: DefinitionPropertyField,
@@ -14,6 +13,12 @@ export function validateTimeField(
   const toSeconds = (s: string) => {
     const parts = s.split(":").map((p) => parseInt(p, 10));
     if (parts.some((n) => Number.isNaN(n))) return NaN;
+    const count = parts.length;
+    if (count < 2 || count > 3) return NaN;
+    
+    if (count === 2 && (parts[0] < 0 || parts[0] > 23 || parts[1] < 0 || parts[1] > 59)) return NaN;
+    if (count === 3 && (parts[0] < 0 || parts[0] > 23 || parts[1] < 0 || parts[1] > 59 || parts[2] < 0 || parts[2] > 59)) return NaN;
+    
     let seconds = 0;
     if (parts.length === 3) {
       seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
@@ -42,5 +47,3 @@ export function validateTimeField(
 
   return null;
 }
-
-registerBuiltinFieldValidationHandler("time", validateTimeField);

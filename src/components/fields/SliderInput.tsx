@@ -1,15 +1,14 @@
 import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../validation/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type SliderInputProps = BaseInputProps<string | number, DefinitionPropertyField>;
 
-const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onError }) => {
-  const { t, definitionName } = useReactaFormContext();
-
+const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onError, error: externalError }) => {
+  const validate = useFieldValidator(field, externalError);
+  
   const min = field.min ?? 0;
   const max = field.max ?? 100;
 
@@ -26,8 +25,8 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
 
   // Validation
   const error = React.useMemo(() => {
-    return validateField(definitionName, field, inputValue, t) ?? null;
-  }, [definitionName, field, inputValue, t]);
+    return validate(inputValue) ?? null;
+  }, [validate, inputValue]);
 
   // Notify parent of errors
   React.useEffect(() => {
@@ -40,10 +39,10 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
       const input = e.target.value;
       setInputValue(input);
       
-      const err = validateField(definitionName, field, input, t) ?? null;
+      const err = validate(input) ?? null;
       onChange?.(input, err);
     },
-    [definitionName, field, t, onChange]
+    [validate, onChange]
   );
 
   const displayValue = !isNaN(Number(inputValue)) ? String(Number(inputValue)) : String(min);

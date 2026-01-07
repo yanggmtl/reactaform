@@ -16,6 +16,7 @@ import {
 } from "../core/fieldVisibility";
 import { renameDuplicatedGroups } from "../utils/groupingHelpers";
 import { submitForm } from "../core/submitForm";
+import { validateField } from "../validation/validation";
 
 export interface ReactaFormRendererProps {
   definition: ReactaDefinition;
@@ -309,7 +310,43 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     const prevName = targetInstanceRef.current?.name;
     targetInstanceRef.current.name = instanceName;
 
-    const result = await submitForm(definition, targetInstanceRef.current, valuesMap, t, errors);
+    // Determine the error map that will be submitted. We avoid relying on
+    // the (async) state update to `errors` and instead use a local
+    // `errorsForSubmit` which we set to the freshly computed `newErrors`
+    // when running on-submission validation.
+    let errorsForSubmit = errors;
+
+    // Go through valuesMap and validate all fields if fieldValidationMode is 'onSubmission'
+    if (renderContext.fieldValidationMode === "onSubmission") {
+      const newErrors: Record<string, string> = {};
+      updatedProperties.forEach((field) => {
+        const value = valuesMap[field.name];
+        if (value === undefined) return;
+        const err = validateField(renderContext.definitionName, field, value, t);
+        if (err) {
+          newErrors[field.name] = err;
+        }
+      });
+
+      // Update state and use the fresh map for the remainder of this function.
+      setErrors(newErrors);
+      errorsForSubmit = newErrors;
+
+      // If there are errors, do not proceed with submission
+      if (Object.keys(newErrors).length > 0) {
+        setSubmissionMessage(t("Please fix validation errors before submitting the form."));
+        setSubmissionSuccess(false);
+        return;
+      } else {
+        setSubmissionMessage(null);
+        setSubmissionSuccess(null);
+      }
+    }
+
+    // No field validation errors, proceed with submission
+    // Form validation is processed in submitForm
+    const result = await submitForm(definition, targetInstanceRef.current, valuesMap, t, errorsForSubmit);
+    
     // Display result message in the UI
     const msg = typeof result.message === 'string' ? result.message : String(result.message);
     const errMsg = Object.values(result.errors??{}).join("\n");
@@ -333,8 +370,8 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   // Memoize expensive computations
   const isApplyDisabled = React.useMemo(
-    () => Object.values(errors).some(Boolean),
-    [errors]
+    () => renderContext.fieldValidationMode === "realTime" ? Object.values(errors).some(Boolean) : false,
+    [errors, renderContext.fieldValidationMode]
   );
 
   return (
@@ -398,7 +435,8 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
             handleError,
             visibility,
             loadedCount,
-            toggleGroup
+            toggleGroup,
+            errors
           )}
           {loadedCount < updatedProperties.length && (
             <div

@@ -1,5 +1,4 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 export function validateRatingField(
   field: DefinitionPropertyField,
@@ -27,5 +26,3 @@ export function validateRatingField(
 
   return null;
 }
-
-registerBuiltinFieldValidationHandler("rating", validateRatingField);

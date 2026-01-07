@@ -6,8 +6,8 @@ import type {
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
-import { validateField } from "../../validation/validation";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type ColorOption = {
   label: string;
@@ -80,19 +80,14 @@ const ColorInput: React.FC<ColorInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-
+  const { t } = useReactaFormContext();
+  const validate = useFieldValidator(field, externalError);
+  
   const normalizedValue = React.useMemo(
     () => normalizeHexColor(value),
     [value]
-  );
-
-  const validate = React.useCallback(
-    (input: string) => {
-      return validateField(definitionName, field, input, t) ?? null;
-    },
-    [definitionName, field, t]
   );
 
   const { inputRef, error, handleChange } =
@@ -106,6 +101,12 @@ const ColorInput: React.FC<ColorInputProps> = ({
   const [previewColor, setPreviewColor] =
     React.useState(normalizedValue);
 
+  // Notify parent when validation result changes
+  React.useEffect(() => {
+    if (externalError) return;
+    onError?.(error);
+  }, [error, externalError, onError]);
+  
   React.useEffect(() => {
     setPreviewColor(normalizedValue);
   }, [normalizedValue]);
@@ -114,15 +115,8 @@ const ColorInput: React.FC<ColorInputProps> = ({
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const color = normalizeHexColor(e.target.value);
       setPreviewColor(color);
-      handleChange(e);
-    },
-    [handleChange]
-  );
-
-  const triggerInputChange = React.useCallback(
-    (value: string) => {
       handleChange({
-        target: { value } as HTMLInputElement,
+        target: { value: color } as HTMLInputElement,
       } as unknown as React.ChangeEvent<HTMLInputElement>);
     },
     [handleChange]
@@ -132,9 +126,11 @@ const ColorInput: React.FC<ColorInputProps> = ({
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const color = normalizeHexColor(e.target.value);
       setPreviewColor(color);
-      triggerInputChange(color);
+      handleChange({
+        target: { value: color } as HTMLInputElement,
+      } as unknown as React.ChangeEvent<HTMLInputElement>);
     },
-    [triggerInputChange]
+    [handleChange]
   );
 
   const predefinedMap = React.useMemo(

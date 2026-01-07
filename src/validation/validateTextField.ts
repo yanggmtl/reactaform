@@ -1,5 +1,4 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 import validateFieldPattern from "./validateFieldPattern";
 
 export function validateTextField(
@@ -21,8 +20,3 @@ export function validateTextField(
   
   return validateFieldPattern(field, input, t, "Invalid text format");
 }
-
-registerBuiltinFieldValidationHandler("text", validateTextField);
-registerBuiltinFieldValidationHandler("string", validateTextField);
-registerBuiltinFieldValidationHandler("multiline", validateTextField);
-registerBuiltinFieldValidationHandler("password", validateTextField);

@@ -10,7 +10,8 @@ const FieldWrapper = React.memo<{
   value: FieldValueType;
   handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void;
   handleError?: (fieldName: string, error: ErrorType) => void;
-}>(({ field, value, handleChange, handleError }) => {
+  error?: string | null;
+}>(({ field, value, handleChange, handleError, error }) => {
   const Component = getComponent(field.type) as JSX.ElementType | undefined;
 
   const stableValue = React.useMemo(() => value, [value]);
@@ -26,13 +27,13 @@ const FieldWrapper = React.memo<{
   );
 
   if (!Component) return null;
-
-  return <Component field={field} value={stableValue} onChange={onChange} onError={onError} />;
+  return <Component field={field} value={stableValue} onChange={onChange} onError={onError} error={error} />;
 }, (prevProps, nextProps) => (
   prevProps.field === nextProps.field &&
   prevProps.value === nextProps.value &&
   prevProps.handleChange === nextProps.handleChange &&
-  prevProps.handleError === nextProps.handleError
+  prevProps.handleError === nextProps.handleError &&
+  prevProps.error === nextProps.error
 ));
 
 FieldWrapper.displayName = 'FieldWrapper';
@@ -42,17 +43,22 @@ const renderField = (
   field: DefinitionPropertyField,
   valuesMap: Record<string, FieldValueType>,
   handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void,
-  handleError?: (fieldName: string, error: ErrorType) => void
-) => (
-  <React.Fragment key={field.name}>
-    <FieldWrapper
-      field={field}
-      value={valuesMap[field.name]}
-      handleChange={handleChange}
-      handleError={handleError}
-    />
-  </React.Fragment>
-);
+  handleError?: (fieldName: string, error: ErrorType) => void,
+  errors?: Record<string, string>
+) => {
+  const fieldError = errors ? errors[field.name] ?? null : undefined;
+  return (
+    <React.Fragment key={field.name}>
+      <FieldWrapper
+        field={field}
+        value={valuesMap[field.name]}
+        handleChange={handleChange}
+        handleError={handleError}
+        error={fieldError}
+      />
+    </React.Fragment>
+  );
+};
 
 // Render fields without grouping
 export const renderFields = (
@@ -61,11 +67,12 @@ export const renderFields = (
   handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void,
   visibility: Record<string, boolean>,
   loadedCount: number,
-  handleError?: (fieldName: string, error: ErrorType) => void
+  handleError?: (fieldName: string, error: ErrorType) => void,
+  errorsMap?: Record<string, string>
 ) => {
   return fields.slice(0, loadedCount).map((field) => {
     if (!visibility[field.name]) return null;
-    return renderField(field, valuesMap, handleChange, handleError);
+    return renderField(field, valuesMap, handleChange, handleError, errorsMap);
   });
 };
 
@@ -77,9 +84,10 @@ const FieldGroup = React.memo<{
   valuesMap: Record<string, FieldValueType>;
   handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void;
   handleError: (fieldName: string, error: ErrorType) => void;
+  errorsMap?: Record<string, string>;
   toggleGroup: (groupName: string) => void;
   t: (key: string) => string;
-}>(({ groupName, isOpen, fields, valuesMap, handleChange, handleError, toggleGroup, t }) => {
+}>(({ groupName, isOpen, fields, valuesMap, handleChange, handleError, errorsMap, toggleGroup, t }) => {
   const onToggle = React.useCallback(() => toggleGroup(groupName), [toggleGroup, groupName]);
   const { formStyle, fieldStyle } = useReactaFormContext();
 
@@ -110,7 +118,7 @@ const FieldGroup = React.memo<{
         <span>{t(groupName)}</span>
         <span>{isOpen ? "▼" : "▶"}</span>
       </legend>
-      {isOpen && fields.map((f) => renderField(f, valuesMap, handleChange, handleError))}
+      {isOpen && fields.map((f) => renderField(f, valuesMap, handleChange, handleError, errorsMap))}
     </fieldset>
   );
 });
@@ -127,7 +135,8 @@ export const renderFieldsWithGroups = (
   handleError: (fieldName: string, error: ErrorType) => void,
   visibility: Record<string, boolean>,
   loadedCount: number,
-  toggleGroup: (groupName: string) => void
+  toggleGroup: (groupName: string) => void,
+  errors?: Record<string, string>
 ) => {
   const fieldsToRender = fields.slice(0, loadedCount).filter((f) => visibility[f.name]);
   const groupResult = groupConsecutiveFields(fieldsToRender);
@@ -145,12 +154,13 @@ export const renderFieldsWithGroups = (
           valuesMap={valuesMap}
           handleChange={handleChange}
           handleError={handleError}
+          errorsMap={errors}
           toggleGroup={toggleGroup}
           t={t}
         />
       );
     } else {
-      group.fields.forEach((f) => output.push(renderField(f, valuesMap, handleChange, handleError)));
+      group.fields.forEach((f) => output.push(renderField(f, valuesMap, handleChange, handleError, errors)));
     }
   });
 

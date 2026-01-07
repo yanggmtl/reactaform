@@ -1,6 +1,5 @@
 
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 import validateFieldPattern from "./validateFieldPattern";
 
 function isValidEmail(email: string): boolean {
@@ -19,7 +18,5 @@ export function validateEmailField(
 
   if (!isValidEmail(inputStr)) return t("Must be valid email format");
 
-  return field.pattern ? validateFieldPattern(field, input, t, t("Email does not match pattern: {{1}}", field.pattern)) : null;
+  return validateFieldPattern(field, input, t, t("Email does not match pattern: {{1}}", field.pattern));
 }
-
-registerBuiltinFieldValidationHandler("email", validateEmailField);

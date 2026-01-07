@@ -3,7 +3,6 @@
 // "int" and "stepper" field types share the same validation logic
 
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 function isValidInteger(input: string) {
   // Regex to validate integer input (optional leading + or -)
@@ -145,7 +144,3 @@ export function validateIntegerArrayField(
 
   return null;
 }
-
-registerBuiltinFieldValidationHandler("int", validateIntegerField);
-registerBuiltinFieldValidationHandler("stepper", validateIntegerField);
-registerBuiltinFieldValidationHandler("int-array", validateIntegerArrayField);

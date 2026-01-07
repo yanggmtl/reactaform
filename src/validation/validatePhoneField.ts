@@ -1,5 +1,4 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 import validateFieldPattern from "./validateFieldPattern";
 
 export function validatePhoneField(
@@ -10,7 +9,5 @@ export function validatePhoneField(
   const inputStr = String(input ?? "").trim();
   if (inputStr === "") return field.required ? t("Value required") : null;
 
-  return field.pattern ? validateFieldPattern(field, inputStr, t, "Invalid phone number format") : null;
+  return validateFieldPattern(field, inputStr, t, "Invalid phone number format");
 }
-
-registerBuiltinFieldValidationHandler("phone", validatePhoneField);

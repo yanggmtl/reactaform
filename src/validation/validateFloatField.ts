@@ -1,5 +1,4 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 export function validateFloatField(
   field: DefinitionPropertyField,
@@ -116,7 +115,3 @@ export function validateFloatArrayField(
 
   return null;
 }
-
-registerBuiltinFieldValidationHandler("float", validateFloatField);
-registerBuiltinFieldValidationHandler("slider", validateFloatField);
-registerBuiltinFieldValidationHandler("float-array", validateFloatArrayField);

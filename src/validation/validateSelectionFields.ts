@@ -1,5 +1,4 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 export function validateDropdownField(
   field: DefinitionPropertyField,
@@ -43,6 +42,3 @@ export function validateMultiSelectionField(
 
   return null;
 }
-
-registerBuiltinFieldValidationHandler("dropdown", validateDropdownField);
-registerBuiltinFieldValidationHandler("multi-selection", validateMultiSelectionField);

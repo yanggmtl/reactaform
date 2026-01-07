@@ -35,6 +35,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
   className,
   theme,
   style, 
+  fieldValidationMode: validationMode = 'realTime',
 }) => {
     const definition = React.useMemo<ReactaDefinition | null>(() => {
       try {
@@ -91,6 +92,7 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
         defaultTheme={inputTheme}
         defaultLocalizeName={definition.localization || ""}
         className={className}
+        defaultFieldValidationMode={validationMode}
       >
         <ReactaFormRenderer
           definition={definition}

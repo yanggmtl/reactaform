@@ -6,8 +6,8 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../validation/validation";
 import { isDarkTheme } from "../../utils/themeUtils";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type DropdownField = DefinitionPropertyField & {
   options: NonNullable<DefinitionPropertyField['options']>;
@@ -31,8 +31,9 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName, theme, formStyle, fieldStyle } = useReactaFormContext();
+  const { t, theme, formStyle, fieldStyle } = useReactaFormContext();
   const controlRef = React.useRef<HTMLDivElement>(null);
   const onErrorRef = React.useRef<DropdownInputProps["onError"] | undefined>(onError);
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -42,12 +43,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     onErrorRef.current = onError;
   }, [onError]);
 
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t) ?? null;
-    },
-    [field, t, definitionName]
-  );
+  const validate = useFieldValidator(field, externalError);
   
   const [error, setError] = React.useState<string | null>(null);
   const prevErrorRef = React.useRef<string | null>(null);

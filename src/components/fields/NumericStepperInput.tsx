@@ -3,10 +3,9 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 export type NumericStepperInputProps = BaseInputProps<string | number, DefinitionPropertyField>;
 
@@ -15,17 +14,9 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-
-  const step = Math.max(1, Math.round(field.step ?? 1)); // ensure step >= 1
-
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t) ?? null;
-    },
-    [definitionName, field, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   // Use shared uncontrolled + validated input hook
   const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
@@ -35,6 +26,7 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
     validate,
   });
 
+  const step = Math.max(1, Math.round(field.step ?? 1)); // ensure step >= 1
   return (
     <StandardFieldLayout field={field} error={error}>
       <input

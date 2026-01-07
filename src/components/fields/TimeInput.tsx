@@ -2,10 +2,9 @@ import * as React from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../validation/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type TimeInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -14,20 +13,18 @@ const TimeInput: React.FC<TimeInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
+  const validate = useFieldValidator(field);
 
-  const validate = React.useCallback((input: string): string | null => {
-    return validateField(definitionName, field, input, t) ?? null;
-  }, [field, definitionName, t]);
-
-  // Use our shared uncontrolled + validated input hook
-  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
+  const { inputRef, error: hookError, handleChange } = useUncontrolledValidatedInput({
     value,
     onChange,
     onError,
     validate,
   });
+
+  const error = externalError ?? hookError;
 
   return (
     <StandardFieldLayout field={field} error={error}>

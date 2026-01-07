@@ -96,9 +96,9 @@ describe('FileInput', () => {
       <FileInput {...baseFieldProps} field={field} value={mockFiles} onChange={onChange} />
     );
 
-    expect(screen.getByText('file1.txt')).toBeInTheDocument();
-    expect(screen.getByText('file2.pdf')).toBeInTheDocument();
-    expect(screen.getByText('file3.jpg')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('file1.txt')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('file2.pdf')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('file3.jpg')).toBeInTheDocument();
   });
 
   it('merges newly selected files with existing files when multiple is true', async () => {

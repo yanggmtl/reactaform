@@ -1,5 +1,4 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 const parseDateTime = (value?: string): number | null => {
   if (!value) return null;
@@ -29,15 +28,11 @@ export function validateDateField(
   input: FieldValueType,
   t: TranslationFunction
 ): string | null {
-  if (input == null || input === "") {
+  if (input == null || String(input).trim() === "") {
     return field.required ? t("Value required") : null;
   }
 
   const inputStr = String(input).trim();
-  if (!inputStr) {
-    return field.required ? t("Value required") : null;
-  }
-
   const inputTime = parseDateTime(inputStr);
   if (inputTime === null) {
     return t("Invalid date format");
@@ -55,5 +50,3 @@ export function validateDateField(
 
   return null;
 }
-
-registerBuiltinFieldValidationHandler("date", validateDateField);

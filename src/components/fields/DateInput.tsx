@@ -2,10 +2,9 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../validation/validation";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type DateInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -58,15 +57,9 @@ const DateInput: React.FC<DateInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t) ?? null;
-    },
-    [field, definitionName, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   // Use our shared uncontrolled + validated input hook
   const formattedValue = formatDateForInput(value);
@@ -77,6 +70,13 @@ const DateInput: React.FC<DateInputProps> = ({
     onError,
     validate,
   });
+
+  // Notify parent when validation result changes
+  React.useEffect(() => {
+    if (!externalError) {
+      onError?.(error);
+    }
+  }, [error, externalError, onError]);
 
   return (
     <StandardFieldLayout field={field} error={error}>

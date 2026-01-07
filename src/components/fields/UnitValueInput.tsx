@@ -2,11 +2,11 @@ import * as React from "react";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../LayoutComponents";
-import { validateField } from "../../validation/validation";
 import PopupOptionMenu from "../PopupOptionMenu";
 import type { PopupOptionMenuPosition } from "../PopupOptionMenu";
 import { getUnitFactors, convertTemperature } from "../../utils/unitValueMapper";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type Dimension = "length" | "area" | "volume" | "weight" | "time" | "temperature" | "angle";
 
@@ -147,7 +147,9 @@ const ConversionButton: React.FC<ConversionButtonProps> = React.memo(({
 ConversionButton.displayName = "ConversionButton";
 
 const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange, onError }) => {
-  const { t, definitionName } = useReactaFormContext();
+  const { t } = useReactaFormContext();
+  const validate = useFieldValidator(field);
+  
   const dimension = field.dimension;
 
   // Load unit factors for this dimension
@@ -174,10 +176,7 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
   }, [currentUnit]);
 
   // Validation
-  const error = React.useMemo(
-    () => validateField(definitionName, field, [inputValue, selectedUnit], t) ?? null,
-    [definitionName, field, inputValue, selectedUnit, t]
-  );
+  const error = validate([inputValue, selectedUnit]);
 
   // Notify parent of errors
   React.useEffect(() => {
@@ -189,22 +188,20 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setInputValue(newValue);
-      // Calculate error immediately for this new value
-      const newError = validateField(definitionName, field, [newValue, selectedUnit], t) ?? null;
+      const newError = validate([newValue, selectedUnit]) ?? null;
       onChange?.([newValue, selectedUnit], newError);
     },
-    [selectedUnit, definitionName, field, t, onChange]
+    [selectedUnit, validate, onChange]
   );
 
   const handleUnitChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newUnit = e.target.value;
       setSelectedUnit(newUnit);
-      // Calculate error immediately for this new unit
-      const newError = validateField(definitionName, field, [inputValue, newUnit], t) ?? null;
+      const newError = validate([inputValue, newUnit]) ?? null;
       onChange?.([inputValue, newUnit], newError);
     },
-    [inputValue, definitionName, field, t, onChange]
+    [inputValue, validate, onChange]
   );
 
   const handleConversionSelect = React.useCallback(

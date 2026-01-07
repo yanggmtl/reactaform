@@ -1,8 +1,8 @@
 import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../validation/validation";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import { StandardFieldLayout } from "../LayoutComponents";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 const ratingWrapperStyle: React.CSSProperties = {
   display: "flex",
@@ -26,8 +26,9 @@ type RatingField = DefinitionPropertyField & {
 
 export type RatingInputProps = BaseInputProps<number, RatingField>;
 
-const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onError }) => {
-  const { t, definitionName } = useReactaFormContext();
+const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onError, error: externalError }) => {
+  const { t } = useReactaFormContext();
+  const validate = useFieldValidator(field, externalError);
 
   const max = field.max ?? 5;
   const iconChar = field.icon?.trim() || "★";
@@ -43,8 +44,8 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
 
   // Validation
   const error = React.useMemo(() => {
-    return validateField(definitionName, field, ratingValue, t) ?? null;
-  }, [definitionName, field, ratingValue, t]);
+    return validate(ratingValue) ?? null;
+  }, [validate, ratingValue]);
 
   // Notify parent of errors
   React.useEffect(() => {
@@ -55,10 +56,10 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
   const handleSelect = React.useCallback(
     (val: number) => {
       const normalized = Math.min(Math.max(val, 0), max);
-      const err = validateField(definitionName, field, normalized, t) ?? null;
+      const err = validate(normalized) ?? null;
       onChange?.(normalized, err);
     },
-    [max, definitionName, field, t, onChange]
+    [max, validate, onChange]
   );
 
   const handleKeyDown = React.useCallback(

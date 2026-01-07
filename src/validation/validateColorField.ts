@@ -1,9 +1,7 @@
 import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
 
 const HEX_REGEX = /^#([0-9A-F]{3}){1,2}$/i;
 const isValidHexColor = (color: string) => HEX_REGEX.test(color);
-
 
 export function validateColorField(
   field: DefinitionPropertyField,
@@ -21,5 +19,3 @@ export function validateColorField(
 
   return null;
 }
-
-registerBuiltinFieldValidationHandler("color", validateColorField);

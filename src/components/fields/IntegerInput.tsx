@@ -3,21 +3,21 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 export type IntegerInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
-const IntegerInput: React.FC<IntegerInputProps> = ({ field, value, onChange, onError }) => {
-  const { t, definitionName } = useReactaFormContext();
-
+const IntegerInput: React.FC<IntegerInputProps> = ({
+  field,
+  value,
+  onChange,
+  onError,
+  error: externalError,
+}) => {
   // Define validation logic
-  const validate = React.useCallback(
-    (val: string) => validateField(definitionName, field, val, t) ?? null,
-    [definitionName, field, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   // Use our shared uncontrolled + validated input hook
   const { inputRef, error, handleChange } = useUncontrolledValidatedInput({

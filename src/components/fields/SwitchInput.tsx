@@ -7,24 +7,30 @@ import type {
 
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES } from "../../utils";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 // Props expected by SwitchInput component
 type SwitchInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
 
 /**
  * SwitchInput
- *
- * Renders a toggle switch UI for boolean values.
- * - Clicking anywhere on the container toggles the switch.
- * - Visual toggle with sliding knob and background color changes.
- * - Displays label and optional tooltip.
  */
 export const SwitchInput: React.FC<SwitchInputProps> = ({
   field,
   value,
   onChange,
+  onError,
+  error: externalError,
 }) => {
-  const { t, formStyle, fieldStyle } = useReactaFormContext();
+  const { t, formStyle, fieldStyle, fieldValidationMode } = useReactaFormContext();
+  const validate = useFieldValidator(field, externalError);
+  const err = validate(value);
+
+  React.useEffect(() => {
+    if (fieldValidationMode !== 'realTime') return;
+    onError?.(err);
+  }, [err, fieldValidationMode, onError]);
+  
   const fs = formStyle as Record<string, unknown> | undefined;
   const ffs = fieldStyle as Record<string, unknown> | undefined;
 
@@ -95,6 +101,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
     ...styleFrom(fs, 'switch', 'knob'),
     ...styleFrom(ffs, undefined, 'knob'),
   }), [fs, ffs]);
+
   const isOn = Boolean(value);
 
   // Toggles boolean value on click

@@ -3,10 +3,9 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 /**
  * FloatInput component
@@ -18,23 +17,19 @@ const FloatInput: React.FC<FloatInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t) ?? null;
-    },
-    [field, definitionName, t]
-  );
+  const validate =  useFieldValidator(field, externalError);
 
   // Use shared uncontrolled + validated input hook
-  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
+  const { inputRef, error : hookError, handleChange } = useUncontrolledValidatedInput({
     value,
     onChange,
     onError,
     validate,
   });
+
+  const error = externalError ?? hookError;
 
   return (
     <StandardFieldLayout field={field} error={error}>

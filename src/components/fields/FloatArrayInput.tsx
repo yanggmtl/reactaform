@@ -5,9 +5,9 @@ import type {
   DefinitionPropertyField,
   BaseInputProps,
 } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
+import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 
 // Props for the generic number array input
 export type FloatArrayInputProps = BaseInputProps<
@@ -24,54 +24,26 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-  const [inputValue, setInputValue] = React.useState<string>(
-    Array.isArray(value) ? value.join(", ") : String(value ?? "")
-  );
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t);
-    },
-    [definitionName, field, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
+  const stringValue = Array.isArray(value) ? value.join(", ") : String(value ?? "");
 
-    const err = validate(input);
-
-    setInputValue(input);
-    onChange?.(input, err);
-  };
-
-  const prevErrorRef = React.useRef<string | null>(null);
-  const onErrorRef = React.useRef<FloatArrayInputProps["onError"] | undefined>(
-    onError
-  );
-  React.useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
-
-  const [error, setError] = React.useState<string | null>(null);
-
-  // synchronize validation when external value or field metadata change
-  React.useEffect(() => {
-    const input = Array.isArray(value) ? value.join(", ") : String(value ?? "");
-    const err = validate(input);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      setError(err);
-      onErrorRef.current?.(err ?? null);
-    }
-  }, [value, field.required, validate, t]);
+  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
+    value: stringValue,
+    onChange,
+    onError,
+    validate,
+  });
 
   return (
     <StandardFieldLayout field={field} error={error}>
       <input
         id={field.name}
         type="text"
-        value={inputValue}
+        defaultValue={stringValue}
+        ref={inputRef}
         onChange={handleChange}
         className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
         style={{ flex: 1 }}

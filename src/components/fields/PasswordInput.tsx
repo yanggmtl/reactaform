@@ -2,10 +2,10 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
+import useReactaFormContext from "../../hooks/useReactaFormContext";
 
 type PasswordInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -14,14 +14,10 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-  
-  // Define validation logic
-  const validate = React.useCallback(
-    (val: string) => validateField(definitionName, field, val, t) ?? null,
-    [definitionName, field, t]
-  );
+  const { t } = useReactaFormContext();
+  const validate = useFieldValidator(field, externalError);
 
   // Use our shared uncontrolled + validated input hook
   const { inputRef, error, handleChange } = useUncontrolledValidatedInput({

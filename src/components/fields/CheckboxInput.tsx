@@ -4,9 +4,9 @@ import type {
   BaseInputProps,
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES } from "../../utils";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type CheckboxInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
 
@@ -15,19 +15,18 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   value = false,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { definitionName, t } = useReactaFormContext();
+  const { t,  } = useReactaFormContext();
+  const validate = useFieldValidator(field, externalError);
 
-  // Single source of truth for validation
-  const error = React.useMemo(
-    () => validateField(definitionName, field, value, t) ?? null,
-    [definitionName, field, value, t]
-  );
+  const error = validate(value);
 
   // Notify parent when validation result changes
   React.useEffect(() => {
+    if (externalError) return;
     onError?.(error);
-  }, [error, onError]);
+  }, [error, externalError, onError]);
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

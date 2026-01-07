@@ -6,7 +6,7 @@ import type {
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
-import { validateField } from "../../validation/validation";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type RadioField = DefinitionPropertyField & {
   options: NonNullable<DefinitionPropertyField["options"]>;
@@ -19,8 +19,10 @@ const RadioInput: React.FC<RadioInputProps> = ({
   value,
   onChange,
   onError,
+  error : externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
+  const { t } = useReactaFormContext();
+  const validate = useFieldValidator(field, externalError);
 
   const layout: "row" | "column" =
     field.layout?.toLowerCase() === "horizontal" ? "row" : "column";
@@ -31,11 +33,6 @@ const RadioInput: React.FC<RadioInputProps> = ({
   React.useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
-
-  const validate = React.useCallback(
-    (input: string) => validateField(definitionName, field, input, t),
-    [definitionName, field, t]
-  );
 
   const [error, setError] = React.useState<string | null>(null);
   const prevErrorRef = React.useRef<string | null>(null);
@@ -76,7 +73,6 @@ const RadioInput: React.FC<RadioInputProps> = ({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = e.target.value;
     const err = validate(nextValue);
-
     updateError(err);
     onChange?.(nextValue, err);
   };

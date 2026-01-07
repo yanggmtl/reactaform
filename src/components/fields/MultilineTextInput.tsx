@@ -2,10 +2,9 @@ import * as React from "react";
 import { StandardFieldLayout } from "../LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { validateField } from "../../validation/validation";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type TextInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -14,15 +13,9 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
-
-  const validate = React.useCallback(
-    (val: string): string | null => {
-      return validateField(definitionName, field, val, t);
-    },
-    [field, definitionName, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   // Use shared uncontrolled + validated input hook (textarea variant)
   const { inputRef, error, handleChange } = useUncontrolledValidatedInput<HTMLTextAreaElement>({

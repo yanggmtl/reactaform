@@ -1,11 +1,10 @@
 import * as React from "react";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { validateField } from "../../validation/validation";
 import { StandardFieldLayout } from "../LayoutComponents";
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
+import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 export type PhoneInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
@@ -14,15 +13,9 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { definitionName, t } = useReactaFormContext();
-
-  const validate = React.useCallback(
-    (input: string): string | null => {
-      return validateField(definitionName, field, input, t);
-    },
-    [definitionName, field, t]
-  );
+  const validate = useFieldValidator(field, externalError);
 
   // Use shared uncontrolled + validated input hook
   const { inputRef, error, handleChange } = useUncontrolledValidatedInput({

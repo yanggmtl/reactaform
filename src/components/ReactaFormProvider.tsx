@@ -7,13 +7,13 @@ import {
   createTranslationFunction
 } from '../utils/translationCache';
 import { registerBaseComponents } from '../core/componentRegistry';
-import { ensureBuiltinValidatorsRegistered } from '../validation/registerBuiltinTypeValidators';
+import { ensureBuiltinTypeValidatorsRegistered } from '../validation/registerBuiltinTypeValidators';
 
 // Import CSS variables if needed
 import '../core/reactaform.css';
 
 registerBaseComponents();
-ensureBuiltinValidatorsRegistered();
+ensureBuiltinTypeValidatorsRegistered();
 
 // Local copies of style generators previously in utils/styleConfig.ts
 const getFormStyle = (

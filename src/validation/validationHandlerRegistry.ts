@@ -1,6 +1,34 @@
 import type { DefinitionPropertyField, FieldValidationHandler, FieldValueType, FormValidationHandler, TranslationFunction } from "../core/reactaFormTypes";
 import BaseRegistry from "../core/baseRegistry";
-export type BuiltinFieldValidationHandler = (
+
+const BUILTIN_TYPES = [
+  "text",
+  "multiline",
+  "int",
+  "float",
+  "stepper",
+  "checkbox",
+  "select",
+  "color",
+  "rating",
+  "file",
+  "url",
+  "email",
+  "phone",
+  "date",
+  "time",
+  "unit",
+  "dropdown",
+  "multi-selection",
+  "int-array",
+  "float-array",
+]
+
+export function isBuiltinType(typeName: string): boolean {
+  return BUILTIN_TYPES.includes(typeName);
+}
+
+export type TypeFieldValidationHandler = (
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction,
@@ -30,8 +58,10 @@ class CategoryRegistry<T> extends BaseRegistry<Record<string, T>> {
 }
 
 const formValidationRegistry = new BaseRegistry<FormValidationHandler>();
-const fieldValidationRegistry = new CategoryRegistry<FieldValidationHandler>();
-const builtinFieldValidationRegistry = new BaseRegistry<BuiltinFieldValidationHandler>();
+const fieldCustomValidationRegistry = new CategoryRegistry<FieldValidationHandler>();
+
+// Used for define new type field validation handlers
+const typeFieldValidationRegistry = new BaseRegistry<TypeFieldValidationHandler>();
 
 export function registerFormValidationHandler(
   name: string,
@@ -40,38 +70,51 @@ export function registerFormValidationHandler(
   formValidationRegistry.register(name, fn);
 }
 
-export function registerFieldValidationHandler(
+export function registerCustomFieldValidationHandler(
   category: string,
   name: string,
   fn: FieldValidationHandler
 ): void {
-  fieldValidationRegistry.registerInCategory(category, name, fn);
+  fieldCustomValidationRegistry.registerInCategory(category, name, fn);
 }
 
-export function registerBuiltinFieldValidationHandler(
+export function registerTypeFieldValidationHandler(
   name: string,
-  fn: BuiltinFieldValidationHandler
+  fn: TypeFieldValidationHandler
 ): void {
-  builtinFieldValidationRegistry.register(name, fn);
+  if (isBuiltinType(name)) {
+    console.warn(
+      `[ReactaForm] Can't override builtin type field validation handler for type "${name}".`
+    );
+    return;
+  }
+  typeFieldValidationRegistry.register(name, fn);
 }
 
-export function getFieldValidationHandler(category: string, name: string): FieldValidationHandler | null {
-  return fieldValidationRegistry.getFromCategory(category, name) || null;
+export function registerBuiltinTypeFieldValidationHandler(
+  name: string,
+  fn: TypeFieldValidationHandler
+): void {
+  typeFieldValidationRegistry.register(name, fn);
+}
+
+export function getFieldCustomValidationHandler(category: string, name: string): FieldValidationHandler | null {
+  return fieldCustomValidationRegistry.getFromCategory(category, name) || null;
 }
 
 export function getFormValidationHandler(name: string): FormValidationHandler | null {
   return formValidationRegistry.get(name) || null;
+} 
+
+export function getTypeFieldValidationHandler(name: string): TypeFieldValidationHandler | null {
+  return typeFieldValidationRegistry.get(name) || null;
 }
 
-export function getBuiltinFieldValidationHandler(name: string): BuiltinFieldValidationHandler | null {
-  return builtinFieldValidationRegistry.get(name) || null;
-}
-
-export function listFieldValidationHandlers(category?: string): string[] {
+export function listFieldCustomValidationHandlers(category?: string): string[] {
   if (category) {
-    return fieldValidationRegistry.listFromCategory(category);
+    return fieldCustomValidationRegistry.listFromCategory(category);
   }
-  return fieldValidationRegistry.listCategories();
+  return fieldCustomValidationRegistry.listCategories();
 }
 
 export function listFormValidationHandlers(): string[] {
@@ -80,9 +123,9 @@ export function listFormValidationHandlers(): string[] {
 
 export default {
   registerFormValidationHandler,
-  registerFieldValidationHandler,
-  getFieldValidationHandler,
+  registerCustomFieldValidationHandler,
+  getFieldCustomValidationHandler,
   getFormValidationHandler,
-  listFieldValidationHandlers,
+  listFieldCustomValidationHandlers,
   listFormValidationHandlers,
 };

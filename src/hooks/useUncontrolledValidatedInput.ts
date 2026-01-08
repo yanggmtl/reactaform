@@ -1,7 +1,7 @@
 import * as React from "react";
 
 export type UseUncontrolledValidatedInputProps = {
-  value?: string;
+  value?: string | number;
   onChange?: (value: string) => void;
   onError?: (error: string | null) => void;
   validate: (value: string) => string | null; // validation always receives string

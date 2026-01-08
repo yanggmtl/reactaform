@@ -14,11 +14,7 @@ type ColorOption = {
   value: string;
 };
 
-type ColorField = DefinitionPropertyField & {
-  defaultValue?: string;
-};
-
-export type ColorInputProps = BaseInputProps<string, ColorField>;
+export type ColorInputProps = BaseInputProps<string, DefinitionPropertyField>;
 
 const predefinedColors: ColorOption[] = [
   { label: "Black", value: "#000000" },

@@ -10,7 +10,7 @@ import { useFieldValidator } from "../../hooks/useFieldValidator";
 /**
  * FloatInput component
  */
-export type FloatInputProps = BaseInputProps<string, DefinitionPropertyField>;
+export type FloatInputProps = BaseInputProps<number | string, DefinitionPropertyField>;
 
 const FloatInput: React.FC<FloatInputProps> = ({
   field,

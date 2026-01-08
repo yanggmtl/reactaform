@@ -101,8 +101,9 @@ export {
 } from './core/submissionHandlerRegistry';
 
 export {
-  registerFieldValidationHandler,
+  registerCustomFieldValidationHandler,
   registerFormValidationHandler,
+  registerTypeFieldValidationHandler
 } from './validation/validationHandlerRegistry';
 
 // Hooks
@@ -113,6 +114,15 @@ export type {
 export {
   useDebouncedCallback
 } from './hooks/useDebouncedCallback';
+
+export {
+  useFieldValidator
+} from './hooks/useFieldValidator';
+
+export {
+  useUncontrolledValidatedInput,
+  type UseUncontrolledValidatedInputProps
+} from './hooks/useUncontrolledValidatedInput';
 
 // Unit Mapping (existing utilities)
 export * as Units from './utils/unitValueMapper';

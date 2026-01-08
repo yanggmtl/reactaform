@@ -6,9 +6,10 @@ import type {
   DefinitionPropertyField,
   TranslationFunction,
 } from "../core/reactaFormTypes";
+
 import {
-  getBuiltinFieldValidationHandler,
-  getFieldValidationHandler,
+  getTypeFieldValidationHandler,
+  getFieldCustomValidationHandler,
   getFormValidationHandler,
 } from "./validationHandlerRegistry";
 
@@ -63,7 +64,7 @@ export function validateFieldWithHandler(
   let validationHandler = fieldHandlerCache.get(cacheKey);
   if (validationHandler === undefined) {
     // Lookup by category and handler name
-    validationHandler = getFieldValidationHandler(category, key) || null;
+    validationHandler = getFieldCustomValidationHandler(category, key) || null;
     fieldHandlerCache.set(cacheKey, validationHandler);
   }
 
@@ -95,9 +96,9 @@ export function validateField(
   input: FieldValueType,
   t: TranslationFunction
 ): string | null {
-  const buildtinValidator = getBuiltinFieldValidationHandler(field.type);
-  if (buildtinValidator) {
-    const err = buildtinValidator(field, input, t);
+  const typeValidator = getTypeFieldValidationHandler(field.type);
+  if (typeValidator) {
+    const err = typeValidator(field, input, t);
     if (err) {
       return err;
     }

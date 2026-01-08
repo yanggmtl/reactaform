@@ -14,14 +14,12 @@ import { validateEmailField } from "./validateEmailField";
 import { validatePhoneField } from "./validatePhoneField";
 import { validateUrlField } from "./validateUrlField";
 import { validateUnitValueField } from "./validateUnitValueField";
-import {
-  validateDropdownField,
-  validateMultiSelectionField,
-} from "./validateSelectionFields";
+import { validateFileField } from "./validateFileField";
+import { validateDropdownField, validateMultiSelectionField } from "./validateSelectionFields";
 import { validateColorField } from "./validateColorField";
 import { validateRatingField } from "./validateRatingField";
-import { registerBuiltinFieldValidationHandler } from "./validationHandlerRegistry";
-import { validateFileField } from "./validateFileField";
+
+import { registerBuiltinTypeFieldValidationHandler } from "./validationHandlerRegistry";
 
 let registed = false;
 /**
@@ -29,31 +27,31 @@ let registed = false;
  * This function references all validators to prevent tree-shaking.
  * Safe to call multiple times as handlers are keyed.
  */
-export function ensureBuiltinValidatorsRegistered(): void {
+export function ensureBuiltinTypeValidatorsRegistered(): void {
   if (registed) return;
-  registerBuiltinFieldValidationHandler("int", validateIntegerField);
-  registerBuiltinFieldValidationHandler("stepper", validateIntegerField);
-  registerBuiltinFieldValidationHandler("int-array", validateIntegerArrayField);
-  registerBuiltinFieldValidationHandler("float", validateFloatField);
-  registerBuiltinFieldValidationHandler("slider", validateFloatField);
-  registerBuiltinFieldValidationHandler("float-array", validateFloatArrayField);
-  registerBuiltinFieldValidationHandler("text", validateTextField);
-  registerBuiltinFieldValidationHandler("string", validateTextField);
-  registerBuiltinFieldValidationHandler("multiline", validateTextField);
-  registerBuiltinFieldValidationHandler("password", validateTextField);
-  registerBuiltinFieldValidationHandler("email", validateEmailField);
-  registerBuiltinFieldValidationHandler("date", validateDateField);
-  registerBuiltinFieldValidationHandler("time", validateTimeField);
-  registerBuiltinFieldValidationHandler("url", validateUrlField);
-  registerBuiltinFieldValidationHandler("phone", validatePhoneField);
-  registerBuiltinFieldValidationHandler("unit", validateUnitValueField);
-  registerBuiltinFieldValidationHandler("dropdown", validateDropdownField);
-  registerBuiltinFieldValidationHandler("multi-selection", validateMultiSelectionField);
-  registerBuiltinFieldValidationHandler("color", validateColorField);
-  registerBuiltinFieldValidationHandler("rating", validateRatingField);
-  registerBuiltinFieldValidationHandler("file", validateFileField);
+  registerBuiltinTypeFieldValidationHandler("int", validateIntegerField);
+  registerBuiltinTypeFieldValidationHandler("stepper", validateIntegerField);
+  registerBuiltinTypeFieldValidationHandler("int-array", validateIntegerArrayField);
+  registerBuiltinTypeFieldValidationHandler("float", validateFloatField);
+  registerBuiltinTypeFieldValidationHandler("slider", validateFloatField);
+  registerBuiltinTypeFieldValidationHandler("float-array", validateFloatArrayField);
+  registerBuiltinTypeFieldValidationHandler("text", validateTextField);
+  registerBuiltinTypeFieldValidationHandler("string", validateTextField);
+  registerBuiltinTypeFieldValidationHandler("multiline", validateTextField);
+  registerBuiltinTypeFieldValidationHandler("password", validateTextField);
+  registerBuiltinTypeFieldValidationHandler("email", validateEmailField);
+  registerBuiltinTypeFieldValidationHandler("date", validateDateField);
+  registerBuiltinTypeFieldValidationHandler("time", validateTimeField);
+  registerBuiltinTypeFieldValidationHandler("url", validateUrlField);
+  registerBuiltinTypeFieldValidationHandler("phone", validatePhoneField);
+  registerBuiltinTypeFieldValidationHandler("unit", validateUnitValueField);
+  registerBuiltinTypeFieldValidationHandler("dropdown", validateDropdownField);
+  registerBuiltinTypeFieldValidationHandler("multi-selection", validateMultiSelectionField);
+  registerBuiltinTypeFieldValidationHandler("color", validateColorField);
+  registerBuiltinTypeFieldValidationHandler("rating", validateRatingField);
+  registerBuiltinTypeFieldValidationHandler("file", validateFileField);
   registed = true;
 }
 
 // Call at module load to ensure registration in typical usage
-ensureBuiltinValidatorsRegistered();
+ensureBuiltinTypeValidatorsRegistered();

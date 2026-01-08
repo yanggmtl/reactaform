@@ -9,10 +9,13 @@ import {
   getComponent,
 } from './componentRegistry';
 import {
-  registerFieldValidationHandler,
+  registerCustomFieldValidationHandler,
   registerFormValidationHandler,
-  getFieldValidationHandler,
+  registerTypeFieldValidationHandler,
+  getFieldCustomValidationHandler,
   getFormValidationHandler,
+  getTypeFieldValidationHandler,
+  TypeFieldValidationHandler,
 } from '../validation/validationHandlerRegistry';
 import {
   registerSubmissionHandler,
@@ -52,7 +55,8 @@ export interface ReactaFormPlugin {
   version: string;
   description?: string;
   components?: Record<string, React.ComponentType<unknown>>;
-  fieldValidators?: Record<string, Record<string, FieldValidationHandler>>;
+  fieldCustomValidators?: Record<string, Record<string, FieldValidationHandler>>;
+  typeFieldValidators?: Record<string, TypeFieldValidationHandler>;
   formValidators?: Record<string, FormValidationHandler>;
   submissionHandlers?: Record<string, FormSubmissionHandler>;
   setup?: () => void;
@@ -66,6 +70,7 @@ const installedPlugins = new Map<string, ReactaFormPlugin>();
 const registrationOwnership = {
   components: new Map<string, string>(),
   fieldValidators: new Map<string, Map<string, string>>(), // category -> name -> plugin
+  typeFieldValidators: new Map<string, string>(),
   formValidators: new Map<string, string>(),
   submissionHandlers: new Map<string, string>(),
 };
@@ -127,12 +132,12 @@ function handleConflicts(plugin: ReactaFormPlugin): PluginConflict[] {
   }
 
   // Field validators
-  if (plugin.fieldValidators) {
-    for (const [category, validators] of Object.entries(plugin.fieldValidators)) {
+  if (plugin.fieldCustomValidators) {
+    for (const [category, validators] of Object.entries(plugin.fieldCustomValidators)) {
       for (const name of Object.keys(validators)) {
         const categoryMap = registrationOwnership.fieldValidators.get(category);
         const existingPlugin = categoryMap?.get(name);
-        const existingHandler = getFieldValidationHandler(category, name);
+        const existingHandler = getFieldCustomValidationHandler(category, name);
         if (existingHandler && existingPlugin && existingPlugin !== plugin.name) {
           conflicts.push({
             type: 'fieldValidator',
@@ -141,6 +146,22 @@ function handleConflicts(plugin: ReactaFormPlugin): PluginConflict[] {
             newPlugin: plugin.name,
           });
         }
+      }
+    }
+  }
+
+  // Type-level field validators (validators registered by type)
+  if (plugin.typeFieldValidators) {
+    for (const name of Object.keys(plugin.typeFieldValidators)) {
+      const existingHandler = getTypeFieldValidationHandler(name);
+      const existingPlugin = registrationOwnership.typeFieldValidators.get(name);
+      if (existingHandler && existingPlugin && existingPlugin !== plugin.name) {
+        conflicts.push({
+          type: 'fieldValidator',
+          name: `type:${name}`,
+          existingPlugin,
+          newPlugin: plugin.name,
+        });
       }
     }
   }
@@ -199,6 +220,8 @@ function registerItems<T>(
       conflict = conflicts.find(c => c.type === 'component' && c.name === key);
     } else if (items === plugin.formValidators) {
       conflict = conflicts.find(c => c.type === 'formValidator' && c.name === key);
+    } else if (items === plugin.typeFieldValidators) {
+      conflict = conflicts.find(c => c.type === 'fieldValidator' && c.name === `type:${key}`);
     } else if (items === plugin.submissionHandlers) {
       conflict = conflicts.find(c => c.type === 'submissionHandler' && c.name === key);
     }
@@ -251,12 +274,12 @@ export function registerPlugin(plugin: ReactaFormPlugin, options?: PluginRegistr
   }
 
   // Register field validators
-  if (plugin.fieldValidators) {
-    for (const [category, validators] of Object.entries(plugin.fieldValidators)) {
+  if (plugin.fieldCustomValidators) {
+    for (const [category, validators] of Object.entries(plugin.fieldCustomValidators)) {
       registerItems(
         validators,
         registrationOwnership.fieldValidators,
-        (name, handler) => registerFieldValidationHandler(category, name, handler),
+        (name, handler) => registerCustomFieldValidationHandler(category, name, handler),
         plugin,
         conflicts,
         strategy,
@@ -278,6 +301,20 @@ export function registerPlugin(plugin: ReactaFormPlugin, options?: PluginRegistr
       options?.onConflict
     );
   }
+
+  // Register type-level field validators
+  if (plugin.typeFieldValidators) {
+    registerItems(
+      plugin.typeFieldValidators,
+      registrationOwnership.typeFieldValidators,
+      registerTypeFieldValidationHandler,
+      plugin,
+      conflicts,
+      strategy,
+      options?.onConflict
+    );
+  }
+
 
   // Register submission handlers
   if (plugin.submissionHandlers) {
@@ -314,8 +351,8 @@ export function unregisterPlugin(pluginName: string, removeRegistrations = false
     }
 
     // Remove field validators
-    if (plugin.fieldValidators) {
-      for (const [category, validators] of Object.entries(plugin.fieldValidators)) {
+    if (plugin.fieldCustomValidators) {
+      for (const [category, validators] of Object.entries(plugin.fieldCustomValidators)) {
         const categoryMap = registrationOwnership.fieldValidators.get(category);
         if (!categoryMap) continue;
         for (const name of Object.keys(validators)) {
@@ -329,6 +366,13 @@ export function unregisterPlugin(pluginName: string, removeRegistrations = false
     if (plugin.formValidators) {
       for (const name of Object.keys(plugin.formValidators)) {
         registrationOwnership.formValidators.delete(name);
+      }
+    }
+
+    // Remove type-level field validators
+    if (plugin.typeFieldValidators) {
+      for (const name of Object.keys(plugin.typeFieldValidators)) {
+        registrationOwnership.typeFieldValidators.delete(name);
       }
     }
 

@@ -7,7 +7,7 @@ import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
-export type IntegerInputProps = BaseInputProps<string, DefinitionPropertyField>;
+export type IntegerInputProps = BaseInputProps<number | string, DefinitionPropertyField>;
 
 const IntegerInput: React.FC<IntegerInputProps> = ({
   field,

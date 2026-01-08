@@ -8,9 +8,7 @@ import { getUnitFactors, convertTemperature } from "../../utils/unitValueMapper"
 import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
-type Dimension = "length" | "area" | "volume" | "weight" | "time" | "temperature" | "angle";
-
-type UnitValueInputProps = BaseInputProps<[string | number, string], DefinitionPropertyField & { dimension?: Dimension }>;
+type UnitValueInputProps = BaseInputProps<[string | number, string], DefinitionPropertyField>;
 
 interface UnitOption {
   label: string;
@@ -23,7 +21,7 @@ interface ConversionButtonProps {
   disabled: boolean;
   inputValue: string;
   selectedUnit: string;
-  dimension: Dimension;
+  dimension: string;
   unitFactors: { units: string[]; factors: Record<string, number> };
   onConversionSelect: (option: UnitOption) => void;
   t: (key: string) => string;

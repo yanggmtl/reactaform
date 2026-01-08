@@ -75,22 +75,20 @@ const SpinInput: React.FC<SpinInputProps> = ({ field, value, onChange, onError }
 
       const trimmed = newVal.trim();
       if (trimmed === "") {
-        const err = field.required ? t("Value required") : null;
-        onChange?.(NaN, err);
+        onChange?.(NaN);
         return;
       }
 
       if (!validIntRegex.test(trimmed)) {
-        const err = t("Must be a valid integer");
-        onChange?.(NaN, err);
+        onChange?.(NaN);
         return;
       }
 
       const parsedValue = parseInt(trimmed, 10);
-      const err = validate(newVal);
-      onChange?.(parsedValue, err);
+      validate(newVal);
+      onChange?.(parsedValue);
     },
-    [field.required, t, validate, onChange]
+    [validate, onChange]
   );
 
   const handleStepChange = React.useCallback(
@@ -100,8 +98,8 @@ const SpinInput: React.FC<SpinInputProps> = ({ field, value, onChange, onError }
       const newValueStr = String(newValue);
       
       setInputValue(newValueStr);
-      const err = validate(newValueStr);
-      onChange?.(newValue, err);
+      validate(newValueStr);
+      onChange?.(newValue);
     },
     [value, field.defaultValue, minVal, clampValue, validate, onChange]
   );

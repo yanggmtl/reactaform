@@ -49,29 +49,30 @@ describe('PhoneInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'phone', label: 'Required Phone', required: true });
     renderWithProvider(
-      <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, ' ');
     await user.clear(input);
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error present
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error present
   });
 
   it('validates pattern constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({
       type: 'phone',
       label: 'Phone', 
       pattern: '^\\+?[1-9]\\d{1,14}$' // E.164 format
     });
     renderWithProvider(
-      <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <PhoneInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
@@ -79,7 +80,7 @@ describe('PhoneInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('invalid');
-    expect(lastCall[1]).toBeTruthy(); // error for pattern mismatch
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for pattern mismatch
   });
 
   it('accepts valid phone matching pattern', async () => {
@@ -99,7 +100,7 @@ describe('PhoneInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('+12345678901');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('trims whitespace in validation', async () => {
@@ -119,7 +120,7 @@ describe('PhoneInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe(' 1234567890 ');
-    expect(lastCall[1]).toBeNull(); // no error after trim
+
   });
 
   it('displays tooltip when provided', () => {
@@ -143,6 +144,6 @@ describe('PhoneInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('');
-    expect(lastCall[1]).toBeNull(); // no error for optional field
+
   });
 });

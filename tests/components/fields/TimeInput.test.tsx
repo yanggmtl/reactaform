@@ -48,9 +48,10 @@ describe('TimeInput', () => {
 
   it('validates Min time constraint', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'time', label: 'Time', defaultValue: '', min: '09:00' });
     const { container } = renderWithProvider(
-      <TimeInput {...baseFieldProps} field={field} value="10:00" onChange={onChange} />
+      <TimeInput {...baseFieldProps} field={field} value="10:00" onChange={onChange} onError={onError} />
     );
 
     const timeInput = container.querySelector('input[type="time"]')!;
@@ -58,15 +59,16 @@ describe('TimeInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('08:30');
-    expect(lastCall[1]).toBeTruthy(); // error for Min
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for Min
   });
 
   it('validates max time constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'time', label: 'Time', max: '17:00' });
     const { container } = renderWithProvider(
-      <TimeInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <TimeInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const input = container.querySelector('input[type="time"]')!;
@@ -74,7 +76,7 @@ describe('TimeInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('18:00');
-    expect(lastCall[1]).toBeTruthy(); // error for Max
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for Max
   });
 
   it('accepts valid time within Min/Max range', async () => {
@@ -89,7 +91,7 @@ describe('TimeInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('12:30');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('sets min attribute when Min is provided', () => {
@@ -167,7 +169,7 @@ describe('TimeInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('00:00');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('handles end of day time (23:59)', async () => {
@@ -182,6 +184,6 @@ describe('TimeInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('23:59');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 });

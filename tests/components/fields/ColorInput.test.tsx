@@ -33,7 +33,7 @@ describe('ColorInput', () => {
     const select = screen.getByRole('combobox');
     await user.selectOptions(select, '#0000ff'); // Blue
 
-    expect(onChange).toHaveBeenCalledWith('#0000ff', null);
+    expect(onChange).toHaveBeenCalledWith('#0000ff');
   });
 
   it('displays all predefined colors in select', () => {

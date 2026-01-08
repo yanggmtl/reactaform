@@ -107,7 +107,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
   // Toggles boolean value on click
   const handleToggle = () => {
     const newVal = !isOn;
-    onChange?.(newVal, null);
+    onChange?.(newVal);
   };
 
   return (

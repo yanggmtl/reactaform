@@ -34,7 +34,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
     // Call onChange for initial validation so consumers/tests receive the
     // current validation state on mount. This mirrors previous behavior and
     // keeps test expectations stable.
-    onChange?.(value, err);
+    onChange?.(value);
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       setError(err);
@@ -64,7 +64,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
       setError(err);
       onErrorRef.current?.(err ?? null);
     }
-    onChange?.(selected, err);
+    onChange?.(selected);
     
     // Reset input value to allow selecting the same file again if needed
     if (e.target) {
@@ -97,7 +97,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
         setError(err);
         onErrorRef.current?.(err ?? null);
       }
-      onChange?.(selected, err);
+      onChange?.(selected);
     }
   };
 
@@ -123,7 +123,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
         setError(err);
         onErrorRef.current?.(err ?? null);
       }
-      onChange?.(selected, err);
+      onChange?.(selected);
     } else {
       const err = validate([]);
       if (err !== prevErrorRef.current) {
@@ -131,7 +131,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
         setError(err);
         onErrorRef.current?.(err ?? null);
       }
-      onChange?.(null, err);
+      onChange?.(null);
     }
   };
 

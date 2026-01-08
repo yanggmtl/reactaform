@@ -56,8 +56,8 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
   const handleSelect = React.useCallback(
     (val: number) => {
       const normalized = Math.min(Math.max(val, 0), max);
-      const err = validate(normalized) ?? null;
-      onChange?.(normalized, err);
+      validate(normalized);
+      onChange?.(normalized);
     },
     [max, validate, onChange]
   );

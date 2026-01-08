@@ -58,27 +58,26 @@ describe('UrlInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'Required URL', required: true });
     renderWithProvider(
-      <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, ' ');
     await user.clear(input);
 
-    if (onChange.mock.calls.length > 0) {
-      const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-      expect(lastCall[1]).toBeTruthy(); // error present
-    }
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error present
   });
 
   it('validates URL format', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'url', label: 'URL' });
     renderWithProvider(
-      <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <UrlInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
@@ -86,7 +85,7 @@ describe('UrlInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('not-a-url^');
-    expect(lastCall[1]).toBeTruthy(); // error for invalid URL
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for invalid URL
   });
 
   it('accepts valid HTTP URL', async () => {
@@ -102,7 +101,6 @@ describe('UrlInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('http://example.com');
-    expect(lastCall[1]).toBeNull(); // no error
   });
 
   it('accepts valid HTTPS URL', async () => {
@@ -118,7 +116,6 @@ describe('UrlInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('https://secure.example.com/path');
-    expect(lastCall[1]).toBeNull(); // no error
   });
 
   it('accepts FTP URL', async () => {
@@ -134,7 +131,6 @@ describe('UrlInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('ftp://files.example.com');
-    expect(lastCall[1]).toBeNull(); // no error
   });
 
   it('trims whitespace in validation', async () => {
@@ -150,7 +146,6 @@ describe('UrlInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('https://example.com'); // trimmed
-    expect(lastCall[1]).toBeNull(); // no error
   });
 
   it('displays tooltip icon when provided', () => {
@@ -174,6 +169,5 @@ describe('UrlInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('');
-    expect(lastCall[1]).toBeNull(); // no error for optional field
   });
 });

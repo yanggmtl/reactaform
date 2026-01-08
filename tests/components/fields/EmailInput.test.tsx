@@ -24,11 +24,12 @@ describe('EmailInput', () => {
 
   it('validates email format on blur', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>(
       { name: 'email', type: 'email' }
     );
     const { getByRole } = renderWithProvider(
-      <EmailInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <EmailInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox');
@@ -37,8 +38,8 @@ describe('EmailInput', () => {
 
     await waitForUpdate();
     expect(onChange).toHaveBeenCalled();
-    // the second arg should contain the validation error
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    // onError should be called with validation error
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('accepts valid email addresses', async () => {
@@ -74,9 +75,10 @@ describe('EmailInput', () => {
 
   it('handles edge case email formats', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({type: 'email'});
     const { getByLabelText } = renderWithProvider(
-      <EmailInput field={field} value="" onChange={onChange} {...baseFieldProps} />
+      <EmailInput field={field} value="" onChange={onChange} onError={onError} {...baseFieldProps} />
     );
 
     const input = getByLabelText('Test Field');
@@ -99,7 +101,7 @@ describe('EmailInput', () => {
       await waitForUpdate();
       
       if (testCase.expectError) {
-        expect(onChange.mock.calls.some(c => typeof c[1] === 'string' && c[1].toLowerCase().includes('valid'))).toBeTruthy();
+        expect(onError.mock.calls.some(c => typeof c[0] === 'string' && c[0].toLowerCase().includes('valid'))).toBeTruthy();
       }
       
       vi.clearAllMocks(); // Clear for next iteration

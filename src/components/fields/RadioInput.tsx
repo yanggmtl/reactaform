@@ -57,7 +57,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
 
     if (err && field.options.length > 0) {
       const firstValue = String(field.options[0].value);
-      onChange?.(firstValue, null);
+      onChange?.(firstValue);
 
       // Sync DOM radios if needed
       groupRef.current
@@ -74,7 +74,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
     const nextValue = e.target.value;
     const err = validate(nextValue);
     updateError(err);
-    onChange?.(nextValue, err);
+    onChange?.(nextValue);
   };
 
   const containerStyle: React.CSSProperties = {

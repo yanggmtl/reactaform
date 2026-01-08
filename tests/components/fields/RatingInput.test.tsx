@@ -51,7 +51,7 @@ describe('RatingInput', () => {
     const star4 = screen.getByLabelText('Rating 4');
     await user.click(star4);
 
-    expect(onChange).toHaveBeenCalledWith(4, null);
+    expect(onChange).toHaveBeenCalledWith(4);
   });
 
   it('updates rating when different star is clicked', async () => {
@@ -65,7 +65,7 @@ describe('RatingInput', () => {
     const star5 = screen.getByLabelText('Rating 5');
     await user.click(star5);
 
-    expect(onChange).toHaveBeenCalledWith(5, null);
+    expect(onChange).toHaveBeenCalledWith(5);
   });
 
   it('validates required field when value is 0', () => {
@@ -92,7 +92,7 @@ describe('RatingInput', () => {
     const star3 = screen.getByLabelText('Rating 3');
     await user.click(star3);
 
-    expect(onChange).toHaveBeenCalledWith(3, null); // no error
+    expect(onChange).toHaveBeenCalledWith(3); // no error
   });
 
   it('clamps value to max if initial value exceeds max', () => {

@@ -47,38 +47,37 @@ describe('IntegerArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '1, 2, 3');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error for valid integers
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('rejects decimal values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'int-array', displayName: 'Numbers', defaultValue: [] });
     renderWithProvider(
-      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '1, 2.5, 3');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for decimals
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for decimals
   });
 
   it('rejects non-numeric values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'int-array', displayName: 'Numbers', defaultValue: [] });
     renderWithProvider(
-      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '1, abc, 3');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for non-numeric
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for non-numeric
   });
 
   it('validates required field', async () => {
@@ -97,61 +96,61 @@ describe('IntegerArrayInput', () => {
   it('validates minCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'int-array', displayName: 'Numbers', defaultValue: [], minCount: 3 });
     renderWithProvider(
-      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '1, 2');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for minCount
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for minCount
   });
 
   it('validates maxCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'int-array', displayName: 'Numbers', defaultValue: [], maxCount: 3 });
     renderWithProvider(
-      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '1, 2, 3, 4');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for maxCount
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for maxCount
   });
 
   it('validates min value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'int-array', displayName: 'Numbers', defaultValue: [], min: 5 });
     renderWithProvider(
-      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '3, 7, 10');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for value < min
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for value < min
   });
 
   it('validates max value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'int-array', displayName: 'Numbers', defaultValue: [], max: 10 });
     renderWithProvider(
-      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <IntegerArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '5, 8, 15');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for value > max
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for value > max
   });
 
   it('accepts valid array within constraints', async () => {
@@ -165,8 +164,7 @@ describe('IntegerArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '10, 20, 30');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('handles negative integers', async () => {
@@ -180,8 +178,7 @@ describe('IntegerArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '-5, -10, 15');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error for negative integers
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('displays tooltip icon when provided', () => {

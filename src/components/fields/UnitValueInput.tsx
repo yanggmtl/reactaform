@@ -188,8 +188,8 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setInputValue(newValue);
-      const newError = validate([newValue, selectedUnit]) ?? null;
-      onChange?.([newValue, selectedUnit], newError);
+      validate([newValue, selectedUnit]);
+      onChange?.([newValue, selectedUnit]);
     },
     [selectedUnit, validate, onChange]
   );
@@ -198,8 +198,8 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newUnit = e.target.value;
       setSelectedUnit(newUnit);
-      const newError = validate([inputValue, newUnit]) ?? null;
-      onChange?.([inputValue, newUnit], newError);
+      validate([inputValue, newUnit]);
+      onChange?.([inputValue, newUnit]);
     },
     [inputValue, validate, onChange]
   );
@@ -208,7 +208,7 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
     (option: UnitOption) => {
       setInputValue(option.value);
       setSelectedUnit(option.unit);
-      onChange?.([option.value, option.unit], null);
+      onChange?.([option.value, option.unit]);
     },
     [onChange]
   );

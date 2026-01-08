@@ -58,32 +58,32 @@ describe('UnitValueInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'unit', label: 'Required Value', dimension: 'length', required: true, defaultValue: ['10', 'm'] });
     renderWithProvider(
-      <UnitValueInput {...baseFieldProps} field={field} value={['10', 'm']} onChange={onChange} />
+      <UnitValueInput {...baseFieldProps} field={field} value={['10', 'm']} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.clear(input);
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for required
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for required
   });
 
   it('validates invalid number format', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'unit', label: 'Value', dimension: 'length', defaultValue: ['10', 'm'] });
     renderWithProvider(
-      <UnitValueInput {...baseFieldProps} field={field} value={['10', 'm']} onChange={onChange} />
+      <UnitValueInput {...baseFieldProps} field={field} value={['10', 'm']} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.clear(input);
     await user.type(input, 'abc');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for invalid number
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for invalid number
   });
 
   it('accepts valid float values', async () => {
@@ -100,7 +100,7 @@ describe('UnitValueInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0][0]).toBe('12.5');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('accepts scientific notation', async () => {
@@ -117,7 +117,7 @@ describe('UnitValueInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0][0]).toBe('1.5e3');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('renders conversion button', () => {

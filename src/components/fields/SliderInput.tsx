@@ -39,8 +39,8 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
       const input = e.target.value;
       setInputValue(input);
       
-      const err = validate(input) ?? null;
-      onChange?.(input, err);
+      validate(input);
+      onChange?.(input);
     },
     [validate, onChange]
   );

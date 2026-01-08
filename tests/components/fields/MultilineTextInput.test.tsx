@@ -41,25 +41,26 @@ describe('MultilineTextInput', () => {
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'multiline', label: 'Required Text', required: true });
     renderWithProvider(
-      <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const textarea = screen.getByRole('textbox');
     await user.type(textarea, ' ');
     await user.clear(textarea);
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error present
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error present
   });
 
   it('validates minLength constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'multiline', label: 'Text', minLength: 5 });
     renderWithProvider(
-      <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const textarea = screen.getByRole('textbox');
@@ -67,15 +68,16 @@ describe('MultilineTextInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('abc');
-    expect(lastCall[1]).toBeTruthy(); // error for minLength
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for minLength
   });
 
   it('validates maxLength constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'multiline', label: 'Text', maxLength: 5 });
     renderWithProvider(
-      <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} />
+      <MultilineTextInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />
     );
 
     const textarea = screen.getByRole('textbox');
@@ -83,7 +85,7 @@ describe('MultilineTextInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('toolong');
-    expect(lastCall[1]).toBeTruthy(); // error for maxLength
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for maxLength
   });
 
   it('accepts valid text within length constraints', async () => {
@@ -99,7 +101,7 @@ describe('MultilineTextInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('valid');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('applies minHeight style', () => {

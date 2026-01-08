@@ -145,7 +145,7 @@ export type FormSubmissionHandler = (
 ) => string[] | undefined | Promise<string[] | undefined>;
 
 // Generic input change callback used by input components
-export type InputOnChange<T> = (value: T | string, error: string | null) => void;
+export type InputOnChange<T> = (value: T | string) => void;
 
 // Shared base props for input components in the builder/renderer
 export interface BaseInputProps<

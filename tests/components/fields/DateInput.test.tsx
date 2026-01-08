@@ -39,7 +39,6 @@ describe('DateInput', () => {
     const last = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(typeof last[0]).toBe('string');
     expect(last[0]).toContain('2024-12-25');
-    expect(last[1]).toBeNull();
   });
 
   it('validates required field and sets aria-invalid / calls onError', () => {
@@ -54,25 +53,25 @@ describe('DateInput', () => {
 
   it('validates minDate constraint', () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Date', minDate: '2024-01-01' });
-    const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onChange={onChange} />);
+    const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />);
 
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: '2023-12-31' } });
 
-    const last = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(last[1]).toBeTruthy(); // error due to minDate
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error due to minDate
   });
 
   it('validates maxDate constraint', () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: "date", displayName: 'Date', maxDate: '2024-12-31' });
-    const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onChange={onChange} />);
+    const { container } = renderWithProvider(<DateInput {...baseFieldProps} field={field} value="" onChange={onChange} onError={onError} />);
 
     const dateInput = container.querySelector('input[type="date"]') as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: '2025-01-01' } });
 
-    const last = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(last[1]).toBeTruthy(); // error due to maxDate
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error due to maxDate
   });
 });

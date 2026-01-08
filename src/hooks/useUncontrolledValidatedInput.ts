@@ -2,7 +2,7 @@ import * as React from "react";
 
 export type UseUncontrolledValidatedInputProps = {
   value?: string;
-  onChange?: (value: string, error: string | null) => void;
+  onChange?: (value: string) => void;
   onError?: (error: string | null) => void;
   validate: (value: string) => string | null; // validation always receives string
 };
@@ -58,7 +58,7 @@ export function useUncontrolledValidatedInput<
         onErrorRef.current?.(err ?? null);
       }
 
-      onChange?.(strValue, err);
+      onChange?.(strValue);
     },
     [onChange, validate]
   );

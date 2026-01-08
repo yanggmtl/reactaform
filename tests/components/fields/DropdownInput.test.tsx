@@ -62,7 +62,7 @@ describe('DropdownInput', () => {
     const option = screen.getByRole('option', { name: 'Option 3' });
     await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith('opt3', null);
+    expect(onChange).toHaveBeenCalledWith('opt3');
   });
 
   it('validates required field with empty value', () => {
@@ -73,7 +73,7 @@ describe('DropdownInput', () => {
     );
 
     // Should auto-correct to first option
-    expect(onChange).toHaveBeenCalledWith('opt1', null);
+    expect(onChange).toHaveBeenCalledWith('opt1');
   });
 
   it('validates that selected value is in options', async () => {
@@ -91,7 +91,7 @@ describe('DropdownInput', () => {
     const option = screen.getByRole('option', { name: 'Option 2' });
     await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith('opt2', null);
+    expect(onChange).toHaveBeenCalledWith('opt2');
   });
 
   it('handles empty options array', async () => {
@@ -131,7 +131,7 @@ describe('DropdownInput', () => {
     const option = screen.getByRole('option', { name: 'Two' });
     await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith('2', null);
+    expect(onChange).toHaveBeenCalledWith('2');
   });
 
   it('displays tooltip when provided', () => {

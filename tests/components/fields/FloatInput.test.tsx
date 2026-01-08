@@ -47,9 +47,10 @@ describe('FloatInput', () => {
 
   it('validates minimum value', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float', min: 10.5, minInclusive: true });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -59,14 +60,15 @@ describe('FloatInput', () => {
 
     await waitForUpdate();
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('validates maximum value', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float', max: 100.0, maxInclusive: true });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -76,7 +78,7 @@ describe('FloatInput', () => {
 
     await waitForUpdate();
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('shows error for required field when empty', async () => {
@@ -96,9 +98,10 @@ describe('FloatInput', () => {
 
   it('accepts scientific notation', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float' });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -106,14 +109,15 @@ describe('FloatInput', () => {
     await user.type(input, '1.23e-4');
 
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls.some(c => c[1] === null)).toBeTruthy();
+    expect(onError.mock.calls.some(c => c[0] === null)).toBeTruthy();
   });
 
   it('rejects invalid float input', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float' });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -122,7 +126,7 @@ describe('FloatInput', () => {
 
     await waitForUpdate();
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('handles negative numbers', async () => {

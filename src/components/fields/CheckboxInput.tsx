@@ -30,7 +30,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange?.(e.target.checked, null);
+      onChange?.(e.target.checked);
     },
     [onChange]
   );
@@ -41,7 +41,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
       const isSpace = e.key === " " || e.key === "Space" || e.key === "Spacebar" || e.code === "Space";
       if (isSpace || e.key === "Enter") {
         e.preventDefault();
-        onChange?.(!value, null);
+        onChange?.(!value);
       }
     },
     [onChange, value]

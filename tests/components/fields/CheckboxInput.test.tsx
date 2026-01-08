@@ -50,7 +50,7 @@ describe('CheckboxInput', () => {
     const checkbox = getByRole('checkbox');
     await user.click(checkbox);
 
-    expect(onChange).toHaveBeenCalledWith(true, null);
+    expect(onChange).toHaveBeenCalledWith(true);
   });
 
   it('toggles from checked to unchecked', async () => {
@@ -63,7 +63,7 @@ describe('CheckboxInput', () => {
     const checkbox = getByRole('checkbox');
     await user.click(checkbox);
 
-    expect(onChange).toHaveBeenCalledWith(false, null);
+    expect(onChange).toHaveBeenCalledWith(false);
   });
 
   it('has proper accessibility attributes', () => {
@@ -87,7 +87,7 @@ describe('CheckboxInput', () => {
     checkbox.focus();
     await user.keyboard('{Space}');
 
-    expect(onChange).toHaveBeenCalledWith(true, null);
+    expect(onChange).toHaveBeenCalledWith(true);
   });
 
   it('shows tooltip when configured', () => {

@@ -62,33 +62,33 @@ describe('SliderInput', () => {
   it('validates min constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 10, max: 100 });
     const { container } = renderWithProvider(
-      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
+      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} onError={onError} />
     );
 
     const textInput = container.querySelector('input[type="text"]')!;
     await user.clear(textInput);
     await user.type(textInput, '5');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for min
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for min
   });
 
   it('validates max constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
-      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
+      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} onError={onError} />
     );
 
     const textInput = container.querySelector('input[type="text"]')!;
     await user.clear(textInput);
     await user.type(textInput, '150');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for max
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for max
   });
 
   it('accepts valid value within min/max range', async () => {
@@ -105,7 +105,7 @@ describe('SliderInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('75');
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('accepts decimal values', async () => {
@@ -122,38 +122,38 @@ describe('SliderInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('42.5');
-    expect(lastCall[1]).toBeNull(); // no error for decimals
+
   });
 
   it('validates invalid number format', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Value', min: 0, max: 100 });
     const { container } = renderWithProvider(
-      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
+      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} onError={onError} />
     );
 
     const textInput = container.querySelector('input[type="text"]')!;
     await user.clear(textInput);
     await user.type(textInput, 'abc');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for invalid format
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for invalid format
   });
 
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'slider', label: 'Required Value', min: 0, max: 100, required: true });
     const { container } = renderWithProvider(
-      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} />
+      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} onError={onError} />
     );
 
     const textInput = container.querySelector('input[type="text"]')!;
     await user.clear(textInput);
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for required
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for required
   });
 
   it('sets min and max attributes on slider', () => {

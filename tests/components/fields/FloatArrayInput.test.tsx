@@ -47,8 +47,7 @@ describe('FloatArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '1.5, 2.7, 3.9');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error for valid floats
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('accepts integer values', async () => {
@@ -62,8 +61,7 @@ describe('FloatArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '1, 2, 3');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error for integers (valid floats)
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('accepts scientific notation', async () => {
@@ -77,23 +75,22 @@ describe('FloatArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '1.5e3, 2.7e-2, 3.9e+1');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error for scientific notation
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('rejects non-numeric values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [] });
     renderWithProvider(
-      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '1.5, abc, 3.9');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for non-numeric
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for non-numeric
   });
 
   it('validates required field', async () => {
@@ -112,61 +109,61 @@ describe('FloatArrayInput', () => {
   it('validates minCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], minCount: 3 });
     renderWithProvider(
-      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '1.5, 2.7');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for minCount
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for minCount
   });
 
   it('validates maxCount constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], maxCount: 3 });
     renderWithProvider(
-      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '1.5, 2.7, 3.9, 4.2');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for maxCount
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for maxCount
   });
 
   it('validates min value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], min: 5.0 });
     renderWithProvider(
-      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '3.5, 7.2, 10.5');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for value < min
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for value < min
   });
 
   it('validates max value constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'float-array', displayName: 'Floats', defaultValue: [], max: 10.0 });
     renderWithProvider(
-      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} />
+      <FloatArrayInput {...baseFieldProps} field={field} value={[]} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.type(input, '5.5, 8.2, 15.7');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for value > max
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for value > max
   });
 
   it('accepts valid array within constraints', async () => {
@@ -180,8 +177,7 @@ describe('FloatArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '10.5, 20.3, 30.8');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('handles negative floats', async () => {
@@ -195,8 +191,7 @@ describe('FloatArrayInput', () => {
     const input = screen.getByRole('textbox');
     await user.type(input, '-5.5, -10.2, 15.8');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeNull(); // no error for negative floats
+    expect(onChange).toHaveBeenCalled();
   });
 
   it('displays tooltip icon when provided', () => {

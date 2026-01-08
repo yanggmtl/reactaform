@@ -54,7 +54,7 @@ describe('SpinInput', () => {
     const upButton = buttons[0]; // First button is increment
     await user.click(upButton);
 
-    expect(onChange).toHaveBeenCalledWith(6, null);
+    expect(onChange).toHaveBeenCalledWith(6);
   });
 
   it('decrements value when down button is clicked', async () => {
@@ -69,7 +69,7 @@ describe('SpinInput', () => {
     const downButton = buttons[1]; // Second button is decrement
     await user.click(downButton);
 
-    expect(onChange).toHaveBeenCalledWith(4, null);
+    expect(onChange).toHaveBeenCalledWith(4);
   });
 
   it('respects step value when incrementing', async () => {
@@ -84,7 +84,7 @@ describe('SpinInput', () => {
     const upButton = buttons[0];
     await user.click(upButton);
 
-    expect(onChange).toHaveBeenCalledWith(5, null);
+    expect(onChange).toHaveBeenCalledWith(5);
   });
 
   it('respects step value when decrementing', async () => {
@@ -99,39 +99,39 @@ describe('SpinInput', () => {
     const downButton = buttons[1];
     await user.click(downButton);
 
-    expect(onChange).toHaveBeenCalledWith(5, null);
+    expect(onChange).toHaveBeenCalledWith(5);
   });
 
   it('validates min constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Number', defaultValue: 10, min: 5 });
     renderWithProvider(
-      <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
+      <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.clear(input);
     await user.type(input, '3');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for min
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for min
   });
 
   it('validates max constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Number', defaultValue: 10, max: 20 });
     renderWithProvider(
-      <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
+      <SpinInput {...baseFieldProps} field={field} value={10} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.clear(input);
     await user.type(input, '25');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for max
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for max
   });
 
   it('does not increment beyond max', async () => {
@@ -171,48 +171,48 @@ describe('SpinInput', () => {
   it('rejects decimal values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Integer', defaultValue: 0 });
     renderWithProvider(
-      <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.clear(input);
     await user.type(input, '12.5');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for non-integer
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for non-integer
   });
 
   it('validates invalid input', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Number', defaultValue: 0 });
     renderWithProvider(
-      <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.clear(input);
     await user.type(input, 'abc');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for invalid format
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for invalid format
   });
 
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'spin', label: 'Required Number', defaultValue: 0, required: true });
     renderWithProvider(
-      <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <SpinInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('textbox');
     await user.clear(input);
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for required
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for required
   });
 
   it('renders input and buttons when rendered', () => {
@@ -241,7 +241,7 @@ describe('SpinInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe(-5);
-    expect(lastCall[1]).toBeNull();
+
   });
 
   it('displays tooltip icon when provided', () => {

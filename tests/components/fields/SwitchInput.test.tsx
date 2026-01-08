@@ -52,7 +52,7 @@ describe('SwitchInput', () => {
     const switchElement = container.querySelector('[role="switch"], .switch, [data-testid="switch"]');
     await user.click(switchElement!);
 
-    expect(onChange).toHaveBeenCalledWith(true, null);
+    expect(onChange).toHaveBeenCalledWith(true);
   });
 
   it('toggles from on to off', async () => {
@@ -65,7 +65,7 @@ describe('SwitchInput', () => {
     const switchElement = container.querySelector('[role="switch"], .switch, [data-testid="switch"]');
     await user.click(switchElement!);
 
-    expect(onChange).toHaveBeenCalledWith(false, null);
+    expect(onChange).toHaveBeenCalledWith(false);
   });
 
   it('has proper accessibility attributes', () => {
@@ -89,7 +89,7 @@ describe('SwitchInput', () => {
     (switchElement as HTMLElement).focus();
     await user.keyboard('{Space}');
 
-    expect(onChange).toHaveBeenCalledWith(true, null);
+    expect(onChange).toHaveBeenCalledWith(true);
   });
 
   it('shows tooltip when configured', () => {

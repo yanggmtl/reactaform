@@ -53,7 +53,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     let err = validate(safeVal);
     if (err && field.options.length > 0) {
       const first = String(field.options[0].value);
-      onChange?.(first, null);
+      onChange?.(first);
       err = null;
     }
     if (err !== prevErrorRef.current) {
@@ -77,7 +77,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
       setError(err);
       onErrorRef.current?.(err ?? null);
     }
-    onChange?.(val, err);
+    onChange?.(val);
     setMenuOpen(false);
   };
 

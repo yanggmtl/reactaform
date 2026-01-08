@@ -93,7 +93,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
       setMultiError(err);
       onErrorRef.current?.(err ?? null);
     }
-    onChange?.(newValues, err);
+    onChange?.(newValues);
   };
 
   const mergedControlStyle = React.useMemo<React.CSSProperties>(
@@ -175,7 +175,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
                 aria-label="Clear selections"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onChange?.([], null);
+                  onChange?.([]);
                 }}
                 style={mergedClearButtonStyle}
               >

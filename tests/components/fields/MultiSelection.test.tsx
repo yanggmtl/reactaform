@@ -102,7 +102,7 @@ describe('MultiSelection', () => {
     const option = screen.getByText('Option 1');
     await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith(['opt1'], null);
+    expect(onChange).toHaveBeenCalledWith(['opt1']);
   });
 
   it('adds to selection when unchecked option is clicked', async () => {
@@ -119,7 +119,7 @@ describe('MultiSelection', () => {
     const option = screen.getByText('Option 2');
     await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith(['opt1', 'opt2'], null);
+    expect(onChange).toHaveBeenCalledWith(['opt1', 'opt2']);
   });
 
   it('removes from selection when checked option is clicked', async () => {
@@ -136,7 +136,7 @@ describe('MultiSelection', () => {
     const option = screen.getByText('Option 1');
     await user.click(option);
 
-    expect(onChange).toHaveBeenCalledWith(['opt2'], null);
+    expect(onChange).toHaveBeenCalledWith(['opt2']);
   });
 
   it('clears all selections when clear button is clicked', async () => {
@@ -150,7 +150,7 @@ describe('MultiSelection', () => {
     const clearButton = screen.getByRole('button', { name: /clear selections/i });
     await user.click(clearButton);
 
-    expect(onChange).toHaveBeenCalledWith([], null);
+    expect(onChange).toHaveBeenCalledWith([]);
   });
 
   it('filters out invalid values from selection', () => {

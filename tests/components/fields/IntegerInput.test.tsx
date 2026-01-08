@@ -64,9 +64,10 @@ describe('IntegerInput', () => {
 
   it('validates maximum value', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'number', type: 'int', max: 100 });
     const { getByRole } = renderWithProvider(
-      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -76,8 +77,8 @@ describe('IntegerInput', () => {
 
     await waitForUpdate();
     expect(onChange).toHaveBeenCalled();
-    // One of the onChange calls should include a non-null error as the second argument
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    // One of the onError calls should include a non-null error
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('shows error for required field when empty', async () => {
@@ -97,25 +98,27 @@ describe('IntegerInput', () => {
 
   it('handles decimal step values', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'number', type: 'int', step: 0.1 });
     const { getByRole } = renderWithProvider(
-      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
     await user.clear(input);
     await user.type(input, '3.14');
 
-    // IntegerInput treats decimals as invalid; expect onChange to be invoked with an error
+    // IntegerInput treats decimals as invalid; expect onError to be invoked
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('validates step increments', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'number', type: 'int', step: 5 });
     const { getByRole } = renderWithProvider(
-      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -125,14 +128,15 @@ describe('IntegerInput', () => {
 
     await waitForUpdate();
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('rejects non-numeric input', async () => {
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'number', type: 'int' });
     const { getByRole } = renderWithProvider(
-      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <IntegerInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -142,7 +146,7 @@ describe('IntegerInput', () => {
 
     await waitForUpdate();
     expect(onChange).toHaveBeenCalled();
-    expect(onChange.mock.calls.some(c => c[1] !== null)).toBeTruthy();
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
   });
 
   it('shows placeholder text', () => {

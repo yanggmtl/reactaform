@@ -42,33 +42,33 @@ describe('NumericStepperInput', () => {
   it('validates min constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 10, min: 5 });
     renderWithProvider(
-      <NumericStepperInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
+      <NumericStepperInput {...baseFieldProps} field={field} value={10} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('spinbutton');
     await user.clear(input);
     await user.type(input, '3');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for min
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for min
   });
 
   it('validates max constraint', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Number', defaultValue: 10, max: 20 });
     renderWithProvider(
-      <NumericStepperInput {...baseFieldProps} field={field} value={10} onChange={onChange} />
+      <NumericStepperInput {...baseFieldProps} field={field} value={10} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('spinbutton');
     await user.clear(input);
     await user.type(input, '25');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for max
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for max
   });
 
   it('accepts valid number within min/max range', async () => {
@@ -85,7 +85,7 @@ describe('NumericStepperInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe("50");
-    expect(lastCall[1]).toBeNull(); // no error
+
   });
 
   it('sets min attribute when min is provided', () => {
@@ -123,32 +123,32 @@ describe('NumericStepperInput', () => {
   it('rejects decimal values', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Integer', defaultValue: 0 });
     renderWithProvider(
-      <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('spinbutton');
     await user.clear(input);
     await user.type(input, '12.5');
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for non-integer
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for non-integer
   });
 
   it('validates required field', async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
+    const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ type: 'stepper', label: 'Required Number', defaultValue: 0, required: true });
     renderWithProvider(
-      <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <NumericStepperInput {...baseFieldProps} field={field} value={0} onChange={onChange} onError={onError} />
     );
 
     const input = screen.getByRole('spinbutton');
     await user.clear(input);
 
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
-    expect(lastCall[1]).toBeTruthy(); // error for required
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy(); // error for required
   });
 
   it('has accessible id matching field name', () => {

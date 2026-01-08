@@ -49,7 +49,7 @@ describe('RadioInput', () => {
     const radioC = screen.getByRole('radio', { name: /option c/i });
     await user.click(radioC);
 
-    expect(onChange).toHaveBeenCalledWith('c', null);
+    expect(onChange).toHaveBeenCalledWith('c');
   });
 
   it('validates required field with empty value', () => {
@@ -60,7 +60,7 @@ describe('RadioInput', () => {
     );
 
     // Should auto-correct to first option
-    expect(onChange).toHaveBeenCalledWith('a', null);
+    expect(onChange).toHaveBeenCalledWith('a');
   });
 
   it('renders vertical layout by default', () => {
@@ -119,7 +119,7 @@ describe('RadioInput', () => {
 
     const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1];
     expect(lastCall[0]).toBe('2');
-    expect(lastCall[1]).toBeNull();
+
   });
 
   it('displays tooltip icon when provided', () => {

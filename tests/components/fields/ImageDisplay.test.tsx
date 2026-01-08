@@ -26,8 +26,7 @@ describe('ImageDisplay', () => {
     renderWithProvider(<ImageDisplay {...baseFieldProps} field={field} value="" />);
 
     const img = screen.getByAltText(field.displayName) as HTMLImageElement;
-    const src = img.getAttribute('src') || '';
-    expect(src.includes('default.png') || src === import.meta.env.BASE_URL || src === '/').toBe(true);
+    expect(img.src).toContain('default.png');
   });
 
   it('does not render when no image URL is provided', () => {

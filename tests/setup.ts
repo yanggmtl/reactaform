@@ -1,9 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
-// Import validators to register them
-import '../src/validation'
-
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

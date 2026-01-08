@@ -14,7 +14,7 @@ describe('FloatInput', () => {
   it('renders with text input type', () => {
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float' });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -25,7 +25,7 @@ describe('FloatInput', () => {
   it('displays initial float value', () => {
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float' });
     const { getByDisplayValue } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={3.14159} />
+      <FloatInput {...baseFieldProps} field={field} value={'3.14159'} />
     );
 
     expect(getByDisplayValue('3.14159')).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('FloatInput', () => {
     const onChange = vi.fn();
     const field = createMockField<DefinitionPropertyField>();
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -49,7 +49,7 @@ describe('FloatInput', () => {
     const onChange = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float', min: 10.5, minInclusive: true });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -66,7 +66,7 @@ describe('FloatInput', () => {
     const onChange = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float', max: 100.0, maxInclusive: true });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -83,7 +83,7 @@ describe('FloatInput', () => {
     const onError = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float', required: true });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onError={onError} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onError={onError} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -98,7 +98,7 @@ describe('FloatInput', () => {
     const onChange = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float' });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -113,7 +113,7 @@ describe('FloatInput', () => {
     const onChange = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float' });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -129,7 +129,7 @@ describe('FloatInput', () => {
     const onChange = vi.fn();
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float', min: -100, max: 100 });
     const { getByRole } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} onChange={onChange} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} onChange={onChange} />
     );
 
     const input = getByRole('textbox', { name: 'Test Field' });
@@ -143,7 +143,7 @@ describe('FloatInput', () => {
   it('handles tooltip display', () => {
     const field = createMockField<DefinitionPropertyField>({ name: 'float', type: 'float', tooltip: 'Enter a decimal number' });
     const { getByTestId } = renderWithProvider(
-      <FloatInput {...baseFieldProps} field={field} value={0} />
+      <FloatInput {...baseFieldProps} field={field} value={'0'} />
     );
 
     expect(getByTestId('tooltip-icon')).toBeInTheDocument();

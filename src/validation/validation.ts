@@ -1,6 +1,6 @@
 import type {
   ReactaDefinition,
-  FieldValidationHandler,
+  FieldCustomValidationHandler,
   FormValidationHandler,
   FieldValueType,
   DefinitionPropertyField,
@@ -8,7 +8,7 @@ import type {
 } from "../core/reactaFormTypes";
 
 import {
-  getTypeFieldValidationHandler,
+  getFieldTypeValidationHandler,
   getFieldCustomValidationHandler,
   getFormValidationHandler,
 } from "./validationHandlerRegistry";
@@ -22,12 +22,12 @@ function isThenable<T = unknown>(v: unknown): v is PromiseLike<T> {
 }
 
 // Cache for validation handlers to avoid repeated lookups
-const fieldHandlerCache = new Map<string, FieldValidationHandler | null>();
+const fieldHandlerCache = new Map<string, FieldCustomValidationHandler | null>();
 const formHandlerCache = new Map<string, FormValidationHandler | null>();
 
 // Validate a single field value using its validation handler
 // Returns first error string or null if valid
-export function validateFieldWithHandler(
+export function validateFieldWithCustomHandler(
   definitionName: string,
   field: DefinitionPropertyField,
   value: FieldValueType,
@@ -80,14 +80,14 @@ export function validateFieldWithHandler(
   return null;
 }
 
-// Deprecated: use validateFieldWithHandler instead
+// Deprecated: use validateFieldWithCustomHandler instead
 export function validateFieldValue(
   definitionName: string,
   field: DefinitionPropertyField,
   value: FieldValueType | unknown,
   t: TranslationFunction
 ): string | null {
-  return validateFieldWithHandler(definitionName, field, value as FieldValueType, t);
+  return validateFieldWithCustomHandler(definitionName, field, value as FieldValueType, t);
 }
 
 export function validateField(
@@ -96,7 +96,7 @@ export function validateField(
   input: FieldValueType,
   t: TranslationFunction
 ): string | null {
-  const typeValidator = getTypeFieldValidationHandler(field.type);
+  const typeValidator = getFieldTypeValidationHandler(field.type);
   if (typeValidator) {
     const err = typeValidator(field, input, t);
     if (err) {
@@ -110,7 +110,7 @@ export function validateField(
     }
   }
 
-  return validateFieldWithHandler(definitionName, field, input, t);
+  return validateFieldWithCustomHandler(definitionName, field, input, t);
 }
 
 

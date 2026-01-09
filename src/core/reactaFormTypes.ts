@@ -122,11 +122,17 @@ export type TranslationFunction = (text: string, ...args: unknown[]) => string;
 export type FieldValidationMode = 'realTime' | 'onSubmission';
 
 // Field validator function: returns error string or undefined if valid
-export type FieldValidationHandler = (
+export type FieldCustomValidationHandler = (
   fieldName: string,
   value: FieldValueType | unknown,
   t: TranslationFunction,
 ) => string | undefined;
+
+export type FieldTypeValidationHandler = (
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction,
+) => string | null;
 
 // Form validator function: takes entire values map,
 // and returns error string or undefined if valid

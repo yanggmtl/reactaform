@@ -19,7 +19,7 @@ import { validateDropdownField, validateMultiSelectionField } from "./validateSe
 import { validateColorField } from "./validateColorField";
 import { validateRatingField } from "./validateRatingField";
 
-import { registerBuiltinTypeFieldValidationHandler } from "./validationHandlerRegistry";
+import { registerBuiltinFieldTypeValidationHandler } from "./validationHandlerRegistry";
 
 let registed = false;
 /**
@@ -27,31 +27,31 @@ let registed = false;
  * This function references all validators to prevent tree-shaking.
  * Safe to call multiple times as handlers are keyed.
  */
-export function ensureBuiltinTypeValidatorsRegistered(): void {
+export function ensureBuiltinFieldTypeValidatorsRegistered(): void {
   if (registed) return;
-  registerBuiltinTypeFieldValidationHandler("int", validateIntegerField);
-  registerBuiltinTypeFieldValidationHandler("stepper", validateIntegerField);
-  registerBuiltinTypeFieldValidationHandler("int-array", validateIntegerArrayField);
-  registerBuiltinTypeFieldValidationHandler("float", validateFloatField);
-  registerBuiltinTypeFieldValidationHandler("slider", validateFloatField);
-  registerBuiltinTypeFieldValidationHandler("float-array", validateFloatArrayField);
-  registerBuiltinTypeFieldValidationHandler("text", validateTextField);
-  registerBuiltinTypeFieldValidationHandler("string", validateTextField);
-  registerBuiltinTypeFieldValidationHandler("multiline", validateTextField);
-  registerBuiltinTypeFieldValidationHandler("password", validateTextField);
-  registerBuiltinTypeFieldValidationHandler("email", validateEmailField);
-  registerBuiltinTypeFieldValidationHandler("date", validateDateField);
-  registerBuiltinTypeFieldValidationHandler("time", validateTimeField);
-  registerBuiltinTypeFieldValidationHandler("url", validateUrlField);
-  registerBuiltinTypeFieldValidationHandler("phone", validatePhoneField);
-  registerBuiltinTypeFieldValidationHandler("unit", validateUnitValueField);
-  registerBuiltinTypeFieldValidationHandler("dropdown", validateDropdownField);
-  registerBuiltinTypeFieldValidationHandler("multi-selection", validateMultiSelectionField);
-  registerBuiltinTypeFieldValidationHandler("color", validateColorField);
-  registerBuiltinTypeFieldValidationHandler("rating", validateRatingField);
-  registerBuiltinTypeFieldValidationHandler("file", validateFileField);
+  registerBuiltinFieldTypeValidationHandler("int", validateIntegerField);
+  registerBuiltinFieldTypeValidationHandler("stepper", validateIntegerField);
+  registerBuiltinFieldTypeValidationHandler("int-array", validateIntegerArrayField);
+  registerBuiltinFieldTypeValidationHandler("float", validateFloatField);
+  registerBuiltinFieldTypeValidationHandler("slider", validateFloatField);
+  registerBuiltinFieldTypeValidationHandler("float-array", validateFloatArrayField);
+  registerBuiltinFieldTypeValidationHandler("text", validateTextField);
+  registerBuiltinFieldTypeValidationHandler("string", validateTextField);
+  registerBuiltinFieldTypeValidationHandler("multiline", validateTextField);
+  registerBuiltinFieldTypeValidationHandler("password", validateTextField);
+  registerBuiltinFieldTypeValidationHandler("email", validateEmailField);
+  registerBuiltinFieldTypeValidationHandler("date", validateDateField);
+  registerBuiltinFieldTypeValidationHandler("time", validateTimeField);
+  registerBuiltinFieldTypeValidationHandler("url", validateUrlField);
+  registerBuiltinFieldTypeValidationHandler("phone", validatePhoneField);
+  registerBuiltinFieldTypeValidationHandler("unit", validateUnitValueField);
+  registerBuiltinFieldTypeValidationHandler("dropdown", validateDropdownField);
+  registerBuiltinFieldTypeValidationHandler("multi-selection", validateMultiSelectionField);
+  registerBuiltinFieldTypeValidationHandler("color", validateColorField);
+  registerBuiltinFieldTypeValidationHandler("rating", validateRatingField);
+  registerBuiltinFieldTypeValidationHandler("file", validateFileField);
   registed = true;
 }
 
 // Call at module load to ensure registration in typical usage
-ensureBuiltinTypeValidatorsRegistered();
+ensureBuiltinFieldTypeValidatorsRegistered();

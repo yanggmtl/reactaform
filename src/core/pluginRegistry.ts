@@ -9,13 +9,12 @@ import {
   getComponent,
 } from './componentRegistry';
 import {
-  registerCustomFieldValidationHandler,
+  registerFieldCustomValidationHandler,
   registerFormValidationHandler,
-  registerTypeFieldValidationHandler,
+  registerFieldTypeValidationHandler,
   getFieldCustomValidationHandler,
   getFormValidationHandler,
-  getTypeFieldValidationHandler,
-  TypeFieldValidationHandler,
+  getFieldTypeValidationHandler,
 } from '../validation/validationHandlerRegistry';
 import {
   registerSubmissionHandler,
@@ -23,7 +22,8 @@ import {
 } from './submissionHandlerRegistry';
 
 import type {
-  FieldValidationHandler,
+  FieldCustomValidationHandler,
+  FieldTypeValidationHandler,
   FormValidationHandler,
   FormSubmissionHandler,
 } from './reactaFormTypes';
@@ -43,7 +43,7 @@ export interface PluginRegistrationOptions {
 
 /** Plugin conflict information */
 export interface PluginConflict {
-  type: 'component' | 'fieldValidator' | 'formValidator' | 'submissionHandler' | 'plugin';
+  type: 'component' | 'fieldCustomValidator' | 'fieldTypeValidator' | 'formValidator' | 'submissionHandler' | 'plugin';
   name: string;
   existingPlugin: string;
   newPlugin: string;
@@ -55,8 +55,8 @@ export interface ReactaFormPlugin {
   version: string;
   description?: string;
   components?: Record<string, React.ComponentType<unknown>>;
-  fieldCustomValidators?: Record<string, Record<string, FieldValidationHandler>>;
-  typeFieldValidators?: Record<string, TypeFieldValidationHandler>;
+  fieldCustomValidators?: Record<string, Record<string, FieldCustomValidationHandler>>;
+  fieldTypeValidators?: Record<string, FieldTypeValidationHandler>;
   formValidators?: Record<string, FormValidationHandler>;
   submissionHandlers?: Record<string, FormSubmissionHandler>;
   setup?: () => void;
@@ -70,7 +70,7 @@ const installedPlugins = new Map<string, ReactaFormPlugin>();
 const registrationOwnership = {
   components: new Map<string, string>(),
   fieldValidators: new Map<string, Map<string, string>>(), // category -> name -> plugin
-  typeFieldValidators: new Map<string, string>(),
+  fieldTypeValidators: new Map<string, string>(),
   formValidators: new Map<string, string>(),
   submissionHandlers: new Map<string, string>(),
 };
@@ -140,7 +140,7 @@ function handleConflicts(plugin: ReactaFormPlugin): PluginConflict[] {
         const existingHandler = getFieldCustomValidationHandler(category, name);
         if (existingHandler && existingPlugin && existingPlugin !== plugin.name) {
           conflicts.push({
-            type: 'fieldValidator',
+            type: 'fieldCustomValidator',
             name: `${category}:${name}`,
             existingPlugin,
             newPlugin: plugin.name,
@@ -151,13 +151,13 @@ function handleConflicts(plugin: ReactaFormPlugin): PluginConflict[] {
   }
 
   // Type-level field validators (validators registered by type)
-  if (plugin.typeFieldValidators) {
-    for (const name of Object.keys(plugin.typeFieldValidators)) {
-      const existingHandler = getTypeFieldValidationHandler(name);
-      const existingPlugin = registrationOwnership.typeFieldValidators.get(name);
+  if (plugin.fieldTypeValidators) {
+    for (const name of Object.keys(plugin.fieldTypeValidators)) {
+      const existingHandler = getFieldTypeValidationHandler(name);
+      const existingPlugin = registrationOwnership.fieldTypeValidators.get(name);
       if (existingHandler && existingPlugin && existingPlugin !== plugin.name) {
         conflicts.push({
-          type: 'fieldValidator',
+          type: 'fieldTypeValidator',
           name: `type:${name}`,
           existingPlugin,
           newPlugin: plugin.name,
@@ -215,13 +215,13 @@ function registerItems<T>(
   for (const key of Object.keys(items)) {
     let conflict: PluginConflict | undefined;
     if (category) {
-      conflict = conflicts.find(c => c.type === 'fieldValidator' && c.name === `${category}:${key}`);
+      conflict = conflicts.find(c => c.type === 'fieldCustomValidator' && c.name === `${category}:${key}`);
     } else if (items === plugin.components) {
       conflict = conflicts.find(c => c.type === 'component' && c.name === key);
     } else if (items === plugin.formValidators) {
       conflict = conflicts.find(c => c.type === 'formValidator' && c.name === key);
-    } else if (items === plugin.typeFieldValidators) {
-      conflict = conflicts.find(c => c.type === 'fieldValidator' && c.name === `type:${key}`);
+    } else if (items === plugin.fieldTypeValidators) {
+      conflict = conflicts.find(c => c.type === 'fieldTypeValidator' && c.name === `type:${key}`);
     } else if (items === plugin.submissionHandlers) {
       conflict = conflicts.find(c => c.type === 'submissionHandler' && c.name === key);
     }
@@ -279,7 +279,7 @@ export function registerPlugin(plugin: ReactaFormPlugin, options?: PluginRegistr
       registerItems(
         validators,
         registrationOwnership.fieldValidators,
-        (name, handler) => registerCustomFieldValidationHandler(category, name, handler),
+        (name, handler) => registerFieldCustomValidationHandler(category, name, handler),
         plugin,
         conflicts,
         strategy,
@@ -303,11 +303,11 @@ export function registerPlugin(plugin: ReactaFormPlugin, options?: PluginRegistr
   }
 
   // Register type-level field validators
-  if (plugin.typeFieldValidators) {
+  if (plugin.fieldTypeValidators) {
     registerItems(
-      plugin.typeFieldValidators,
-      registrationOwnership.typeFieldValidators,
-      registerTypeFieldValidationHandler,
+      plugin.fieldTypeValidators,
+      registrationOwnership.fieldTypeValidators,
+      registerFieldTypeValidationHandler,
       plugin,
       conflicts,
       strategy,
@@ -370,9 +370,9 @@ export function unregisterPlugin(pluginName: string, removeRegistrations = false
     }
 
     // Remove type-level field validators
-    if (plugin.typeFieldValidators) {
-      for (const name of Object.keys(plugin.typeFieldValidators)) {
-        registrationOwnership.typeFieldValidators.delete(name);
+    if (plugin.fieldTypeValidators) {
+      for (const name of Object.keys(plugin.fieldTypeValidators)) {
+        registrationOwnership.fieldTypeValidators.delete(name);
       }
     }
 

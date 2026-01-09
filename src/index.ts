@@ -43,7 +43,8 @@ export type {
   ReactaFormProps,
   FieldValueType,
   ErrorType,
-  FieldValidationHandler,
+  FieldCustomValidationHandler,
+  FieldTypeValidationHandler,
   FormValidationHandler,
   FormSubmissionHandler,
   InputOnChange,
@@ -61,7 +62,7 @@ export {
 // Validation Utilities for custom validation logic
 export {
   validateFieldValue, // Deprecated, use validateFieldWithHandler instead
-  validateFieldWithHandler
+  validateFieldWithCustomHandler
 } from './validation/validation';
 
 // Plugin System
@@ -101,9 +102,9 @@ export {
 } from './core/submissionHandlerRegistry';
 
 export {
-  registerCustomFieldValidationHandler,
+  registerFieldCustomValidationHandler,
+  registerFieldTypeValidationHandler,
   registerFormValidationHandler,
-  registerTypeFieldValidationHandler
 } from './validation/validationHandlerRegistry';
 
 // Hooks

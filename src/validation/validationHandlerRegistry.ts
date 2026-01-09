@@ -1,4 +1,7 @@
-import type { DefinitionPropertyField, FieldValidationHandler, FieldValueType, FormValidationHandler, TranslationFunction } from "../core/reactaFormTypes";
+import type { 
+  FieldCustomValidationHandler,
+  FieldTypeValidationHandler,
+  FormValidationHandler } from "../core/reactaFormTypes";
 import BaseRegistry from "../core/baseRegistry";
 
 const BUILTIN_TYPES = [
@@ -28,12 +31,6 @@ export function isBuiltinType(typeName: string): boolean {
   return BUILTIN_TYPES.includes(typeName);
 }
 
-export type TypeFieldValidationHandler = (
-  field: DefinitionPropertyField,
-  input: FieldValueType,
-  t: TranslationFunction,
-) => string | null;
-
 // Enhanced registry that supports categorized field validators
 class CategoryRegistry<T> extends BaseRegistry<Record<string, T>> {
   registerInCategory(category: string, name: string, value: T): void {
@@ -58,10 +55,10 @@ class CategoryRegistry<T> extends BaseRegistry<Record<string, T>> {
 }
 
 const formValidationRegistry = new BaseRegistry<FormValidationHandler>();
-const fieldCustomValidationRegistry = new CategoryRegistry<FieldValidationHandler>();
+const fieldCustomValidationRegistry = new CategoryRegistry<FieldCustomValidationHandler>();
 
 // Used for define new type field validation handlers
-const typeFieldValidationRegistry = new BaseRegistry<TypeFieldValidationHandler>();
+const fieldTypeValidationRegistry = new BaseRegistry<FieldTypeValidationHandler>();
 
 export function registerFormValidationHandler(
   name: string,
@@ -70,17 +67,17 @@ export function registerFormValidationHandler(
   formValidationRegistry.register(name, fn);
 }
 
-export function registerCustomFieldValidationHandler(
+export function registerFieldCustomValidationHandler(
   category: string,
   name: string,
-  fn: FieldValidationHandler
+  fn: FieldCustomValidationHandler
 ): void {
   fieldCustomValidationRegistry.registerInCategory(category, name, fn);
 }
 
-export function registerTypeFieldValidationHandler(
+export function registerFieldTypeValidationHandler(
   name: string,
-  fn: TypeFieldValidationHandler
+  fn: FieldTypeValidationHandler
 ): void {
   if (isBuiltinType(name)) {
     console.warn(
@@ -88,17 +85,17 @@ export function registerTypeFieldValidationHandler(
     );
     return;
   }
-  typeFieldValidationRegistry.register(name, fn);
+  fieldTypeValidationRegistry.register(name, fn);
 }
 
-export function registerBuiltinTypeFieldValidationHandler(
+export function registerBuiltinFieldTypeValidationHandler(
   name: string,
-  fn: TypeFieldValidationHandler
+  fn: FieldTypeValidationHandler
 ): void {
-  typeFieldValidationRegistry.register(name, fn);
+  fieldTypeValidationRegistry.register(name, fn);
 }
 
-export function getFieldCustomValidationHandler(category: string, name: string): FieldValidationHandler | null {
+export function getFieldCustomValidationHandler(category: string, name: string): FieldCustomValidationHandler | null {
   return fieldCustomValidationRegistry.getFromCategory(category, name) || null;
 }
 
@@ -106,8 +103,8 @@ export function getFormValidationHandler(name: string): FormValidationHandler | 
   return formValidationRegistry.get(name) || null;
 } 
 
-export function getTypeFieldValidationHandler(name: string): TypeFieldValidationHandler | null {
-  return typeFieldValidationRegistry.get(name) || null;
+export function getFieldTypeValidationHandler(name: string): FieldTypeValidationHandler | null {
+  return fieldTypeValidationRegistry.get(name) || null;
 }
 
 export function listFieldCustomValidationHandlers(category?: string): string[] {
@@ -123,7 +120,8 @@ export function listFormValidationHandlers(): string[] {
 
 export default {
   registerFormValidationHandler,
-  registerCustomFieldValidationHandler,
+  registerFieldCustomValidationHandler,
+  registerFieldTypeValidationHandler,
   getFieldCustomValidationHandler,
   getFormValidationHandler,
   listFieldCustomValidationHandlers,

@@ -2,8 +2,7 @@ import BaseRegistry from "./baseRegistry";
 import * as React from "react";
 import type { DefinitionPropertyField } from "./reactaFormTypes";
 import { useDebouncedCallback } from "../hooks/useDebouncedCallback";
-import { DEBOUNCE_CONFIG, DebounceConfig } from "./debounceConfig";
-import { IS_TEST_ENV } from "./debounceEnv";
+import { IS_TEST_ENV } from "./env";
 
 import CheckboxInput from "../components/fields/CheckboxInput";
 import ColorInput from "../components/fields/ColorInput";
@@ -31,6 +30,47 @@ import TimeInput from "../components/fields/TimeInput";
 import UnitValueInput from "../components/fields/UnitValueInput";
 import UrlInput from "../components/fields/UrlInput";
 
+// Now DebounceConfig and DEBOUNCE_CONFIG are only used in this file
+// In future we can move them to a separate file if needed
+export type DebounceConfig = false | {
+  wait?: number;
+  leading?: boolean;
+  trailing?: boolean;
+};
+
+export const DEBOUNCE_CONFIG: Record<string, DebounceConfig> = {
+  // No debounce
+  checkbox: false,
+  switch: false,
+  radio: false,
+  dropdown: false,
+  "multi-selection": false,
+  color: false,
+  rating: false,
+  file: false,
+  image: false,
+  separator: false,
+
+  // Standard text inputs
+  string: { wait: 200 },
+  text: { wait: 200 },
+  multiline: { wait: 200 },
+  email: { wait: 200 },
+  password: { wait: 200 },
+  phone: { wait: 200 },
+  url: { wait: 200 },
+  int: { wait: 200 },
+  float: { wait: 200 },
+  unit: { wait: 100 },
+
+  // Date / time
+  date: { wait: 150 },
+  time: { wait: 150 },
+
+  // Continuous
+  slider: { wait: 100, leading: true, trailing: true },
+  stepper: { wait: 100, leading: true, trailing: true },
+};
 
 // IMPORTANT: This registry is part of the public API surface.
 // Do not expose React types (e.g. `React.ComponentType`) from here, because
@@ -69,23 +109,23 @@ const baseComponents: Record<string, RegisteredComponent> = {
   url: UrlInput,
 };
 
+export function isBuiltinComponentType(typeName: string): boolean {
+  return typeName in baseComponents;
+}
+
+// Helper to wrap a component with debounce functionality
 type WrappedProps = {
   field?: Partial<DefinitionPropertyField>;
   onChange?: ((...args: unknown[]) => void) | undefined;
 } & Record<string, unknown>;
 
-function wrapWithDebounce(
+function componentWithDebounce(
   Component: RegisteredComponent,
   config: Exclude<DebounceConfig, false>
 ): RegisteredComponent {
-  if (IS_TEST_ENV) {
-    // No debounce in test environment
-    return Component;
-  }
-  
   const { wait = 200, leading, trailing } = config;
 
-  const Wrapped = React.memo((props: WrappedProps) => {
+  const WrappedComponent = React.memo((props: WrappedProps) => {
     const onChangeRef = React.useRef(props.onChange);
 
     React.useEffect(() => {
@@ -108,10 +148,12 @@ function wrapWithDebounce(
     );
   });
 
-  Wrapped.displayName = "DebouncedFieldWrapper";
-  return Wrapped;
+  WrappedComponent.displayName = "DebouncedFieldWrapper";
+  return WrappedComponent;
 }
 
+// Internal registration function
+//   Prevent overwriting base components if isBaseComponent is false
 export function registerComponentInternal(
   type: string,
   component: unknown,
@@ -136,12 +178,19 @@ export function registerComponentInternal(
   const effectiveConfig =
     debounceConfig ?? { wait: 200 };
 
-  registry.register(
-    type,
-    wrapWithDebounce(typedComponent, effectiveConfig)
-  );
+  if (IS_TEST_ENV) {
+    // Regster component directly in test env
+    registry.register(type, typedComponent)
+  } else {
+    // Wrap with debounce HOC
+    registry.register(
+      type,
+      componentWithDebounce(typedComponent, effectiveConfig) 
+    );
+  }
 }
 
+// Register a component for a given type, external user API
 export function registerComponent(type: string, component: unknown): void {
   registerComponentInternal(type, component, false);
 }
@@ -154,11 +203,13 @@ export function listComponents(): string[] {
   return registry.list();
 }
 
+// Register base components (called once)
 let baseComponentRegistered = false;
 export function registerBaseComponents(): void {
   if (baseComponentRegistered) return;
 
   Object.entries(baseComponents).forEach(([type, component]) => {
+    // Register as base component
     registerComponentInternal(type, component, true);
   });
 

@@ -3,33 +3,7 @@ import type {
   FieldTypeValidationHandler,
   FormValidationHandler } from "../core/reactaFormTypes";
 import BaseRegistry from "../core/baseRegistry";
-
-const BUILTIN_TYPES = [
-  "text",
-  "multiline",
-  "int",
-  "float",
-  "stepper",
-  "checkbox",
-  "select",
-  "color",
-  "rating",
-  "file",
-  "url",
-  "email",
-  "phone",
-  "date",
-  "time",
-  "unit",
-  "dropdown",
-  "multi-selection",
-  "int-array",
-  "float-array",
-]
-
-export function isBuiltinType(typeName: string): boolean {
-  return BUILTIN_TYPES.includes(typeName);
-}
+import { isBuiltinComponentType } from "../core/componentRegistry";
 
 // Enhanced registry that supports categorized field validators
 class CategoryRegistry<T> extends BaseRegistry<Record<string, T>> {
@@ -79,7 +53,7 @@ export function registerFieldTypeValidationHandler(
   name: string,
   fn: FieldTypeValidationHandler
 ): void {
-  if (isBuiltinType(name)) {
+  if (isBuiltinComponentType(name)) {
     console.warn(
       `[ReactaForm] Can't override builtin type field validation handler for type "${name}".`
     );

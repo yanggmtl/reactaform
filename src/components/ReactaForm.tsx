@@ -2,7 +2,7 @@
 import * as React from "react";
 import ReactaFormRenderer from "./ReactaFormRenderer";
 import { ReactaFormProvider } from "./ReactaFormProvider";
-import { createInstanceFromDefinition } from "../core";
+import { createInstanceFromDefinition } from "../core/reactaFormModel";
 import type { ReactaDefinition, ReactaFormProps } from "../core/reactaFormTypes";
 
 function useNearestReactaformTheme(ref?: React.RefObject<HTMLElement>) {

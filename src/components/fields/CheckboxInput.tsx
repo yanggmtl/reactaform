@@ -5,7 +5,7 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { CSS_CLASSES } from "../../utils";
+import { CSS_CLASSES } from "../../utils/cssClasses";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type CheckboxInputProps = BaseInputProps<boolean, DefinitionPropertyField>;

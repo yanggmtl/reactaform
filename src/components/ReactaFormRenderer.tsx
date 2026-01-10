@@ -17,6 +17,8 @@ import {
 import { renameDuplicatedGroups } from "../utils/groupingHelpers";
 import { submitForm } from "../core/submitForm";
 import { validateField } from "../validation/validation";
+import { SubmissionMessage } from "./SubmissionMessage";
+import SubmissionButton from "./SubmissionButton";
 
 export interface ReactaFormRendererProps {
   definition: ReactaDefinition;
@@ -58,15 +60,13 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   const [loadedCount, setLoadedCount] = React.useState(0); // how many fields are loaded so far
   const [initDone, setInitDone] = React.useState(false);
-  const [btnHover, setBtnHover] = React.useState(false);
+  
   const [instanceName, setInstanceName] = React.useState<string>(instance.name || '');
   const targetInstanceRef = React.useRef<ReactaInstance>(instance);
   const suppressClearOnNextInstanceUpdate = React.useRef(false);
 
  
   // Step 1: Initialize basic structures immediately
-  // TODO: rename group name if group name appears more than once?
-
   // Initialization effect performs synchronous state setup from the `definition`
   // and `instance` props. This is a safe prop->state initialization and will
   // not cause an infinite update loop.
@@ -186,15 +186,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
    * 2. Update the visibility map when the changed field affects conditional
    *    visibility (options/select/radio/multi-select/boolean). Visibility is
    *    recomputed from the new values so dependent fields show/hide correctly.
-   * 3. Update the errors map (add or remove the entry for the field).
-   *
-   * Notes:
-   * - We keep this handler stable with useCallback so that child components
-   *   receiving it won't re-render unnecessarily. The handler depends on
-   *   `fieldMap` because visibility logic needs metadata about fields.
-   * - We intentionally update visibility inside the functional update for
-   *   values to make sure visibility calculations use the up-to-date values
-   *   map.
    */
   const handleChange = React.useCallback(
     (name: string, value: FieldValueType, error: ErrorType) => {
@@ -378,41 +369,13 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     <ReactaFormContext.Provider value={renderContext}>
       <div style={formStyle.container}>
       {displayName && <h2 style={formStyle.titleStyle}>{t(displayName)}</h2>}
-      {submissionMessage && (
-        <div
-          role="status"
-          style={{
-            marginBottom: 12,
-            padding: 12,
-            borderRadius: 6,
-            backgroundColor: submissionSuccess
-              ? 'rgba(76, 175, 80, 0.12)'
-              : 'rgba(225, 29, 72, 0.06)',
-            border: `1px solid ${submissionSuccess ? 'rgba(76,175,80,0.3)' : 'rgba(225,29,72,0.12)'}`,
-            color: submissionSuccess ? 'var(--reactaform-success-color, #4CAF50)' : 'var(--reactaform-error-color, #e11d48)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <div style={{ whiteSpace: 'pre-wrap', flex: 1 }}>{submissionMessage}</div>
-          <button
-            onClick={() => { setSubmissionMessage(null); setSubmissionSuccess(null); }}
-            aria-label={t('Dismiss')}
-            style={{
-              marginLeft: 12,
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'inherit',
-              fontSize: 16,
-              lineHeight: 1
-            }}
-          >
-            ×
-          </button>
-        </div>
-      )}
+      {/* Display submission message on top*/}
+      <SubmissionMessage
+        message={submissionMessage}
+        success={submissionSuccess}
+        onDismiss={() => { setSubmissionMessage(null); setSubmissionSuccess(null); }}
+        t={t}
+      />
       {instance && (
         <InstanceName
           name={instanceName}
@@ -445,39 +408,12 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
                 color: "var(--reactaform-text-muted, #666)",
               }}
             >
-              {/* Loading more fields... ({loadedCount}/{updatedProperties.length}) */}
+              { t(`Loading more fields...` + ` (${loadedCount}/${updatedProperties.length})`) }
             </div>
           )}
         </>
       {/* <Separator /> */}
-      <button
-        onClick={handleSubmit}
-        disabled={isApplyDisabled}
-        onMouseEnter={() => setBtnHover(true)}
-        onMouseLeave={() => setBtnHover(false)}
-        style={{
-          padding: "var(--reactaform-button-padding, var(--reactaform-space) 12px)",
-          backgroundColor: isApplyDisabled
-            ? "var(--reactaform-button-disabled-bg, #cccccc)"
-            : "var(--reactaform-button-bg, var(--reactaform-success-color))",
-          color: "var(--reactaform-button-text, #ffffff)",
-          border: "none",
-          borderRadius: "4px",
-          cursor: isApplyDisabled ? "var(--reactaform-button-disabled-cursor, not-allowed)" : "pointer",
-          fontSize: "var(--reactaform-button-font-size, 14px)",
-          fontWeight: "var(--reactaform-button-font-weight, 500)",
-          boxShadow: "var(--reactaform-button-shadow, none)",
-          marginTop: "var(--reactaform-button-margin-top, 0.5em)",
-          transition: "opacity 0.2s ease",
-          opacity: isApplyDisabled
-            ? "var(--reactaform-button-disabled-opacity, 0.6)"
-            : btnHover
-            ? "var(--reactaform-button-hover-opacity, 0.9)"
-            : "1",
-        }}
-      >
-        {t("Submit")}
-      </button>
+      <SubmissionButton onClick={handleSubmit} disabled={isApplyDisabled} t={t} />
       </div>
     </ReactaFormContext.Provider>
   );

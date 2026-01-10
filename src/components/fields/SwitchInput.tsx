@@ -6,7 +6,7 @@ import type {
 } from "../../core/reactaFormTypes";
 
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { CSS_CLASSES } from "../../utils";
+import { CSS_CLASSES } from "../../utils/cssClasses";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 // Props expected by SwitchInput component

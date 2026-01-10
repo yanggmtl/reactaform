@@ -53,7 +53,7 @@ export type {
   FieldValidationMode
 } from './core/reactaFormTypes';
 
-// Component Registry
+// Component Registry, for registering custom field components
 export { 
   registerComponent,
   getComponent,
@@ -67,19 +67,17 @@ export {
 
 // Plugin System
 export {
+  type ReactaFormPlugin,
+  type ConflictResolution,
+  type PluginRegistrationOptions,
+  type PluginConflict,
+
   registerPlugin,
   unregisterPlugin,
   getPlugin,
   getAllPlugins,
   hasPlugin,
   registerComponents,
-} from './core/pluginRegistry';
-
-export type { 
-  ReactaFormPlugin,
-  ConflictResolution,
-  PluginRegistrationOptions,
-  PluginConflict,
 } from './core/pluginRegistry';
 
 // Definition & Instance Management
@@ -108,11 +106,8 @@ export {
 } from './validation/validationHandlerRegistry';
 
 // Hooks
-export type {
-  DebouncedCallback
-} from './hooks/useDebouncedCallback';
-
 export {
+  type DebouncedCallback,
   useDebouncedCallback
 } from './hooks/useDebouncedCallback';
 

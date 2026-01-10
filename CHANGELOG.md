@@ -85,3 +85,9 @@ All notable changes to this project are documented in this file.
   - Fix build issues
   - Test type issues.
   - Dropdown keyboard navigation issue.
+
+## 1.8.1 — 2026-01-10
+- Add FieldValidationMode to support validating fields in submit case and real time case.
+- Fix test issues
+- Remove error prop from Onchange
+- Cleanup and add missing translations

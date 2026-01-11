@@ -41,6 +41,32 @@ Notes:
 - Messages: prefer returning message keys or using `patternErrorMessage` so the renderer or your `t()` helper can localize messages consistently.
 - Builder: the visual builder surfaces these rules and will warn about mismatches (for example, a `defaultValue` not found in `options`).
 
+## Field Validation Mode
+
+The field validation mode determines when field validation is performed: either in real time while the user is editing, or when the form is submitted.
+
+FieldValidationMode values:
+
+  - "realTime" — Validation occurs as the user edits a field. Errors are displayed immediately.
+  - "onSubmission" — Validation occurs during submission. If validation fails, the form is not submitted.”
+
+Example:
+```ts
+  // Real-time field validation
+  <ReactaForm
+    definitionData={definition}
+    instance={instance}
+    fieldValidationMode="realTime"
+  />;
+
+  // On-submission field validation
+  <ReactaForm
+    definitionData={definition}
+    instance={instance}
+    fieldValidationMode="onSubmission"
+  />;
+```
+
 ## Field-level Validation
 
 Field-level validators validate a single property. They are ideal for format checks, value ranges, and field-specific async checks (e.g. uniqueness).
@@ -48,26 +74,24 @@ Field-level validators validate a single property. They are ideal for format che
 Usage:
 
 - In the field definition, set `validationHandlerName` to the registered handler name.
-- Register the handler in application code with `registerFieldValidationHandler(name, handler)`.
+- Register the handler in application code with `registerFieldCustomValidationHandler(name, handler)`.
 - Handler signature: `(value, t) => string | null`.
 
 Examples:
 
 ```ts
 // synchronous handler
-registerFieldValidationHandler('evenNumber', (value, t) => {
-  const translate = (key: string) => t?.(key) ?? key;
+registerFieldCustomValidationHandler('evenNumber', (value, t) => {
   if (typeof value !== 'number' || value % 2 !== 0) {
-    return { error: ctx?.t ? ctx.t('errors.mustBeEven') : 'Value must be an even number' };
+    return t('Value must be an even number');
   }
-  return { valid: true };
+  return null;
 });
 
 // asynchronous handler
-registerFieldValidationHandler('uniqueUsername', async (value, t) => {
-  const translate = (key: string) => t?.(key) ?? key;
+registerFieldCustomValidationHandler('uniqueUsername', async (value, t) => {
   const ok = await api.isUsernameAvailable(value);
-  return ok ? null : translate()'Username already taken') };
+  return ok ? null : t('Username already taken');
 });
 
 // field definition (JSON)
@@ -127,7 +151,7 @@ Notes:
 Example (async field handler):
 
 ```ts
-registerFieldValidationHandler('uniqueUsername', async (value, _values, ctx) => {
+registerFieldCustomValidationHandler('uniqueUsername', async (value, _values, ctx) => {
   if (!value) return { valid: true };
   const ok = await api.isUsernameAvailable(value);
   return ok ? { valid: true } : { error: ctx?.t ? ctx.t('errors.usernameTaken') : 'Username already taken' };

@@ -114,7 +114,7 @@ const Point2DInput: React.FC<BaseInputProps<Point2DValue>> = ({ field, value, on
 export default Point2DInput;
 ```
 
-## Step 2: Register with Builder
+## Step 2: Register with registerComponent
 
 ```ts
 // Register the custom component under type 'point2d' in your app.

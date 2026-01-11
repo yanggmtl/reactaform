@@ -16,6 +16,10 @@ The ReactaForm Builder is a visual, drag-and-drop editor for creating and editin
 - Select a component to edit its `name`, `displayName`, validation rules, and type-specific properties in the right panel.
 - Use the Preview button to test the form, then export when ready.
 
+**Builder Interface**
+
+![Visual Builder Interface](./assets/images/builder_ui.jpg)
+
 **Export & Re-import**
 
 - Download a `.json` file or copy the pretty-printed JSON to the clipboard.

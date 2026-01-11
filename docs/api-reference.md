@@ -274,7 +274,7 @@ export type TranslationFunction = (
 ```
 ###  Notes
 
-`{{<index>}}` is used to insert arguments dynamically.
+<code v-pre>{{&lt;index&gt;}}</code> is used to insert arguments dynamically.
 
 - `index` represents the **(index + 1)-th argument**
 - Arguments are replaced in order
@@ -295,8 +295,8 @@ Result
 ### Internationalization Example
 | Language | Translation Template                          |
 |----------|-----------------------------------------------|
-| English  | Number {{1}} + Number {{2}} is equal to {{3}} |
-| French   | Nombre {{1}} + Nombre {{2}} est égal à {{3}}  |
+| English  | Number &#123;&#123;1&#125;&#125; + Number &#123;&#123;2&#125;&#125; is equal to &#123;&#123;3&#125;&#125; |
+| French   | Nombre &#123;&#123;1&#125;&#125; + Nombre &#123;&#123;2&#125;&#125; est égal à &#123;&#123;3&#125;&#125;  |
 
 ### Runtime Usage
 | Language | Output                                                |
@@ -471,12 +471,12 @@ export function registerSubmissionHandler(
 ): void
 ```
 
-### registerFieldValidationHandler
+### registerFieldCustomValidationHandler
 ```ts
-export function registerFieldValidationHandler(
+export function registerFieldCustomValidationHandler(
   category: string,
   name: string,
-  fn: FieldValidationHandler
+  fn: FieldCustomValidationHandler
 ): void
 ```
 

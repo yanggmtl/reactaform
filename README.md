@@ -32,7 +32,7 @@ Design forms using the drag-and-drop builder or JSON schemas, render them instan
 - [License](#license)
 
 
-## 🤔 Why ReactaForm?
+## <a id="why-reactaform"></a> 🤔 Why ReactaForm?
 
 Most React form libraries assume your form structure is **static JSX**.
 
@@ -57,13 +57,13 @@ ReactaForm is built for cases where forms are:
 
 ---
 
-## 🏗 ReactaForm Builder
+## <a id="reactaform-builder"></a> 🏗 ReactaForm Builder
 
 Visual drag-and-drop builder for creating dynamic forms:
 
 <img src="./docs/assets/images/builder_ui.jpg" alt="ReactaForm Builder Screenshot" width="900" style="max-width:100%;height:auto;display:block;margin:0.5rem auto;" />
 
-## ✨ Key Features
+## <a id="key-features"></a> ✨ Key Features
 
 ### 🔧 Core
 - Schema-driven form rendering
@@ -116,7 +116,7 @@ Visual drag-and-drop builder for creating dynamic forms:
 
 ---
 
-## 📦 Installation
+## <a id="installation"></a> 📦 Installation
 
 ```bash
 npm install reactaform
@@ -128,7 +128,7 @@ npm install reactaform
 
 ---
 
-## 🚀 Quick Start
+## <a id="quick-start"></a> 🚀 Quick Start
 
 ```tsx
 import { ReactaForm } from 'reactaform';
@@ -146,7 +146,7 @@ export default function App() {
 }
 ```
 
-## 🎭 Conditional Logic
+## <a id="conditional-logic"></a> 🎭 Conditional Logic
 
 Dynamically show or hide individual fields or groups based on parent–child rules or group conditions.
 
@@ -208,7 +208,7 @@ Example — `Address` group contains `address1` and `address2`
 
 ---
 
-## 🔒 Validation and Validators
+## <a id="validation-and-validators"></a> 🔒 Validation and Validators
 
 ReactaForm supports both field-level and form-level validation.
 
@@ -262,13 +262,13 @@ registerSubmissionHandler('api:saveForm', async (definition, instanceName, value
 }
 ```
 
-## 📚 Documentation
+## <a id="documentation"></a> 📚 Documentation
 
 👉 https://reactaform.vercel.app/docs
 
 ---
 
-## 🗺️ Roadmap
+## <a id="roadmap"></a> 🗺️ Roadmap
 
 ### Core & Standards
 - [ ] Accessibility certification (WCAG 2.2 AA)
@@ -317,13 +317,13 @@ registerSubmissionHandler('api:saveForm', async (definition, instanceName, value
 
 ---
 
-## 🤝 Contributing
+## <a id="contributing"></a> 🤝 Contributing
 
 Contributions are welcome!  
 Open an issue or submit a pull request.
 
 ---
 
-## 📄 License
+## <a id="license"></a> 📄 License
 
 MIT

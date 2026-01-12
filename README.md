@@ -17,6 +17,21 @@ Design forms using the drag-and-drop builder or JSON schemas, render them instan
 
 ---
 
+## Table of Contents
+
+- [Why ReactaForm?](#why-reactaform)
+- [ReactaForm Builder](#reactaform-builder)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Conditional Logic](#conditional-logic)
+- [Validation and Validators](#validation-and-validators)
+- [Documentation](#documentation)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+
+
 ## 🤔 Why ReactaForm?
 
 Most React form libraries assume your form structure is **static JSX**.
@@ -46,7 +61,7 @@ ReactaForm is built for cases where forms are:
 
 Visual drag-and-drop builder for creating dynamic forms:
 
-![ReactaForm Builder Screenshot](./docs/assets/images/builder_ui.jpg)
+<img src="./docs/assets/images/builder_ui.jpg" alt="ReactaForm Builder Screenshot" width="900" style="max-width:100%;height:auto;display:block;margin:0.5rem auto;" />
 
 ## ✨ Key Features
 
@@ -71,7 +86,6 @@ Visual drag-and-drop builder for creating dynamic forms:
 
 ### 🧠 Logic & Validation
 - Conditional visibility
-  Currently parent-child logic and group conditions are supported
 - Custom validators
 - Custom submission handlers
 
@@ -132,31 +146,122 @@ export default function App() {
 }
 ```
 
-## Conditional visibility
-  Dynamically show or hide individual fields or groups based on defined parent–child logic or group conditions.
+## 🎭 Conditional Logic
 
-## Validation and Validators
-  ### Validation
-    ReactaForm supports both field-level and form-level validation.
-    - Field-level    
-      Validation per field, can happend at real time (editing field) or at form submission.
-    - Form-level
-      Validates the form as a whole, enabling cross-field checks. This validation runs during form submission.
+Dynamically show or hide individual fields or groups based on parent–child rules or group conditions.
 
-  ### Field validation mode
-    A prop for ReactaForm to control when to perform field validation
-    FieldValidationMode
-      - "realTime"    : Runs validation while the user is editing a field.
-      - "onSubmission": Runs validation only when the form is submitted.
+Parent–child example (schema fragment):
 
-  ### Validators
-    - Field Custom validator
-      Validates user-defined logic for individual fields by registering a custom handler.
-    - Form Custom Validator 
-      Validates user-defined form logic by registering a custom handler, enabling cross-field validation.
-    - Field Type Validator
-      Defines validation logic for a custom or new field/component type.
+```json
+{
+  "properties": [
+    {
+      "name": "country",
+      "displayName": "Country",
+      "type": "dropdown",
+      "options": [
+        { "label": "United States", "value": "US" },
+        { "label": "Canada", "value": "CA" }
+      ]
+    },
+    {
+      "name": "state",
+      "displayName": "State",
+      "type": "dropdown",
+      "parents": { "country": ["US"] }
+    },
+    {
+      "name": "province",
+      "displayName": "Province",
+      "type": "dropdown",
+      "parents": { "country": ["CA"] }
+    }
+  ]
+}
+```
+
+### Group support
+
+Groups let you treat multiple fields as a unit and control the group's visibility with group name defined in field. Consecutive fields with same group name will be grouped while non consecutive fields with same group name are treated as different groups.
+
+Example — an `address` group visible when `hasAddress` is true and `country` is US or CA:
+
+```json
+{
+  {
+    "type": "text",
+    "name": "address1",
+    "displayName": "Address Line 1",
+    "defaultValue": "",
+    "group": "Address"
+  },
+  {
+    "type": "text",
+    "name": "address2",
+    "displayName": "Address Line 2",
+    "defaultValue": "",
+    "group": "Address"
+  }
+}
+```
+
+Runtime note: group visibility is evaluated before child-level rules; children may still define their own `parents` rules to further refine visibility.
+
 ---
+
+## 🔒 Validation and Validators
+
+ReactaForm supports both field-level and form-level validation.
+
+- Field-level: validation for a single field; can happen in real-time (while editing) or on submission.
+- Form-level: cross-field validation performed during submission.
+
+### Field validation modes
+
+`FieldValidationMode`:
+- `realTime`: Runs validation while the user edits a field.
+- `onSubmission`: Runs validation only when the form is submitted.
+
+### Validators
+
+- Field custom validator — register a handler for individual-field logic.
+- Form custom validator — register a handler for cross-field logic (runs during submission).
+- Field type validator — define validation for a custom field/component type.
+---
+
+## Submission Handler
+Since ReactaForm is a dynamic form system, it provides a submission handler mechanism that allows you to define and plug in custom submission logic, such as validation, data processing, or API calls.
+
+**How It Works**
+
+Submission handling is configured in two steps:
+
+1. Define and Register a Submission Handler
+
+```ts
+import { registerSubmissionHandler } from 'reactaform';
+
+registerSubmissionHandler('api:saveForm', async (definition, instanceName, valuesMap, t) => {
+  // send valuesMap to your API
+  const res = await fetch('/api/save', { method: 'POST', body: JSON.stringify(valuesMap), headers: { 'Content-Type': 'application/json' } });
+  if (!res.ok) return [t('Server error while submitting form')];
+  return undefined; // returning undefined (or falsy) means success
+});
+```
+
+2. Reference the Registered Handler in the Form Definition
+
+    Schema example (Reference a registered handler using the submitHandlerName property):
+
+```json
+{
+  "name": "contactForm",
+  "version": "1.0",
+  "displayName": "Contact",
+  "submitHandlerName": "api:saveForm",
+  "properties": [ /* ... */ ]
+}
+```
 
 ## 📚 Documentation
 
@@ -208,7 +313,6 @@ export default function App() {
 ### Enterprise
 - [ ] Form analytics & submission insights
 - [ ] Role-based builder permissions
-- [ ] Form analytics & submission insights
 - [ ] Hosted schema & asset management
 - [ ] Enterprise integrations
 

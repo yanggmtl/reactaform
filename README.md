@@ -1,465 +1,226 @@
 # ReactaForm
 
-ReactaForm is a fully dynamic, ultra-customizable form engine for modern React applications. With schema-driven rendering, full TypeScript support, and built-in performance optimizations, it provides everything you need to build powerful forms—without the boilerplate.
+> **Build dynamic React forms visually — no JSX, no boilerplate.**
 
-**🌐 [Visit the official website for full documentation and guides →](https://reactaform.vercel.app)**
+**ReactaForm is a dynamic, schema-driven form platform for React, built for visual workflows.**
 
-## ✨ Features
+Design forms using the drag-and-drop builder or JSON schemas, render them instantly, and scale complex, configurable UIs without rewriting JSX.
 
-### 🔧 Core Capabilities
+✨ Visual Builder included  
+✨ TypeScript-first  
+✨ Themeable & extensible  
+✨ Designed for dynamic, backend-driven UIs
 
-- **Dynamic Schema-Driven Forms** — Generate entire forms from JSON definitions.
-- **Type-Safe by Design** — Strongly typed fields, validators, and submission handlers.
-- **20+ Built-In Field Types** — Text, email, phone, dropdown, slider, rating, date, file upload, and more.
-- **Visual Form Builder** — Design forms visually with drag-and-drop at [reactaform.vercel.app/builder](https://reactaform.vercel.app/builder) and export production-ready schemas instantly.
+🌐 **Documentation & Demos**  
+- https://reactaform.vercel.app  
+- **Builder:** https://reactaform.vercel.app/builder
 
-### 🎨 Customization & Theming
+---
 
-- **Themeable via CSS Variables** — Customize colors, spacing, borders, typography, and support light/dark modes.
-- **Component Registry** — Register custom field components.
+## 🤔 Why ReactaForm?
+
+Most React form libraries assume your form structure is **static JSX**.
+
+ReactaForm is built for cases where forms are:
+- Generated from backend data
+- Configurable at runtime
+- Built visually (low-code / no-code)
+- Shared across multiple apps
+- Highly customizable and themeable
+
+### Comparison
+
+| Feature | React Hook Form | Formik | ReactaForm |
+|------|------|------|------|
+| JSX required | ✔ | ✔ | ❌ |
+| Schema-driven | ❌ | ❌ | ✔ |
+| Runtime dynamic forms | ⚠️ | ⚠️ | ✔ |
+| Visual form builder | ❌ | ❌ | ✔ |
+| Built-in theming | ❌ | ⚠️ | ✔ |
+| Plugin architecture | ❌ | ❌ | ✔ |
+| Backend-driven UI | ❌ | ❌ | ✔ |
+
+---
+
+## 🏗 ReactaForm Builder
+
+Visual drag-and-drop builder for creating dynamic forms:
+
+![ReactaForm Builder Screenshot](./docs/assets/images/builder_ui.jpg)
+
+## ✨ Key Features
+
+### 🔧 Core
+- Schema-driven form rendering
+- 20+ built-in field types
+- Automatic state management
+- Full TypeScript support
+
+### 🛠 Visual Form Builder
+- Drag-and-drop form creation
+- Live preview
+- Validation & conditional logic
+- Export production-ready JSON schemas
+
+👉 https://reactaform.vercel.app/builder
+
+### 🎨 Theming
+- CSS-variable-based themes
+- Light & dark modes
+- 20+ built-in themes
 
 ### 🧠 Logic & Validation
+- Conditional visibility
+  Currently parent-child logic and group conditions are supported
+- Custom validators
+- Custom submission handlers
 
-- **Custom Validation System** — Register validators globally or per field.
-- **Conditional Logic** — Show or hide fields dynamically based on parent values.
+### 🔌 Extensibility
+- Component registry
+- Plugin system
+- Custom fields and workflows
 
-### 🌍 Internationalization
+### 🌍 i18n
+- Built-in multi-language support
+- Translation caching
 
-- **Built-In Multi-Language Support** — i18n with translation caching for fast rendering.
+### ⚡ Performance & Accessibility
+- Debounced input handling
+- requestAnimationFrame-based updates
+- ARIA-compliant by default
 
-### ⚡ Performance & UX
+---
 
-- **Optimized Input Handling** — Debounced updates + requestAnimationFrame-driven state management.
-- **Accessible by Default** — ARIA attributes, keyboard navigation, and focus management.
+## 👥 Who Is ReactaForm For?
 
-### 🔌 Flexible Submission Flow
+- SaaS settings pages
+- Admin dashboards
+- Product configurators
+- CMS-driven forms
+- Low-code tools
+- Enterprise dynamic UIs
 
-- **Custom Submission Handlers** — Integrate any workflow, API, or async logic.
+---
 
 ## 📦 Installation
 
 ```bash
-npm install reactaform react react-dom
+npm install reactaform
 ```
 
-**Peer Dependencies:**
+**Peer Dependencies**
+- React ^18 || ^19
+- React-DOM ^18 || ^19
 
-- React `^18.0.0 || ^19.0.0`
-- React-DOM `^18.0.0 || ^19.0.0`
-
-## 🌐 Environment Compatibility
-
-ReactaForm works seamlessly with:
-
-- Vite (recommended)
-- Webpack / CRA
-- Next.js
-- Parcel, esbuild, Rollup
-
-The library intelligently handles `import.meta.env` and `process.env` with automatic fallbacks—no config tweaks required.
+---
 
 ## 🚀 Quick Start
 
 ```tsx
-import { ReactaForm, createInstanceFromDefinition } from 'reactaform';
-import { useState } from 'react';
+import { ReactaForm } from 'reactaform';
 
-// Define definition, can be load from server
 const definition = {
-  name: "contactForm",
-  version: "1.0",
-  displayName: "Contact Form",
+  name: "simpleForm",
+  displayName: "Simple Form",
   properties: [
-    { name: "fullName", displayName: "Full Name", type: "string", required: true },
-    { name: "email", displayName: "Email", type: "email", required: true },
-    { name: "message", displayName: "Message", type: "text", required: true }
+    { name: "email", type: "email", required: true }
   ]
 };
 
-function App() {
-  const result = createInstanceFromDefinition(definition, "myForm");
-  const [instance] = useState(result.instance);
-
-  return (
-    <ReactaForm
-      definitionData={definition}
-      instance={instance}
-      language="en"
-    />
-  );
+export default function App() {
+  return <ReactaForm definitionData={definition} />;
 }
 ```
 
-> **Note:** ReactaForm manages internal form state automatically. Use `setInstance()` only for programmatic overrides.
-
-## 🛠️ ReactaForm Builder
-
-**Design, validate, and ship forms in minutes—not hours.**
-
-ReactaForm Builder is a visual form-building experience that eliminates manual schema writing and accelerates form creation from idea to production.
-
-With the builder at https://reactaform.vercel.app/builder
-, you can:
-
-- Build Faster — Create complex forms using an intuitive drag-and-drop interface instead of writing JSON by hand
-- See Results Instantly — Real-time previews ensure your form behaves exactly as expected while you design
-- Reuse & Iterate Easily — Import existing form definitions, make changes visually, and re-export in seconds
-- Ship Production-Ready Schemas — Export clean, validated JSON definitions ready to plug directly into ReactaForm
-- Reduce Errors — Configure validation, conditional logic, and styling visually to avoid schema mistakes
-- Start with Confidence — Use built-in templates to jump-start common form use cases
-
-No coding required. Build once visually, export instantly,and integrate seamlessly with ReactaForm—saving development time and reducing maintenance overhead.
-
-## 📖 Core Concepts
-
-### Form Definitions
-
-```ts
-interface ReactaDefinition {
-  name: string;
-  version: string;
-  displayName: string;
-  properties: FieldDefinition[];
-}
-```
-
-### Supported Field Types
-
-| Type | Description |
-|------|-------------|
-| `checkbox` | Boolean |
-| `color` | Color picker |
-| `date` | Date Picker |
-| `dropdown` | Select menu |
-| `email` | Email input |
-| `file` | File selection |
-| `float` | Float input |
-| `float-array` | Float array input |
-| `image` | Image preview |
-| `int-array`| Integer array input |
-| `int` | Integer input |
-| `multi-selection` | Multiple selection |
-| `password` | Password input |
-| `phone` | Phone number input |
-| `radio` | Radio button group |
-| `rating` | Star rating |
-| `slider` | Range slider |
-| `switch` | Boolean |
-| `text` | Single line input |
-| `time` | Time input |
-| `unitValue` | Value + unit conversion |
-| `url` | URL input |
-
-### 🎭 Conditional Visibility
-
-```json
-{
-  "name": "country",
-  "displayName": "Country",
-  "type": "dropdown",
-  "options": [
-    { "label": "United States", "value": "US" },
-    { "label": "Canada", "value": "CA" }
-  ]
-},
-{
-  "name": "state",
-  "displayName": "State",
-  "type": "dropdown",
-  "parents": { "country": ["US"] }
-},
-{
-  "name": "province",
-  "displayName": "Province",
-  "type": "dropdown",
-  "parents": { "country": ["CA"] }
-}
-
-```
-
-### 🔍 Validation
-
-```json
-{
-  "name": "email",
-  "displayName": "Email",
-  "type": "email",
-  "required": true,
-  "pattern": "^[a-z]+$",
-  "minLength": 5,
-  "maxLength": 100
-}
-```
-
-## 🎨 Theming
-
-ReactaForm includes **20 pre-built themes** that you can import individually for optimal bundle size.
-
-### Quick Start
-
-```tsx
-// Import a theme
-import 'reactaform/themes/material.css';
-import { ReactaForm } from 'reactaform';
-
-function App() {
-  return <ReactaForm theme="material" definitionData={...} />;
-}
-```
-
-### Available Themes
-
-**Light Themes:**
-- `material`, `ant-design`, `blueprint`, `fluent`, `shadcn`, `tailwind`
-- `modern-light`, `macos-native`, `ios-mobile`, `soft-pastel`
-- `glass-morphism`, `high-contrast-accessible`
-
-**Dark Themes:**
-- `material-dark`, `ant-design-dark`, `blueprint-dark`, `tailwind-dark`
-- `midnight-dark`, `neon-cyber-dark`
-
-**Variants:**
-- `compact-variant`, `spacious-variant` (size adjustments)
-
-### Theme Switching
-
-```tsx
-import 'reactaform/themes/material.css';
-import 'reactaform/themes/material-dark.css';
-import { ReactaForm } from 'reactaform';
-import { useState } from 'react';
-
-function App() {
-  const [isDark, setIsDark] = useState(false);
-  
-  return (
-    <>
-      <button onClick={() => setIsDark(!isDark)}>Toggle Theme</button>
-      <ReactaForm 
-        theme={isDark ? 'material-dark' : 'material'}
-        definitionData={...}
-      />
-    </>
-  );
-}
-```
-
-### Custom Theme
-
-Customize with CSS variables:
-
-```css
-[data-reactaform-theme="my-custom"] {
-  --reactaform-primary-bg: #ffffff;
-  --reactaform-secondary-bg: #f9f9f9;
-  --reactaform-text-color: #000000;
-  --reactaform-border-color: #cccccc;
-  --reactaform-border-radius: 8px;
-  /* ... see theme files for all variables */
-}
-```
-
-```tsx
-<ReactaForm theme="my-custom" definitionData={...} />
-```
-
-**Dark Theme Convention:** Include "dark" in your theme name (e.g., `my-custom-dark`) for automatic dark mode detection.
-
-### Detect Dark Themes
-
-```tsx
-import { isDarkTheme } from 'reactaform';
-
-isDarkTheme('material-dark'); // true
-isDarkTheme('material');      // false
-```
-
-📖 **Full theme documentation:** [docs/theme-integration.md](docs/theme-integration.md)
-
-## 🌍 Internationalization (i18n)
-
-```tsx
-<ReactaForm language="fr" ... />
-```
-
-### Custom Translations
-
-```json
-// public/locales/fr/myform.json
-{
-  "Full Name": "Nom complet",
-  "Email": "Courriel"
-}
-```
-
-
-## 🔧 Advanced Usage
-
-### Custom Components
-
-```tsx
-import { registerComponent } from 'reactaform';
-
-const CustomInput = ({ value, onChange, field }) => (
-  <input
-    value={value}
-    placeholder={field.displayName}
-    onChange={(e) => onChange(e.target.value, null)}
-  />
-);
-
-registerComponent("customType", CustomInput);
-```
-
-### Custom Validation
-
-```tsx
-import { registerValidationHandler } from 'reactaform';
-
-registerValidationHandler("customType", (value) =>
-  value.length < 10 ? "Must be at least 10 characters" : null
-);
-```
-
-### Custom Submission
-
-```tsx
-import { registerSubmissionHandler } from 'reactaform';
-
-registerSubmissionHandler("mySubmitHandler", async (_, __, values, t) => {
-  if (!values.email.includes("@")) return [t("Invalid email address")];
-
-  await fetch("/api/contact", {
-    method: "POST",
-    body: JSON.stringify(values),
-  });
-});
-
-const definition = {
-  name: "contactForm",
-  submitHandlerName: "mySubmitHandler"
-};
-```
-
-### Provider Usage
-
-```tsx
-import { ReactaFormProvider, ReactaFormRenderer } from 'reactaform';
-
-<ReactaFormProvider defaultLanguage="en">
-  <ReactaFormRenderer properties={definition.properties} instance={formData} />
-</ReactaFormProvider>
-```
-
-## 🔌 Plugin Support
-
-ReactaForm includes a plugin system to register components, validation handlers, submission handlers, and optional lifecycle hooks. Plugins let you bundle reusable form extensions and share them across projects.
-
-Basic plugin shape (TypeScript):
-
-```ts
-const myPlugin: ReactaFormPlugin = {
-  name: 'my-awesome-plugin',
-  version: '0.1.0',
-  description: 'Adds a custom field and validators',
-  components: {
-    customType: CustomInput,
-  },
-  fieldValidators: {
-    default: {
-      myValidator: (value) => (value ? null : 'Required'),
-    },
-  },
-  submissionHandlers: {
-    mySubmitHandler: async (_, __, values) => {
-      // Custom submission logic
-      return [] as string[]; // return array of errors or empty array
-    },
-  },
-  setup() {
-    // optional init logic
-  },
-  cleanup() {
-    // optional teardown logic
-  },
-};
-```
-
-Registering a plugin:
-
-```ts
-import { registerPlugin } from 'reactaform';
-
-registerPlugin(myPlugin, { conflictResolution: 'warn' });
-```
-
-Options and conflict handling:
-
-- `conflictResolution`: one of `'error'` (default), `'warn'`, `'override'`, or `'skip'`.
-- `onConflict`: optional callback `(conflict: PluginConflict) => boolean` to programmatically decide whether to proceed when a conflict occurs.
-
-Unregistering and inspecting plugins:
-
-```ts
-import { unregisterPlugin, getPlugin, getAllPlugins, hasPlugin } from 'reactaform';
-
-unregisterPlugin('my-awesome-plugin', true); // remove plugin and its registrations
-const plugin = getPlugin('my-awesome-plugin');
-const all = getAllPlugins();
-const exists = hasPlugin('my-awesome-plugin');
-```
-
-For implementation details and advanced behavior, see the plugin registry implementation: [src/core/registries/pluginRegistry.ts](src/core/registries/pluginRegistry.ts#L1-L240).
-
-## 📚 API Reference
-
-### ReactaForm Props
-
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `definitionData` | `ReactaDefinition \| string` | ✔ | Form definition |
-| `instance` | `ReactaInstance` | – | Form state instance |
-| `language` | `string` | – | e.g. "en", "fr" |
-| `darkMode` | `boolean` | – | Force dark mode |
-| `className` | `string` | – | Custom CSS class |
-| `style` | `CSSProperties` | – | Inline styles |
-
-## 🧪 Testing
-
-```bash
-npm run test
-npm run typecheck
-```
-
-## 🏗️ Building
-
-```bash
-npm run build:lib
-npm pack
-```
-
-**Outputs:**
-
-- ESM: `dist/reactaform.es.js`
-- CJS: `dist/reactaform.cjs.js`
-- Types: `dist/index.d.ts`
+## Conditional visibility
+  Dynamically show or hide individual fields or groups based on defined parent–child logic or group conditions.
+
+## Validation and Validators
+  ### Validation
+    ReactaForm supports both field-level and form-level validation.
+    - Field-level    
+      Validation per field, can happend at real time (editing field) or at form submission.
+    - Form-level
+      Validates the form as a whole, enabling cross-field checks. This validation runs during form submission.
+
+  ### Field validation mode
+    A prop for ReactaForm to control when to perform field validation
+    FieldValidationMode
+      - "realTime"    : Runs validation while the user is editing a field.
+      - "onSubmission": Runs validation only when the form is submitted.
+
+  ### Validators
+    - Field Custom validator
+      Validates user-defined logic for individual fields by registering a custom handler.
+    - Form Custom Validator 
+      Validates user-defined form logic by registering a custom handler, enabling cross-field validation.
+    - Field Type Validator
+      Defines validation logic for a custom or new field/component type.
+---
+
+## 📚 Documentation
+
+👉 https://reactaform.vercel.app/docs
+
+---
+
+## 🗺️ Roadmap
+
+### Core & Standards
+- [ ] Accessibility certification (WCAG 2.2 AA)
+- [ ] Performance & accessibility audit tooling
+- [ ] Schema versioning & migration tools
+
+### Conditional Logic
+- [x] Parent–child conditional visibility (current)
+- [x] Field grouping (current)
+- [ ] Advanced conditional logic engine
+  - [ ] Logical operators (AND / OR / NOT)
+  - [ ] Multi-field conditions
+  - [ ] Expression-based rules
+  - [ ] Nested condition groups
+- [ ] Layout enhancement
+  - [ ] Tabbed forms (planned)
+  - [ ] Navigation sections (planned)
+  - [ ] Multi-step forms
+
+### Visual Builders
+- [ ] Enhanced visual form builder
+  - [ ]Advanced conditional logic editor
+  - [ ]Validation rule designer
+- [ ] **Theme Builder (Visual)**
+  - [ ]Visual CSS-variable editor
+  - [ ]Live preview across field types
+  - [ ]Light / dark theme generation
+  - [ ]Exportable, versioned theme packages
+  - [ ]Tailwind-compatible themes
+- [ ] **Plugin Builder**
+  - [ ] Scaffold custom field components
+  - [ ] Scaffold validators & submission handlers
+  - [ ] Plugin metadata & versioning
+  - [ ] One-click plugin export
+
+### Ecosystem
+- [ ] Plugin marketplace (community-driven)
+- [ ] Theme sharing & presets gallery
+- [ ] Official plugin & theme collections
+
+### Enterprise
+- [ ] Form analytics & submission insights
+- [ ] Role-based builder permissions
+- [ ] Form analytics & submission insights
+- [ ] Hosted schema & asset management
+- [ ] Enterprise integrations
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome!  
+Open an issue or submit a pull request.
+
+---
 
 ## 📄 License
 
 MIT
-
-## 🤝 Contributing
-
-Contributions welcome! Open a pull request anytime.
-
-## 🗺️ Roadmap
-
-- [ ] Enhanced accessibility audit
-- [ ] Additional built-in validators
-- [ ] Visual form-builder UI
-- [ ] Schema migration tools
-- [ ] Performance profiling dashboard
-
----
-
-Built with ❤️ using React and TypeScript

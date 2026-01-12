@@ -151,6 +151,7 @@ export default function App() {
 Dynamically show or hide individual fields or groups based on parent–child rules or group conditions.
 
 Parent–child example (schema fragment):
+Parents are defined in the parents field by specifying the parent field name and the corresponding values.
 
 ```json
 {
@@ -184,7 +185,7 @@ Parent–child example (schema fragment):
 
 Groups let you treat multiple fields as a unit and control the group's visibility with group name defined in field. Consecutive fields with same group name will be grouped while non consecutive fields with same group name are treated as different groups.
 
-Example — an `address` group visible when `hasAddress` is true and `country` is US or CA:
+Example — `Address` group contains `address1` and `address2` 
 
 ```json
 {
@@ -204,8 +205,6 @@ Example — an `address` group visible when `hasAddress` is true and `country` i
   }
 }
 ```
-
-Runtime note: group visibility is evaluated before child-level rules; children may still define their own `parents` rules to further refine visibility.
 
 ---
 

@@ -91,3 +91,8 @@ All notable changes to this project are documented in this file.
 - Fix test issues
 - Remove error prop from Onchange
 - Cleanup and add missing translations
+
+## 1.8.2 - 2026-01-13
+- Add more languages to support builtin messsages
+- Rewrite README.md to make it clear
+- Update documentation

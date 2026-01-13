@@ -10,6 +10,7 @@ Design forms using the drag-and-drop builder or JSON schemas, render them instan
 ✨ TypeScript-first  
 ✨ Themeable & extensible  
 ✨ Designed for dynamic, backend-driven UIs
+✨ Optimized performance dynamic forms — fast, predictable rendering.
 
 🌐 **Documentation & Demos**  
 - https://reactaform.vercel.app  
@@ -97,10 +98,12 @@ Visual drag-and-drop builder for creating dynamic forms:
 ### 🌍 i18n
 - Built-in multi-language support
 - Translation caching
+- Support custom per-form translation dictionaries for user defined translation.
 
 ### ⚡ Performance & Accessibility
-- Debounced input handling
-- requestAnimationFrame-based updates
+- Fast initial load via incremental (chunked) mounting.
+- Efficient updates using requestAnimationFrame batching and targeted visibility recomputation.
+- Reduced input overhead with debounced callbacks for expensive handlers.
 - ARIA-compliant by default
 
 ---
@@ -305,6 +308,7 @@ registerSubmissionHandler('api:saveForm', async (definition, instanceName, value
   - [ ] One-click plugin export
 
 ### Ecosystem
+- [ ] Definition templates (community-driven)
 - [ ] Plugin marketplace (community-driven)
 - [ ] Theme sharing & presets gallery
 - [ ] Official plugin & theme collections

@@ -1,5 +1,48 @@
 import type { TranslationMap, TranslationCache } from "../core/reactaFormTypes";
 
+export const supportedLanguages: Record<
+  string,
+  { name: string; nativeName: string }
+> = {
+  en: { name: "English", nativeName: "English" },
+  fr: { name: "French", nativeName: "Français" },
+  de: { name: "German", nativeName: "Deutsch" },
+  es: { name: "Spanish", nativeName: "Español" },
+  "zh-cn": { name: "Chinese (Simplified)", nativeName: "简体中文" },
+  bg: { name: "Bulgarian", nativeName: "Български" },
+  cs: { name: "Czech", nativeName: "Čeština" },
+  da: { name: "Danish", nativeName: "Dansk" },
+  el: { name: "Greek", nativeName: "Ελληνικά" },
+  fi: { name: "Finnish", nativeName: "Suomi" },
+  hi: { name: "Hindi", nativeName: "हिन्दी" },
+  hu: { name: "Hungarian", nativeName: "Magyar" },
+  id: { name: "Indonesian", nativeName: "Bahasa Indonesia" },
+  it: { name: "Italian", nativeName: "Italiano" },
+  ja: { name: "Japanese", nativeName: "日本語" },
+  ko: { name: "Korean", nativeName: "한국어" },
+  ms: { name: "Malay", nativeName: "Bahasa Melayu" },
+  nl: { name: "Dutch", nativeName: "Nederlands" },
+  no: { name: "Norwegian", nativeName: "Norsk" },
+  pl: { name: "Polish", nativeName: "Polski" },
+  pt: { name: "Portuguese", nativeName: "Português" },
+  ro: { name: "Romanian", nativeName: "Română" },
+  ru: { name: "Russian", nativeName: "Русский" },
+  sk: { name: "Slovak", nativeName: "Slovenčina" },
+  sv: { name: "Swedish", nativeName: "Svenska" },
+  th: { name: "Thai", nativeName: "ไทย" },
+  tr: { name: "Turkish", nativeName: "Türkçe" },
+  uk: { name: "Ukrainian", nativeName: "Українська" },
+  vi: { name: "Vietnamese", nativeName: "Tiếng Việt" },
+  "zh-tw": { name: "Chinese (Traditional)", nativeName: "繁體中文" },
+};
+
+export const getSupportedLanguages = (): Record<
+  string,
+  { name: string; nativeName: string }
+> => {
+  return supportedLanguages;
+};
+
 /**
  * Translation loading result
  */
@@ -40,7 +83,8 @@ export const loadCommon = async (
   try {
     let translations: TranslationMap = {};
 
-    switch (language.toLowerCase()) {
+    const abbr = language.toLowerCase();
+    switch (abbr) {
       case "fr":
         translations = (await import("../locales/fr/common.json")).default;
         break;
@@ -56,8 +100,23 @@ export const loadCommon = async (
       case "en":
         translations = {}; // English is the default language
         break;
-      default:
-        translations = {};
+      default: {
+        // No built-in translations available, find language in supportedLanguages
+        // Get the translations from external source or return empty
+        // External source: https://reactaform.vercel.app/locales/{lang}/common.json
+        const langInfo = supportedLanguages[abbr];
+        if (langInfo) {
+          const url = `https://reactaform.vercel.app/locales/${abbr}/common.json`;
+          const response = await fetch(url);
+          if (response.ok) {
+            const data = await response.json();
+            translations = data as TranslationMap;
+          }
+        } else {
+          // Language not supported
+          translations = {};
+        }
+      }
     }
 
     return {

@@ -84,15 +84,7 @@
   "Invalid number format for field {{1}}": "Formato de número inválido para el campo {{1}}",
   "Invalid number {{1}} in array for field {{2}}": "Número inválido {{1}} en el arreglo para el campo {{2}}",
   "Error processing field {{1}}: {{2}}": "Error al procesar el campo {{1}}: {{2}}",
-  "Top Left Position must be above and to the left of Bottom Right Position.": "La posición superior izquierda debe estar por encima y a la izquierda de la posición inferior derecha.",
-  "Position coordinates must be positive.": "Las coordenadas de posición deben ser positivas.",
   "Form submitted with values: ": "Formulario enviado con valores: ",
   "Loading more fields...": "Cargando más campos...",
-  "Instance name {{1}} has been used. Please choose another name.": "El nombre de instancia {{1}} ya se ha utilizado. Por favor elija otro nombre.",
-  "X": "X",
-  "Y": "Y",
-  "Z": "Z",
-  "Invalid X value": "Valor X inválido",
-  "Invalid Y value": "Valor Y inválido",
-  "Invalid Z value": "Valor Z inválido"
+  "Instance name {{1}} has been used. Please choose another name.": "El nombre de instancia {{1}} ya se ha utilizado. Por favor elija otro nombre."
 }

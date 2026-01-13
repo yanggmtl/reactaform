@@ -133,3 +133,8 @@ export {
   serializeDefinition,
   deserializeDefinition
 } from './utils/definitionSerializers';
+
+// Translation Utilities
+export {
+  getSupportedLanguages
+} from './utils/translationCache';

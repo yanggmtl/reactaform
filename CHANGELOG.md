@@ -96,3 +96,7 @@ All notable changes to this project are documented in this file.
 - Add more languages to support builtin messsages
 - Rewrite README.md to make it clear
 - Update documentation
+
+## 1.8.3 - 2026-01-14
+- Fix handleChange & onChange error prop issue
+- Update example apps

@@ -9,13 +9,10 @@ import React, { useState } from "react";
 import {
   createInstanceFromDefinition,
   ReactaForm,
-  registerComponent,
   registerSubmissionHandler,
 } from "reactaform";
 import type { FieldValueType, ReactaDefinition, ReactaInstance } from "reactaform";
 import "./style.css";
-// Custom DateTime input component
-import DateTimeInput from "./DateTimeInput";
 
 // Example definition for creating new instances
 const exampleDefinition: ReactaDefinition = {
@@ -53,14 +50,7 @@ const exampleDefinition: ReactaDefinition = {
       displayName: "Active User",
       type: "checkbox",
       defaultValue: true,
-    },
-    {
-      name: "dateTime",
-      displayName: "Date and Time",
-      type: "datetime",
-      defaultValue: "2024-06-15T14:30",
-      tooltip: "Select date and time",
-    },
+    }
   ],
 };
 
@@ -77,8 +67,7 @@ const getUniqueName = (baseName: string, instances: ReactaInstance[]) => {
   return candidate;
 };
 
-const placeholder=`Paste instance JSON here, e.g.:
-{
+const placeholder=`{
   "name": "My Instance",
   "definition": "user_profile",
   "version": "1.0.0",
@@ -87,8 +76,7 @@ const placeholder=`Paste instance JSON here, e.g.:
     "lastName": "Doe",
     "email": "john@example.com",
     "age": 30,
-    "isActive": true,
-    "dateTime": "2024-06-15T14:30"
+    "isActive": true
   }
 }`;
 
@@ -114,10 +102,6 @@ export default function App() {
   React.useEffect(() => {
     instancesRef.current = instances;
   }, [instances]);
-
-  React.useEffect(() => {
-    registerComponent("datetime", DateTimeInput);
-  }, []);
 
   const submissionHandler = React.useCallback(
     (
@@ -191,7 +175,8 @@ export default function App() {
 
   const handleLoadConfirm = () => {
     try {
-      const parsed = JSON.parse(loadJsonInput) as ReactaInstance;
+      const jsonInput = loadJsonInput.trim() != "" ? loadJsonInput : placeholder;
+      const parsed = JSON.parse(jsonInput) as ReactaInstance;
 
       // Basic validation
       if (!parsed.name || !parsed.definition || !parsed.version || !parsed.values) {

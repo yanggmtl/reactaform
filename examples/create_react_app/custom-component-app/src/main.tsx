@@ -5,7 +5,7 @@ import { ReactaForm, registerComponent } from "reactaform";
 import type { ReactaDefinition } from "reactaform";
 import "./style.css";
 
-const def: ReactaDefinition = {
+const def = {
   name: "point2d3dDemo",
   displayName: "Point 2D/3D Custom Component Demo",
   version: "1.0.0",

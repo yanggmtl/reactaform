@@ -4,22 +4,63 @@ import { ReactaForm } from 'reactaform';
 import './style.css';
 
 const testDefinition = {
-  name: 'customerSurvey',
-  displayName: 'Customer Survey',
-  version: '1.0.0',
+  name: "customer",
+  displayName: "Customer",
+  version: "1.0.0",
   properties: [
-    { type: 'text', name: 'name', displayName: 'Name', defaultValue: '', required: true },
-    { type: 'rating', name: 'satisfaction', displayName: 'How Satisfy with our product', defaultValue: 0, labelLayout: 'column-left' },
-    { type: 'switch', name: 'satisfyWithService', displayName: 'Do you satisfy with our customer service', defaultValue: false },
-    { type: 'multiline', name: 'suggestion', displayName: 'Tell us your suggestions with our service', defaultValue: '', parents: { satisfyWithService: [false] }, labelLayout: 'column-left' },
-  ]
+    {
+      type: "text",
+      name: "name",
+      displayName: "Name",
+      defaultValue: "",
+      required: true,
+    },
+    {
+      type: "dropdown",
+      name: "country",
+      displayName: "Country",
+      defaultValue: "US",
+      options: [
+        { label: "United States", value: "US" },
+        { label: "Canada", value: "CA" },
+      ],
+    },
+    {
+      type: "dropdown",
+      name: "state",
+      displayName: "State",
+      defaultValue: "",
+      options: [
+        { label: "Alaska", value: "AK " },
+        { label: "California", value: "CA" },
+        { label: "New York", value: "NY" },
+      ],
+      parents: { country: ["US"] },
+    },
+    {
+      type: "dropdown",
+      name: "province",
+      displayName: "Province",
+      defaultValue: "",
+      options: [
+        { label: "British Columbia", value: "BC" },
+        { label: "Ontario", value: "ON" },
+        { label: "Quebec", value: "QC" },
+      ],
+      parents: { country: ["CA"] },
+    },
+  ],
 };
 
 const predefined_instance = {
-  name: 'parentsExampleInstance',
-  version: '1.0.0',
-  definition: 'customerSurvey',
-  values: { name: 'John Doe', satisfaction: 4, satisfyWithService: false, suggestion: 'Improve response time.' }
+  name: "parentsExampleInstance",
+  version: "1.0.0",
+  definition: "customer",
+  values: {
+    name: "John Doe",
+    country: "CA",
+    province: "ON",
+  },
 };
 
 export default function App() {

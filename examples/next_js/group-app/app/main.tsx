@@ -36,7 +36,7 @@ export default function App() {
   return (
     <div className={`app`}>
       <h2>Reactaform Group Example</h2>
-      <ReactaForm definitionData={{ ...testDefinition }} instance={instance} style={{ height: "100%" }} />
+      <ReactaForm definitionData={testDefinition} instance={instance} />
     </div>
   );
 }

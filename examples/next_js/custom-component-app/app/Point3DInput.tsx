@@ -1,74 +1,65 @@
 "use client";
-import * as React from "react";
-import type { BaseInputProps } from "reactaform";
+import React, { useEffect, useRef } from "react";
+import type { BaseInputProps, DefinitionPropertyField, FieldValueType, TranslationFunction } from "reactaform";
 import {
   StandardFieldLayout,
-  validateFieldValue,
+  registerFieldTypeValidationHandler,
   useReactaFormContext,
+  useFieldValidator,
 } from "reactaform";
 import { CSS_CLASSES, combineClasses } from "reactaform";
 
 type Point3DValue = [string, string, string];
+
+registerFieldTypeValidationHandler('point3d', (
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction) => 
+{
+  void field; // unused  
+  if (!Array.isArray(input) || input.length !== 3) {
+    return t('Value must be a 3D point array');
+  }
+  const [x, y, z] = input;
+  const xNum = Number(x);
+  const yNum = Number(y);
+  if (!Number.isFinite(xNum)) {
+    return t('X must be a valid number');
+  }
+  
+  if (!Number.isFinite(yNum)) {
+    return t('Y must be a valid number');
+  }
+
+  const zNum = Number(z);
+  if (!Number.isFinite(zNum)) {
+    return t('Z must be a valid number');
+  }
+
+  return null;
+});
 
 const Point3DInput: React.FC<BaseInputProps<Point3DValue>> = ({
   field,
   value,
   onChange,
   onError,
+  error: externalError,
 }) => {
-  const { t, definitionName } = useReactaFormContext();
+  const { t } = useReactaFormContext();
+
+  // Important: useFieldValidator will take care of real time validation or on submit validation
+  const validate = useFieldValidator(field, externalError);
 
   // Uncontrolled inputs: use refs and keep an `error` state.
-  const xRef = React.useRef<HTMLInputElement | null>(null);
-  const yRef = React.useRef<HTMLInputElement | null>(null);
-  const zRef = React.useRef<HTMLInputElement | null>(null);
-  const validate = React.useCallback(
-    (xs: string, ys: string, zs: string): string | null => {
-      if (
-        field.required &&
-        (xs.trim() === "" || ys.trim() === "" || zs.trim() === "")
-      ) {
-        return t("Value required");
-      }
-
-      const x = xs.trim() === "" ? 0 : Number(xs);
-      if (!Number.isFinite(x)) return t("Invalid X value");
-      const y = ys.trim() === "" ? 0 : Number(ys);
-      if (!Number.isFinite(y)) return t("Invalid Y value");
-      const z = zs.trim() === "" ? 0 : Number(zs);
-      if (!Number.isFinite(z)) return t("Invalid Z value");
-
-      // allow library-level validation to run as well
-      const err = validateFieldValue(definitionName, field, [xs, ys, zs], t);
-      return err ?? null;
-    },
-    [field, definitionName, t]
-  );
-
-  // initialize error from incoming value so initial instance errors are visible
-  const [error, setError] = React.useState<string | null>(() => {
-    if (value && Array.isArray(value)) {
-      return validate(
-        String(value[0] ?? ""),
-        String(value[1] ?? ""),
-        String(value[2] ?? "")
-      );
-    }
-    return null;
-  });
-
-  React.useEffect(() => {
-    // sync when external value changes by setting input values on refs
-    if (value && Array.isArray(value)) {
-      if (xRef.current) xRef.current.value = String(value[0] ?? "");
-      if (yRef.current) yRef.current.value = String(value[1] ?? "");
-      if (zRef.current) zRef.current.value = String(value[2] ?? "");
-    }
-    // Do not run validation here; validation runs on user input handlers.
-  }, [value]);
+  const xRef = useRef<HTMLInputElement | null>(null);
+  const yRef = useRef<HTMLInputElement | null>(null);
+  const zRef = useRef<HTMLInputElement | null>(null);
+  
+  const error = validate(value);
 
   // keep parent informed when our local error state changes
-  React.useEffect(() => {
+  useEffect(() => {
     onError?.(error ?? null);
   }, [error, onError]);
 
@@ -76,27 +67,21 @@ const Point3DInput: React.FC<BaseInputProps<Point3DValue>> = ({
     const xs = e.target.value;
     const ys = yRef.current ? yRef.current.value : "";
     const zs = zRef.current ? zRef.current.value : "";
-    const err = validate(xs, ys, zs);
-    setError(err);
-    onChange?.([xs, ys, zs] as Point3DValue, err ?? null);
+    onChange?.([xs, ys, zs] as Point3DValue);
   };
 
   const handleYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const ys = e.target.value;
     const xs = xRef.current ? xRef.current.value : "";
     const zs = zRef.current ? zRef.current.value : "";
-    const err = validate(xs, ys, zs);
-    setError(err);
-    onChange?.([xs, ys, zs] as Point3DValue, err ?? null);
+    onChange?.([xs, ys, zs] as Point3DValue);
   };
 
   const handleZChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const zs = e.target.value;
     const xs = xRef.current ? xRef.current.value : "";
     const ys = yRef.current ? yRef.current.value : "";
-    const err = validate(xs, ys, zs);
-    setError(err);
-    onChange?.([xs, ys, zs] as Point3DValue, err ?? null);
+    onChange?.([xs, ys, zs] as Point3DValue);
   };
 
   return (

@@ -188,7 +188,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
    *    recomputed from the new values so dependent fields show/hide correctly.
    */
   const handleChange = React.useCallback(
-    (name: string, value: FieldValueType, error: ErrorType) => {
+    (name: string, value: FieldValueType) => {
       // Clear any previous submission message when the user changes a value
       setSubmissionMessage(null);
       setSubmissionSuccess(null);
@@ -224,16 +224,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
         }
 
         return newValues;
-      });
-
-      // Update errors map
-      setErrors((prev) => {
-        if (error) {
-          return { ...prev, [name]: error };
-        }
-        // remove key
-        const rest = Object.fromEntries(Object.entries(prev).filter(([k]) => k !== name)) as Record<string, string>;
-        return rest;
       });
     },
     [fieldMap, setSubmissionMessage, setSubmissionSuccess]

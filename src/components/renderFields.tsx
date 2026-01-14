@@ -8,7 +8,7 @@ import { groupConsecutiveFields } from "../utils/groupingHelpers";
 const FieldWrapper = React.memo<{
   field: DefinitionPropertyField;
   value: FieldValueType;
-  handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void;
+  handleChange: (fieldName: string, value: FieldValueType) => void;
   handleError?: (fieldName: string, error: ErrorType) => void;
   error?: string | null;
 }>(({ field, value, handleChange, handleError, error }) => {
@@ -17,7 +17,7 @@ const FieldWrapper = React.memo<{
   const stableValue = React.useMemo(() => value, [value]);
 
   const onChange = React.useCallback(
-    (v: FieldValueType, err: ErrorType) => handleChange(field.name, v, err),
+    (v: FieldValueType) => handleChange(field.name, v),
     [handleChange, field.name]
   );
 
@@ -42,7 +42,7 @@ FieldWrapper.displayName = 'FieldWrapper';
 const renderField = (
   field: DefinitionPropertyField,
   valuesMap: Record<string, FieldValueType>,
-  handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void,
+  handleChange: (fieldName: string, value: FieldValueType) => void,
   handleError?: (fieldName: string, error: ErrorType) => void,
   errors?: Record<string, string>
 ) => {
@@ -64,7 +64,7 @@ const renderField = (
 export const renderFields = (
   fields: DefinitionPropertyField[],
   valuesMap: Record<string, FieldValueType>,
-  handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void,
+  handleChange: (fieldName: string, value: FieldValueType) => void,
   visibility: Record<string, boolean>,
   loadedCount: number,
   handleError?: (fieldName: string, error: ErrorType) => void,
@@ -82,7 +82,7 @@ const FieldGroup = React.memo<{
   isOpen: boolean;
   fields: DefinitionPropertyField[];
   valuesMap: Record<string, FieldValueType>;
-  handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void;
+  handleChange: (fieldName: string, value: FieldValueType) => void;
   handleError: (fieldName: string, error: ErrorType) => void;
   errorsMap?: Record<string, string>;
   toggleGroup: (groupName: string) => void;
@@ -131,7 +131,7 @@ export const renderFieldsWithGroups = (
   fields: DefinitionPropertyField[],
   valuesMap: Record<string, FieldValueType>,
   t: (key: string) => string,
-  handleChange: (fieldName: string, value: FieldValueType, error: ErrorType) => void,
+  handleChange: (fieldName: string, value: FieldValueType) => void,
   handleError: (fieldName: string, error: ErrorType) => void,
   visibility: Record<string, boolean>,
   loadedCount: number,

@@ -1,12 +1,3 @@
-// Instance App: Create, Load, and Edit Instances
-// This app demonstrates creating new instances from definitions, loading
-// existing instances from JSON, managing a list of instances, and editing
-// selected instances using ReactaForm with immediate updates on submit.
-
-// In this app, global.d.ts is added by removing following line which is 
-// types specific to vite in tsconfig.json
-// "types": ["vite/client"]
-
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -53,7 +44,7 @@ const exampleDefinition: ReactaDefinition = {
       displayName: "Active User",
       type: "checkbox",
       defaultValue: true,
-    },
+    }
   ],
 };
 
@@ -69,6 +60,19 @@ const getUniqueName = (baseName: string, instances: ReactaInstance[]) => {
   }
   return candidate;
 };
+
+const placeholder=`{
+  "name": "My Instance",
+  "definition": "user_profile",
+  "version": "1.0.0",
+  "values": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "age": 30,
+    "isActive": true
+  }
+}`;
 
 // instanceCounter removed: using name-based uniqueness instead
 
@@ -165,7 +169,8 @@ export default function App() {
 
   const handleLoadConfirm = () => {
     try {
-      const parsed = JSON.parse(loadJsonInput) as ReactaInstance;
+      const jsonInput = loadJsonInput.trim() != "" ? loadJsonInput : placeholder;
+      const parsed = JSON.parse(jsonInput) as ReactaInstance;
 
       // Basic validation
       if (!parsed.name || !parsed.definition || !parsed.version || !parsed.values) {
@@ -206,7 +211,7 @@ export default function App() {
           <div className="instance-list">
             {instances.length === 0 && (
               <div style={{ color: "#999", fontSize: "13px", padding: "12px" }}>
-                No instances yet. Click "New" or "Load" to get started.
+                {`No instances yet. Click "New" or "Load" to get started.`}
               </div>
             )}
             {instances.map((instance, index) => (
@@ -242,19 +247,7 @@ export default function App() {
             <h3>Load Instance from JSON</h3>
             {errorMessage && <div className="error-message">{errorMessage}</div>}
             <textarea
-              placeholder='Paste instance JSON here, e.g.:
-{
-  "name": "My Instance",
-  "definition": "user_profile",
-  "version": "1.0.0",
-  "values": {
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "john@example.com",
-    "age": 30,
-    "isActive": true
-  }
-}'
+              placeholder={placeholder}
               value={loadJsonInput}
               onChange={(e) => setLoadJsonInput(e.target.value)}
             />

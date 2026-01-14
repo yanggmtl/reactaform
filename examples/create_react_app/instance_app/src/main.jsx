@@ -33,6 +33,19 @@ const getUniqueName = (baseName, instances) => {
   return candidate;
 };
 
+const placeholder=`{
+  "name": "My Instance",
+  "definition": "user_profile",
+  "version": "1.0.0",
+  "values": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john@example.com",
+    "age": 30,
+    "isActive": true
+  }
+}`;
+
 export default function App() {
   const [instances, setInstances] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -115,7 +128,8 @@ export default function App() {
 
   const handleLoadConfirm = () => {
     try {
-      const parsed = JSON.parse(loadJsonInput);
+      const jsonInput = loadJsonInput.trim() != "" ? loadJsonInput : placeholder;
+      const parsed = JSON.parse(jsonInput);
 
       if (!parsed.name || !parsed.definition || !parsed.version || !parsed.values) {
         setErrorMessage("Invalid instance format. Must include name, definition, version, and values.");
@@ -188,7 +202,7 @@ export default function App() {
             <h3>Load Instance from JSON</h3>
             {errorMessage && <div className="error-message">{errorMessage}</div>}
             <textarea
-              placeholder='Paste instance JSON here'
+              placeholder={placeholder}
               value={loadJsonInput}
               onChange={(e) => setLoadJsonInput(e.target.value)}
             />

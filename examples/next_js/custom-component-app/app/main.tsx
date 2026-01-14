@@ -3,10 +3,9 @@
 import Point2DInput from "./Point2DInput";
 import Point3DInput from "./Point3DInput";
 import { ReactaForm, registerComponent } from "reactaform";
-import type { ReactaDefinition } from "reactaform";
 import "./style.css";
 
-const def: ReactaDefinition = {
+const def: Record<string, unknown> = {
   name: "point2d3dDemo",
   displayName: "Point 2D/3D Custom Component Demo",
   version: "1.0.0",
@@ -47,7 +46,7 @@ export default function App() {
   return (
     <div className="app">
       <h2>Custom Component: Point2D</h2>
-      <ReactaForm definitionData={def} instance={instance} />
+      <ReactaForm definitionData={def} instance={instance} fieldValidationMode="realTime" />
     </div>
   );
 }

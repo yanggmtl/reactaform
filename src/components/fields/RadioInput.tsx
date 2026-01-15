@@ -27,7 +27,6 @@ const RadioInput: React.FC<RadioInputProps> = ({
   const layout: "row" | "column" =
     field.layout?.toLowerCase() === "horizontal" ? "row" : "column";
 
-  const groupRef = React.useRef<HTMLDivElement | null>(null);
   const onErrorRef = React.useRef(onError);
 
   React.useEffect(() => {
@@ -58,13 +57,6 @@ const RadioInput: React.FC<RadioInputProps> = ({
     if (err && field.options.length > 0) {
       const firstValue = String(field.options[0].value);
       onChange?.(firstValue);
-
-      // Sync DOM radios if needed
-      groupRef.current
-        ?.querySelectorAll<HTMLInputElement>("input[type=radio]")
-        .forEach((input) => {
-          input.checked = input.value === firstValue;
-        });
     }
 
     updateError(err);
@@ -102,22 +94,28 @@ const RadioInput: React.FC<RadioInputProps> = ({
   return (
     <StandardFieldLayout field={field} error={error}>
       <div
-        ref={groupRef}
         className={CSS_CLASSES.input}
-        role="radiogroup"
         aria-labelledby={`${field.name}-label`}
         aria-invalid={!!error}
         style={containerStyle}
       >
         {field.options.map((opt) => {
           const optValue = String(opt.value);
+          const id = `${field.name}-${optValue}`;
           return (
             <label
               key={optValue}
               className={combineClasses(CSS_CLASSES.label)}
               style={labelStyle}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                if (String(value ?? "") !== optValue) {
+                  handleChange({ target: { value: optValue } } as React.ChangeEvent<HTMLInputElement>);
+                }
+              }}
             >
               <input
+                id={id}
                 type="radio"
                 name={field.name}
                 value={optValue}

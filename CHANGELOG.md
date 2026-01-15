@@ -103,3 +103,6 @@ All notable changes to this project are documented in this file.
 
 ## 1.8.4 - 2026-01-15
 - Simplify README.md and provide a full README. 
+
+## 1.8.5 - 2026-01-15
+- Fix radio selection issue in builder preview

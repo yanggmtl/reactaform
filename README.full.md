@@ -34,6 +34,7 @@ Design forms using JSON schemas or a visual builder, render them instantly, and 
 - [Who Is ReactaForm For?](#target-customer)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
+- [Learn More](#learn-more)
 - [License](#license)
 
 
@@ -424,6 +425,16 @@ Current: built-in i18n with per-form dictionaries
 
 Contributions are welcome!  
 Open an issue or submit a pull request.
+
+---
+
+## <a id="learn-more"></a> 📘 Learn more
+
+- [Full README](https://github.com/yanggmtl/reactaform/blob/master/README.full.md) 
+- [ReactaForm Official Site](http://reactaform.vercel.app)
+- [Documentation](https://reactaform.vercel.app/docs)
+- [Demos](http://reactaform.vercel.app/features#Demos)
+- [Visual Builder](https://reactaform.vercel.app/builder)
 
 ---
 

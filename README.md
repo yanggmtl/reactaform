@@ -101,8 +101,9 @@ npm install reactaform
 ## Learn more
 
 - [Full README](https://github.com/yanggmtl/reactaform/blob/master/README.full.md) 
+- [ReactaForm Official Site](http://reactaform.vercel.app)
 - [Documentation](https://reactaform.vercel.app/docs)
-- [ReactaForm Website (Demos)](https://reactaform.vercel.app)
+- [Demos](http://reactaform.vercel.app/features#Demos)
 - [Visual Builder](https://reactaform.vercel.app/builder)
 
 ## License

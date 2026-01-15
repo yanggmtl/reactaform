@@ -127,6 +127,7 @@ export const RowFieldLayout = React.memo(({
         id={`${field.name}-label`}
         className={CSS_CLASSES.label}
         htmlFor={field.name}
+        style={{ textAlign: 'left' }}
       >
         {t(field.displayName)}
       </label>

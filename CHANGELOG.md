@@ -100,3 +100,6 @@ All notable changes to this project are documented in this file.
 ## 1.8.3 - 2026-01-14
 - Fix handleChange & onChange error prop issue
 - Update example apps
+
+## 1.8.4 - 2026-01-15
+- Simplify README.md and provide a full README. 

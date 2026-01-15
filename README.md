@@ -1,146 +1,50 @@
 # ReactaForm
 
-> **Build dynamic React forms visually — no JSX, no boilerplate.**
+Build dynamic React forms visually — no JSX, no boilerplate.
 
-**ReactaForm is a dynamic, schema-driven form platform for React, built for visual workflows.**
+ReactaForm is a schema-driven, extendable form platform for React. Define forms as JSON (or visually), render them at runtime, and scale complex, configurable UIs without rewriting JSX.
 
-Design forms using the drag-and-drop builder or JSON schemas, render them instantly, and scale complex, configurable UIs without rewriting JSX.
+- Visual Form Builder
+- Forms as data (JSON, not JSX)
+- Fully extendable (components, themes, validation, i18n)
+- TypeScript-first
+- Optimized for large, dynamic forms
 
-✨ Visual Builder included  
-✨ TypeScript-first  
-✨ Themeable & extensible  
-✨ Designed for dynamic, backend-driven UIs
-✨ Optimized performance dynamic forms — fast, predictable rendering.
+## Why ReactaForm?
 
-🌐 **Documentation & Demos**  
-- https://reactaform.vercel.app  
-- **Builder:** https://reactaform.vercel.app/builder
+Most React form libraries are code-first:
 
----
+- Forms are written in JSX
+- Changes require code edits and redeploys
 
-## Table of Contents
+ReactaForm is different:
 
-- [Why ReactaForm?](#why-reactaform)
-- [ReactaForm Builder](#reactaform-builder)
-- [Key Features](#key-features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Conditional Logic](#conditional-logic)
-- [Validation and Validators](#validation-and-validators)
-- [Documentation](#documentation)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
+- Forms are schema-driven
+- Stored in APIs, databases, or CMSs
+- Editable visually (low-code / no-code)
+- Rendered dynamically at runtime
 
+If your forms change often or are backend-owned, ReactaForm fits naturally.
 
-## <a id="why-reactaform"></a> 🤔 Why ReactaForm?
+## Use Cases
 
-Most React form libraries assume your form structure is **static JSX**.
-
-ReactaForm is built for cases where forms are:
-- Generated from backend data
-- Configurable at runtime
-- Built visually (low-code / no-code)
-- Shared across multiple apps
-- Highly customizable and themeable
-
-### Comparison
-
-| Feature | React Hook Form | Formik | ReactaForm |
-|------|------|------|------|
-| JSX required | ✔ | ✔ | ❌ |
-| Schema-driven | ❌ | ❌ | ✔ |
-| Runtime dynamic forms | ⚠️ | ⚠️ | ✔ |
-| Visual form builder | ❌ | ❌ | ✔ |
-| Built-in theming | ❌ | ⚠️ | ✔ |
-| Plugin architecture | ❌ | ❌ | ✔ |
-| Backend-driven UI | ❌ | ❌ | ✔ |
-
----
-
-## <a id="reactaform-builder"></a> 🏗 ReactaForm Builder
-
-Visual drag-and-drop builder for creating dynamic forms:
-
-<img src="./docs/assets/images/builder_ui.jpg" alt="ReactaForm Builder Screenshot" width="900" style="max-width:100%;height:auto;display:block;margin:0.5rem auto;" />
-
-## <a id="key-features"></a> ✨ Key Features
-
-### 🔧 Core
-- Schema-driven form rendering
-- 20+ built-in field types
-- Automatic state management
-- Full TypeScript support
-
-### 🛠 Visual Form Builder
-- Drag-and-drop form creation
-- Live preview
-- Validation & conditional logic
-- Export production-ready JSON schemas
-
-👉 https://reactaform.vercel.app/builder
-
-### 🎨 Theming
-- CSS-variable-based themes
-- Light & dark modes
-- 20+ built-in themes
-
-### 🧠 Logic & Validation
-- Conditional visibility
-- Custom validators
-- Custom submission handlers
-
-### 🔌 Extensibility
-- Component registry
-- Plugin system
-- Custom fields and workflows
-
-### 🌍 i18n
-- Built-in multi-language support
-- Translation caching
-- Support custom per-form translation dictionaries for user defined translation.
-
-### ⚡ Performance & Accessibility
-- Fast initial load via incremental (chunked) mounting.
-- Efficient updates using requestAnimationFrame batching and targeted visibility recomputation.
-- Reduced input overhead with debounced callbacks for expensive handlers.
-- ARIA-compliant by default
-
----
-
-## 👥 Who Is ReactaForm For?
-
-- SaaS settings pages
+- SaaS settings & configuration pages
 - Admin dashboards
-- Product configurators
 - CMS-driven forms
-- Low-code tools
+- Product configurators
+- Low-code / no-code platforms
 - Enterprise dynamic UIs
 
----
-
-## <a id="installation"></a> 📦 Installation
-
-```bash
-npm install reactaform
-```
-
-**Peer Dependencies**
-- React ^18 || ^19
-- React-DOM ^18 || ^19
-
----
-
-## <a id="quick-start"></a> 🚀 Quick Start
+## Quick example
 
 ```tsx
 import { ReactaForm } from 'reactaform';
 
 const definition = {
-  name: "simpleForm",
-  displayName: "Simple Form",
+  name: 'contactForm',
+  displayName: 'Contact',
   properties: [
-    { name: "email", type: "email", required: true }
+    { name: 'email', type: 'email', required: true }
   ]
 };
 
@@ -149,185 +53,58 @@ export default function App() {
 }
 ```
 
-## <a id="conditional-logic"></a> 🎭 Conditional Logic
+No JSX fields. No wiring. Just render.
 
-Dynamically show or hide individual fields or groups based on parent–child rules or group conditions.
+## Key features
 
-Parent–child example (schema fragment):
-Parents are defined in the parents field by specifying the parent field name and the corresponding values.
+- Schema-driven rendering (JSON, not JSX)
+- Visual drag-and-drop form builder
+- Runtime-configurable forms
+- Conditional logic & grouping
+- Pluggable validation & submission
+- Themeable via CSS variables
+- Built-in i18n
+- High-performance rendering
+- ARIA-compliant by default
 
-```json
-{
-  "properties": [
-    {
-      "name": "country",
-      "displayName": "Country",
-      "type": "dropdown",
-      "options": [
-        { "label": "United States", "value": "US" },
-        { "label": "Canada", "value": "CA" }
-      ]
-    },
-    {
-      "name": "state",
-      "displayName": "State",
-      "type": "dropdown",
-      "parents": { "country": ["US"] }
-    },
-    {
-      "name": "province",
-      "displayName": "Province",
-      "type": "dropdown",
-      "parents": { "country": ["CA"] }
-    }
-  ]
-}
+## Extensible by design
+
+ReactaForm is a platform, not just a renderer. You can extend:
+
+- Field components
+- Validation logic (field, form, type)
+- Submission workflows
+- Themes & design systems
+- Languages & translations
+- Custom field types & metadata
+
+No forks. No hacks.
+
+## How it compares
+
+- Formik / React Hook Form → code-first, JSX-based
+- ReactaForm → schema-first, runtime-driven
+
+ReactaForm doesn’t replace form state libraries — it replaces hand-coding forms when forms are dynamic.
+
+## Installation
+
+```bash
+npm install reactaform
 ```
 
-### Group support
+### Peer dependencies
 
-Groups let you treat multiple fields as a unit and control the group's visibility with group name defined in field. Consecutive fields with same group name will be grouped while non consecutive fields with same group name are treated as different groups.
+- React ^18 || ^19
+- React DOM ^18 || ^19
 
-Example — `Address` group contains `address1` and `address2` 
+## Learn more
 
-```json
-{
-  {
-    "type": "text",
-    "name": "address1",
-    "displayName": "Address Line 1",
-    "defaultValue": "",
-    "group": "Address"
-  },
-  {
-    "type": "text",
-    "name": "address2",
-    "displayName": "Address Line 2",
-    "defaultValue": "",
-    "group": "Address"
-  }
-}
-```
+- [Full README](README.full.md) 
+- [Documentation](https://reactaform.vercel.app/docs)
+- [ReactaForm Website (Demos)](https://reactaform.vercel.app)
+- [Visual Builder](https://reactaform.vercel.app/builder)
 
----
-
-## <a id="validation-and-validators"></a> 🔒 Validation and Validators
-
-ReactaForm supports both field-level and form-level validation.
-
-- Field-level: validation for a single field; can happen in real-time (while editing) or on submission.
-- Form-level: cross-field validation performed during submission.
-
-### Field validation modes
-
-`FieldValidationMode`:
-- `realTime`: Runs validation while the user edits a field.
-- `onSubmission`: Runs validation only when the form is submitted.
-
-### Validators
-
-- Field custom validator — register a handler for individual-field logic.
-- Form custom validator — register a handler for cross-field logic (runs during submission).
-- Field type validator — define validation for a custom field/component type.
----
-
-## Submission Handler
-Since ReactaForm is a dynamic form system, it provides a submission handler mechanism that allows you to define and plug in custom submission logic, such as validation, data processing, or API calls.
-
-**How It Works**
-
-Submission handling is configured in two steps:
-
-1. Define and Register a Submission Handler
-
-```ts
-import { registerSubmissionHandler } from 'reactaform';
-
-registerSubmissionHandler('api:saveForm', async (definition, instanceName, valuesMap, t) => {
-  // send valuesMap to your API
-  const res = await fetch('/api/save', { method: 'POST', body: JSON.stringify(valuesMap), headers: { 'Content-Type': 'application/json' } });
-  if (!res.ok) return [t('Server error while submitting form')];
-  return undefined; // returning undefined (or falsy) means success
-});
-```
-
-2. Reference the Registered Handler in the Form Definition
-
-    Schema example (Reference a registered handler using the submitHandlerName property):
-
-```json
-{
-  "name": "contactForm",
-  "version": "1.0",
-  "displayName": "Contact",
-  "submitHandlerName": "api:saveForm",
-  "properties": [ /* ... */ ]
-}
-```
-
-## <a id="documentation"></a> 📚 Documentation
-
-👉 https://reactaform.vercel.app/docs
-
----
-
-## <a id="roadmap"></a> 🗺️ Roadmap
-
-### Core & Standards
-- [ ] Accessibility certification (WCAG 2.2 AA)
-- [ ] Performance & accessibility audit tooling
-- [ ] Schema versioning & migration tools
-
-### Conditional Logic
-- [x] Parent–child conditional visibility (current)
-- [x] Field grouping (current)
-- [ ] Advanced conditional logic engine
-  - [ ] Logical operators (AND / OR / NOT)
-  - [ ] Multi-field conditions
-  - [ ] Expression-based rules
-  - [ ] Nested condition groups
-- [ ] Layout enhancement
-  - [ ] Tabbed forms (planned)
-  - [ ] Navigation sections (planned)
-  - [ ] Multi-step forms
-
-### Visual Builders
-- [ ] Enhanced visual form builder
-  - [ ]Advanced conditional logic editor
-  - [ ]Validation rule designer
-- [ ] **Theme Builder (Visual)**
-  - [ ]Visual CSS-variable editor
-  - [ ]Live preview across field types
-  - [ ]Light / dark theme generation
-  - [ ]Exportable, versioned theme packages
-  - [ ]Tailwind-compatible themes
-- [ ] **Plugin Builder**
-  - [ ] Scaffold custom field components
-  - [ ] Scaffold validators & submission handlers
-  - [ ] Plugin metadata & versioning
-  - [ ] One-click plugin export
-
-### Ecosystem
-- [ ] Definition templates (community-driven)
-- [ ] Plugin marketplace (community-driven)
-- [ ] Theme sharing & presets gallery
-- [ ] Official plugin & theme collections
-
-### Enterprise
-- [ ] Form analytics & submission insights
-- [ ] Role-based builder permissions
-- [ ] Hosted schema & asset management
-- [ ] Enterprise integrations
-
----
-
-## <a id="contributing"></a> 🤝 Contributing
-
-Contributions are welcome!  
-Open an issue or submit a pull request.
-
----
-
-## <a id="license"></a> 📄 License
+## License
 
 MIT

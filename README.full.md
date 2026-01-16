@@ -17,6 +17,8 @@ Design forms using JSON schemas or a visual builder, render them instantly, and 
 - **Playground & Demos:** https://reactaform.vercel.app
 - **Builder:** https://reactaform.vercel.app/builder
 
+![ReactaForm Example](https://github.com/yanggmtl/docs/assets/images/reactaform_example.gif)
+
 ---
 
 ## Table of Contents

@@ -10,7 +10,7 @@ ReactaForm is a schema-driven, extendable form platform for React. Define forms 
 - TypeScript-first
 - Optimized for large, dynamic forms
 
-![ReactaForm Example](https://github.com/yanggmtl/reactaform/tree/master/docs/assets/images/reactaform_example.gif)
+![ReactaForm Example](https://raw.githubusercontent.com/yanggmtl/reactaform/master/docs/assets/images/reactaform_example.gif)
 
 ## Why ReactaForm?
 

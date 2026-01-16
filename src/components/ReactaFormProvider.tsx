@@ -133,6 +133,18 @@ const getFieldStyle = (
   };
 };
 
+/**
+ * ReactaFormProvider component - Context provider for ReactaForm configuration
+ * @param {ReactaFormProviderProps} props - The component props
+ * @param {ReactNode} props.children - Child components to wrap with context
+ * @param {string} [props.definitionName] - Name of the form definition
+ * @param {Record<string, unknown>} [props.defaultStyle] - Default styling configuration
+ * @param {string} [props.defaultLanguage='en'] - Default language code for translations
+ * @param {string} [props.defaultTheme='light'] - Default theme name
+ * @param {string} [props.defaultLocalizeName] - Name of custom localization file
+ * @param {FieldValidationMode} [props.defaultFieldValidationMode='realTime'] - Validation timing mode
+ * @param {string} [props.className='reactaform-container'] - CSS class name for the container
+ */
 export const ReactaFormProvider = ({
   children,
   definitionName = '',

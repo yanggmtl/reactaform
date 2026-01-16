@@ -27,6 +27,14 @@ export interface ReactaFormRendererProps {
   chunkDelay?: number;
 }
 
+/**
+ * ReactaFormRenderer component - Internal form renderer with field management
+ * @param {ReactaFormRendererProps} props - The component props
+ * @param {ReactaDefinition} props.definition - The form definition object
+ * @param {ReactaInstance} props.instance - The form instance with values
+ * @param {number} [props.chunkSize=50] - Number of fields to render per chunk for performance
+ * @param {number} [props.chunkDelay=50] - Delay in ms between rendering chunks
+ */
 const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   definition,
   instance,

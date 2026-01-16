@@ -13,7 +13,7 @@ Each app is a minimal React app located at `<vite|next_js|create_react_app>/<app
 
 ## 🎮 Demo Applications
 
-The `example/<vite|next_js|create_react_app>` directory contains working examples demonstrating various ReactaForm features:
+The `examples/<vite|next_js|create_react_app>` directory contains working examples demonstrating various ReactaForm features:
 
 ### **instance-app**
 Demonstrates instance management - create, load, edit, and save multiple form instances. Shows how to:
@@ -48,13 +48,6 @@ Multi-language form support with custom translations. Demonstrates:
 - Custom translation files
 - Localized field labels and messages
 - RTL support preparation
-
-### **dark-mode-app**
-Theme customization and dark mode support. Features:
-- Light/dark theme switching
-- CSS variable customization
-- Dynamic theme changes
-- Persistent theme preferences
 
 ### **submit-handler-app**
 Custom form submission handling. Shows how to:

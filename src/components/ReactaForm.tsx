@@ -28,6 +28,17 @@ function useNearestReactaformTheme(ref?: React.RefObject<HTMLElement>) {
   return theme;
 }
 
+/**
+ * ReactaForm component - The main form rendering component
+ * @param {ReactaFormProps} props - The component props
+ * @param {string | Record<string, unknown> | ReactaDefinition} props.definitionData - Form definition data (JSON string, object, or ReactaDefinition)
+ * @param {ReactaInstance} [props.instance] - Optional form instance with saved values
+ * @param {string} [props.language] - Language code for localization
+ * @param {string} [props.className] - Additional CSS class names
+ * @param {string} [props.theme] - Theme name ('light' or 'dark')
+ * @param {React.CSSProperties} [props.style] - Inline styles
+ * @param {FieldValidationMode} [props.fieldValidationMode] - Validation timing mode ('realTime' or 'onSubmission')
+ */
 const ReactaForm: React.FC<ReactaFormProps> = ({
   definitionData,
   instance,

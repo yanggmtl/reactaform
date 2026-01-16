@@ -106,7 +106,7 @@ export interface ReactaInstance {
 }
 
 export interface ReactaFormProps {
-  definitionData: string | Record<string, unknown>; // Json string or map object
+  definitionData: string | Record<string, unknown> | ReactaDefinition; // Json string or map object
   language?: string;
   instance?: ReactaInstance;
   className?: string;

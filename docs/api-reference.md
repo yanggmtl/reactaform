@@ -78,7 +78,7 @@ export interface ReactaDefinition {
 ```ts
 export interface ReactaInstance {
   name: string;                            // Instance name
-  definition: string;                      // Correspodent definition name
+  definition: string;                      // Corresponding definition name
   version: string;                         // Instance version
   values: Record<string, FieldValueType>;  // values map
 }
@@ -89,13 +89,13 @@ export interface ReactaInstance {
 ### ReactaFormProps
 ```ts
 export interface ReactaFormProps {
-  definitionData: string | Record<string, unknown>; // Can be json string or json data
-  language?: string;           // Language, "en", "fr", ...
-  instance?: ReactaInstance;   // instance of definitionData
-  className?: string;          // css class name
-  darkMode?: boolean;          // Dark mode flag, true for dark mode, otherwise, it is normal light mode
-  style?: React.CSSProperties; // Currently only height and width are processed.
-                               // Additional styles can be customized using CSS variables
+  definitionData: string | Record<string, unknown> | ReactaDefinition; // JSON string, plain object, or typed definition
+  language?: string;                 // Language, "en", "fr", ...
+  instance?: ReactaInstance;         // Optional instance (if omitted, ReactaForm creates one from the definition)
+  className?: string;                // Container css class
+  theme?: string;                    // Theme name (e.g. "light", "material-dark", custom)
+  style?: React.CSSProperties;       // Inline styles (merged into default style)
+  fieldValidationMode?: FieldValidationMode; // "realTime" | "onSubmission"
 }
 ```
 
@@ -109,12 +109,12 @@ export interface ReactaFormProps {
 export type FieldValidationHandler = (
   fieldName: string;                // Field name to validate
   value: FieldValueType | unknown,  // Input field value
-  t: TranslationFunction            // Translation funtion for translate error message
+  t: TranslationFunction            // Translation function for translating error messages
 ) => string | undefined;           
 ```
 
 ```ts
-// Callbak handler for form validation
+// Callback handler for form validation
 // Used for validate relationship of fields, also can put time consuming field validation here
 // Return: if success, return undefined, otherwise return error messages
 export type FormValidationHandler = (
@@ -124,7 +124,7 @@ export type FormValidationHandler = (
 ```
 
 ```ts
-// Callbak handler for form submission
+// Callback handler for form submission
 // Support async operation and can transfer input data to server.
 // Return: undefined when success, otherwise return error messages
 export type FormSubmissionHandler = (
@@ -163,7 +163,7 @@ export interface ReactaFormRendererProps {
 ---
 
 ### ReactaFormProvider
-Context provider for translations, styling, language and dark mode.
+Context provider for translations, styling, language, theme and validation mode.
 ```ts
 export const ReactaFormProvider: React.FC<ReactaFormProviderProps>;
 ```
@@ -176,10 +176,11 @@ export const ReactaFormProvider: React.FC<ReactaFormProviderProps>;
 export type ReactaFormContextType = {
   definitionName: string;               // Definition name
   language: string;                     // Form language
-  darkMode: boolean;                    // Dark mode flag
+  theme: string;                        // Theme name
   formStyle: { container?: React.CSSProperties; titleStyle?: React.CSSProperties }; // Form style
   fieldStyle: Record<string, unknown>;  // Field style
   t: TranslationFunction;               // Translation function
+  fieldValidationMode?: FieldValidationMode; // Field validation timing
 };
 ```
 ### useReactaFormContext
@@ -232,6 +233,66 @@ export const StandardFieldLayout: React.FC<{
 
 ## CSS Utilities
 
+### <a id="css-variables-reference"></a> CSS Variables Reference
+
+All themes use the same CSS variable system. Override these for custom styling:
+
+#### Colors & Surfaces
+```css
+--reactaform-primary-bg        /* Main container background */
+--reactaform-secondary-bg      /* Card/surface background */
+--reactaform-input-bg          /* Input field background */
+--reactaform-text-color        /* Primary text color */
+--reactaform-text-muted        /* Secondary/muted text */
+--reactaform-border-color      /* Default border */
+--reactaform-border-hover      /* Hover border */
+--reactaform-border-focus      /* Focus border */
+--reactaform-error-color       /* Error state */
+--reactaform-success-color     /* Success state */
+--reactaform-link-color        /* Link color */
+```
+
+#### Spacing & Layout
+```css
+--reactaform-space             /* Base spacing unit */
+--reactaform-space-lg          /* Large spacing */
+--reactaform-field-gap         /* Gap between fields */
+--reactaform-column-gap        /* Gap between columns */
+--reactaform-inline-gap        /* Inline element gap */
+--reactaform-label-gap         /* Label to input gap */
+--reactaform-container-padding /* Container padding */
+--reactaform-input-padding     /* Input padding */
+```
+
+#### Typography
+```css
+--reactaform-font-family       /* Font stack */
+--reactaform-font-size         /* Base font size */
+--reactaform-font-weight       /* Font weight */
+--reactaform-line-height       /* Line height */
+```
+
+#### Shape & Borders
+```css
+--reactaform-border-radius     /* Border radius */
+--reactaform-border-width      /* Border width */
+```
+
+#### Buttons & Controls
+```css
+--reactaform-button-bg         /* Button background */
+--reactaform-button-text       /* Button text color */
+--reactaform-button-hover-bg   /* Button hover state */
+--reactaform-button-padding    /* Button padding */
+--reactaform-button-font-size  /* Button font size */
+```
+
+#### Tooltips
+```css
+--reactaform-tooltip-bg        /* Tooltip background */
+--reactaform-tooltip-color     /* Tooltip text color */
+```
+
 ### CSS_CLASSES
 Constant class registry.
 ```ts
@@ -239,6 +300,11 @@ export const CSS_CLASSES = {
   field: 'reactaform-field',
   label: 'reactaform-label',
   input: 'reactaform-input',
+  textInput: 'reactaform-input--text',
+  inputNumber: 'reactaform-input--number',
+  inputSelect: 'reactaform-select',
+  rangeInput: 'reactaform-input--range',
+  button: 'reactaform-button',
 };
 ```
 

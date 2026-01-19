@@ -20,13 +20,41 @@ Translation resolution
 
 ## Supported Languages
 
-This project provides localization support for the following languages:
+This project provides builtin messages localization support for the following languages:
+| Abbr | Name | Native Name |
+| --- | --- | --- |
+| en | English | English |
+| fr | French | Français |
+| de | German | Deutsch |
+| es | Spanish | Español |
+| zh-cn | Chinese (Simplified) | 简体中文 |
+| zh-tw | Chinese (Traditional) | 繁體中文 |
+| bg | Bulgarian | Български |
+| cs | Czech | Čeština |
+| da | Danish | Dansk |
+| el | Greek | Ελληνικά |
+| fi | Finnish | Suomi |
+| hi | Hindi | हिन्दी |
+| hu | Hungarian | Magyar |
+| id | Indonesian | Bahasa Indonesia |
+| it | Italian | Italiano |
+| ja | Japanese | 日本語 |
+| ko | Korean | 한국어 |
+| ms | Malay | Bahasa Melayu |
+| nl | Dutch | Nederlands |
+| no | Norwegian | Norsk |
+| pl | Polish | Polski |
+| pt | Portuguese | Português |
+| ro | Romanian | Română |
+| ru | Russian | Русский |
+| sk | Slovak | Slovenčina |
+| sv | Swedish | Svenska |
+| th | Thai | ไทย |
+| tr | Turkish | Türkçe |
+| uk | Ukrainian | Українська |
+| vi | Vietnamese | Tiếng Việt |
 
-- `en` (English)
-- `fr` (Français)
-- `de` (Deutsch)
-- `es` (Español)
-- `zh-cn` (简体中文)
+The builtin messsages of first 5 languages can be found in ReactaForm library and others can be found in `https://reactaform.vercel.app/locales/<abbr>/common.json`.
 
 ## Translation Features
 
@@ -65,7 +93,7 @@ This project provides localization support for the following languages:
 Follow these steps to provide custom, per-form localization dictionaries that the builder and renderer will load automatically:
 
 1. Provide a translation dictionary
-   - Place files under `public/locales/<lang>/<localizationName>.json`.
+   - Place files under `public/locales/<abbr>/<localizationName>.json`.
    - Example: `public/locales/fr/my_form_translations.json`.
 
 2. Reference it in your form
@@ -81,7 +109,9 @@ Follow these steps to provide custom, per-form localization dictionaries that th
 ```
 
 3. ReactaForm loads automatically
-   - When the app/provider initializes, the form renderer will attempt to load `public/locales/<currentLang>/<localizationName>.json` and merge it with the global dictionary.
+   - When the app/provider initializes, the form renderer will attempt to load `public/locales/<abbr>/<localizationName>.json` and merge it with the global dictionary.
    - Authors can ship multiple localizationName files per language and reference them per-form to customize labels and messages.
 
-Place locale JSON files under `public/locales/<lang>/` (or `src/locales/<lang>/` if you prefer bundling) and ensure your app provider loads the appropriate files for the current locale.
+Place locale JSON files under `public/locales/<abbr>/` and ensure your app provider loads the appropriate files for the current locale.
+
+Note: All language message translation files are translated by AI and if you find any improper translation, please contact us.

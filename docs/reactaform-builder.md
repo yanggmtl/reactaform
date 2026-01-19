@@ -18,7 +18,7 @@ The ReactaForm Builder is a visual, drag-and-drop editor for creating and editin
 
 **Builder Interface**
 
-![Visual Builder Interface](./assets/images/builder_ui.jpg)
+![Visual Builder Interface](/assets/images/builder_ui.jpg)
 
 **Export & Re-import**
 

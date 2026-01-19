@@ -111,9 +111,10 @@ registerSubmissionHandler('mySubmit', submitHandler);
 - `ReactaFormProps` — props for the top-level `ReactaForm` component.
 - `FieldValueType` — union of allowed field value types (boolean, number, string, arrays, unit tuple, `File`, etc.).
 - `ErrorType` — error string or `null`.
-- `FieldValidationHandler` — single-field validator signature `(value, t) => string | undefined`.
+- `FieldCustomValidationHandler` — single-field validator signature `(fieldName, value, t) => string | undefined`.
+- `FieldTypeValidationHandler` — single-field validator signature for new type `(field, value, t) => string | undefined`.
 - `FormValidationHandler` — cross-field validator signature `(valuesMap, t) => string[] | undefined`.
-- `FormSubmissionHandler` — submission handler signature `(definition, instanceName, valuesMap, t) => string[] | undefined`.
+- `FormSubmissionHandler` — submission handler signature `(definition, instanceName, valuesMap, t) => string[] |  Promise<string[] | undefined>`.
 - `InputOnChange<T>` — generic input change callback `(value: T | string, error: string | null) => void`.
 - `BaseInputProps<TValue, TField>` — base props for input components (`field`, `value`, `onChange`, `onError`).
 - `RegistryResult<T>` — generic registry operation result `{ success, data?, error? }`.

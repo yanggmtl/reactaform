@@ -14,7 +14,7 @@ The examples are located at [Github Examples](https://github.com/yanggmtl/reacta
 
 ---
 
-## 🎮 Demo Applications
+## ? Demo Applications
 
 The `example/<vite|next_js|create_react_app>` directory contains working examples demonstrating various ReactaForm features:
 
@@ -61,15 +61,6 @@ Multi-language form support with custom translations. Demonstrates:
 - RTL support preparation
 
   [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/translation-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/translation-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/translation-app)
-
-### **dark-mode-app**
-Theme customization and dark mode support. Features:
-- Light/dark theme switching
-- CSS variable customization
-- Dynamic theme changes
-- Persistent theme preferences
-
-  [Vite Example](https://github.com/yanggmtl/reactaform/tree/master/examples/vite/dark-mode-app)  |   [Next.js example](https://github.com/yanggmtl/reactaform/tree/master/examples/next_js/dark-mode-app) | [Create react app example](https://github.com/yanggmtl/reactaform/tree/master/examples/create_react_app/dark-mode-app)
 
 ### **submit-handler-app**
 Custom form submission handling. Shows how to:

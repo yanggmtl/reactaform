@@ -24,8 +24,8 @@ pnpm add reactaform
 
 ### A simple example for display ReactaForm
 1. Define your form as JSON.
-2. Define or get a instance 
-3. Render it with `ReactaForm` or `ReactaFormRenderer`.
+2. (Optional) Provide an instance (values) if you want to load/edit existing data.
+3. Render it with `ReactaForm`.
 
 ```tsx
 import { ReactaForm } from 'reactaform';
@@ -42,11 +42,9 @@ const definition = {
   ]
 };
 
-// Define an instance or get from server
-const instance = {"name": "John", "email": "abc@example.com", "message" : "Send Notification."};
-
 export function App() {
-  return <ReactaForm definitionData={definition} instance = {instance} />;
+  // If you don't pass `instance`, ReactaForm will create one from the definition.
+  return <ReactaForm definitionData={definition} />;
 }
 ```
 
@@ -75,11 +73,11 @@ const definition = {
 2. Implement your custom submission handler
 ```ts
 // Define submission handler to process input data
-const handler : FormSubmissionHandler = (
-  definition: any,
-  instanceName: string | undefined,
-  valuesMap: Record<string, unknown>,
-  t: TranslationFunction
+const handler: FormSubmissionHandler = (
+  definition,
+  instanceName,
+  valuesMap,
+  t
 ): string[] | undefined => {
   // you can get valuesMap and process it
   // ... 
@@ -93,9 +91,6 @@ const handler : FormSubmissionHandler = (
 3. Register the submission handler with ReactaForm
 
 ```ts
-// Define an instance or get from server
-const instance = {"name": "John", "email": "abc@example.com", "message" : "Send Notification."};
-
 export default function App() {
   React.useEffect(() => {
     // Register the submission handler
@@ -104,7 +99,7 @@ export default function App() {
   }, []);
 
   return (
-    <ReactaForm definitionData={definition} instance = {instance} />;
+    <ReactaForm definitionData={definition} />
   );
 }
 ```

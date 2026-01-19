@@ -140,7 +140,7 @@ export type FieldTypeValidationHandler = (
 export type FormValidationHandler = (
   valuesMap: Record<string, FieldValueType | unknown>,
   t: TranslationFunction,
-) => string[] | undefined | Promise<string[] | undefined>;
+) => string[] | Promise<string[] | undefined>;
 
 // Submission function: returns error string or undefined if valid
 export type FormSubmissionHandler = (

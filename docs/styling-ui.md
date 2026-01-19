@@ -121,63 +121,8 @@ Any theme name containing "dark" is treated as a dark theme for component behavi
 
 ## CSS Variables Reference
 
-All themes use the same CSS variable system. Override these for custom styling:
+Check out all CSS variables in api-reference [CSS variable reference](./api-reference.md#css-variables-reference)
 
-### Colors & Surfaces
-```css
---reactaform-primary-bg        /* Main container background */
---reactaform-secondary-bg      /* Card/surface background */
---reactaform-input-bg          /* Input field background */
---reactaform-text-color        /* Primary text color */
---reactaform-text-muted        /* Secondary/muted text */
---reactaform-border-color      /* Default border */
---reactaform-border-hover      /* Hover border */
---reactaform-border-focus      /* Focus border */
---reactaform-error-color       /* Error state */
---reactaform-success-color     /* Success state */
---reactaform-link-color        /* Link color */
-```
-
-### Spacing & Layout
-```css
---reactaform-space             /* Base spacing unit */
---reactaform-space-lg          /* Large spacing */
---reactaform-field-gap         /* Gap between fields */
---reactaform-column-gap        /* Gap between columns */
---reactaform-inline-gap        /* Inline element gap */
---reactaform-label-gap         /* Label to input gap */
---reactaform-container-padding /* Container padding */
---reactaform-input-padding     /* Input padding */
-```
-
-### Typography
-```css
---reactaform-font-family       /* Font stack */
---reactaform-font-size         /* Base font size */
---reactaform-font-weight       /* Font weight */
---reactaform-line-height       /* Line height */
-```
-
-### Shape & Borders
-```css
---reactaform-border-radius     /* Border radius */
---reactaform-border-width      /* Border width */
-```
-
-### Buttons & Controls
-```css
---reactaform-button-bg         /* Button background */
---reactaform-button-text       /* Button text color */
---reactaform-button-hover-bg   /* Button hover state */
---reactaform-button-padding    /* Button padding */
---reactaform-button-font-size  /* Button font size */
-```
-
-### Tooltips
-```css
---reactaform-tooltip-bg        /* Tooltip background */
---reactaform-tooltip-color     /* Tooltip text color */
-```
 
 ## Custom Styling
 
@@ -441,9 +386,8 @@ The `theme` prop provides more flexibility and access to 20 pre-built themes ins
 
 ## References
 
-- **Theme Integration Guide:** [theme-integration.md](./theme-integration.md)
-- **Theme Catalog:** [src/themes/README.md](../src/themes/README.md)
-- **Core Provider:** [src/components/ReactaFormProvider.tsx](../src/components/ReactaFormProvider.tsx)
-- **Theme Detection:** [src/utils/themeUtils.ts](../src/utils/themeUtils.ts)
+- **Theme Catalog:** [src/themes/README.md](https://github.com/yanggmtl/reactaform/blob/master/src/themes/README.md)
+- **Core Provider:** [src/components/ReactaFormProvider.tsx](https://github.com/yanggmtl/reactaform/blob/master/src/components/ReactaFormProvider.tsx)
+- **Theme Detection:** [src/utils/themeUtils.ts](https://github.com/yanggmtl/reactaform/blob/master/src/utils/themeUtils.ts)
 
 ---

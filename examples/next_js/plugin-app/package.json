@@ -1,5 +1,5 @@
 {
-  "name": "reactaform-submit-handler-next",
+  "name": "reactaform-plugin-next",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "next": "16.0.7",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "reactaform": "^1.8.7"
+    "reactaform": "^1.8.8"
   },
   "devDependencies": {
     "@types/node": "^20",

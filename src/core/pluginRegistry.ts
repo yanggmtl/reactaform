@@ -68,7 +68,7 @@ const installedPlugins = new Map<string, ReactaFormPlugin>();
 
 /** Track which plugin registered which items */
 const registrationOwnership = {
-  components: new Map<string, string>(),
+  components: new Map<string, React.ComponentType<unknown>>(),
   fieldValidators: new Map<string, Map<string, string>>(), // category -> name -> plugin
   fieldTypeValidators: new Map<string, string>(),
   formValidators: new Map<string, string>(),
@@ -118,7 +118,14 @@ function handleConflicts(plugin: ReactaFormPlugin): PluginConflict[] {
     for (const type of Object.keys(plugin.components)) {
       const existing = getComponent(type);
       if (existing) {
-        const existingPlugin = registrationOwnership.components.get(type);
+        // Find which installed plugin registered this component
+        let existingPlugin: string | undefined;
+        for (const [pname, p] of installedPlugins) {
+          if (p.components && p.components[type] === existing) {
+            existingPlugin = pname;
+            break;
+          }
+        }
         if (existingPlugin && existingPlugin !== plugin.name) {
           conflicts.push({
             type: 'component',
@@ -204,7 +211,7 @@ function handleConflicts(plugin: ReactaFormPlugin): PluginConflict[] {
 /** Generic item registration helper */
 function registerItems<T>(
   items: Record<string, T>,
-  ownershipMap: Map<string, string> | Map<string, Map<string, string>>,
+  ownershipMap: Map<string, string> | Map<string, Map<string, string>> | Map<string, React.ComponentType<unknown>>,
   registerFn: (key: string, value: T) => void,
   plugin: ReactaFormPlugin,
   conflicts: PluginConflict[],
@@ -235,7 +242,14 @@ function registerItems<T>(
         // already the map for that category, so simply use `items[key]`.
         registerFn(key, items[key]);
       } else {
-        (ownershipMap as Map<string, string>).set(key, plugin.name);
+        if (ownershipMap === registrationOwnership.components) {
+          (ownershipMap as Map<string, React.ComponentType<unknown>>).set(
+            key,
+            items[key] as unknown as React.ComponentType<unknown>
+          );
+        } else {
+          (ownershipMap as Map<string, string>).set(key, plugin.name);
+        }
         registerFn(key, items[key]);
       }
     }

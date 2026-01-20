@@ -114,3 +114,7 @@ All notable changes to this project are documented in this file.
 - Align field label to left when field is row layout
 - Add JSDoc comments for Typescript intelllisence
 - Add animation gif in README
+
+## 1.8.8 - 2026-01-20
+- Fix plugin issue
+- Update/add plugin examples for vite and next.js (No CRA)

@@ -1,4 +1,5 @@
-import { createRoot } from "react-dom/client";
+"use client";
+
 import { PointPlugin } from "./PointPlugin";
 import { ReactaForm, registerPlugin } from "reactaform";
 import type { ReactaDefinition } from "reactaform";
@@ -57,6 +58,3 @@ export default function App() {
     </div>
   );
 }
-
-const container = document.getElementById("root");
-if (container) createRoot(container).render(<App />);

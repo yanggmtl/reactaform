@@ -38,6 +38,7 @@ function useNearestReactaformTheme(ref?: React.RefObject<HTMLElement>) {
  * @param {string} [props.theme] - Theme name ('light' or 'dark')
  * @param {React.CSSProperties} [props.style] - Inline styles
  * @param {FieldValidationMode} [props.fieldValidationMode] - Validation timing mode ('realTime' or 'onSubmission')
+ * @param {boolean} [props.displayInstanceName] - Whether to display the instance name
  */
 const ReactaForm: React.FC<ReactaFormProps> = ({
   definitionData,
@@ -47,6 +48,9 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
   theme,
   style, 
   fieldValidationMode: validationMode = 'realTime',
+  displayInstanceName = true,
+  onSubmit = undefined,
+  onValidation = undefined,
 }) => {
     const definition = React.useMemo<ReactaDefinition | null>(() => {
       try {
@@ -104,10 +108,13 @@ const ReactaForm: React.FC<ReactaFormProps> = ({
         defaultLocalizeName={definition.localization || ""}
         className={className}
         defaultFieldValidationMode={validationMode}
+        defaultDisplayInstanceName={displayInstanceName}
       >
         <ReactaFormRenderer
           definition={definition}
           instance={resolvedInstance}
+          onSubmit={onSubmit}
+          onValidation={onValidation}
         />
       </ReactaFormProvider>
     );

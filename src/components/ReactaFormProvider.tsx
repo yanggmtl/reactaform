@@ -144,6 +144,7 @@ const getFieldStyle = (
  * @param {string} [props.defaultLocalizeName] - Name of custom localization file
  * @param {FieldValidationMode} [props.defaultFieldValidationMode='realTime'] - Validation timing mode
  * @param {string} [props.className='reactaform-container'] - CSS class name for the container
+ * @param {boolean} [props.displayInstanceName] - Whether to display the instance name
  */
 export const ReactaFormProvider = ({
   children,
@@ -154,6 +155,7 @@ export const ReactaFormProvider = ({
   defaultLocalizeName = '',
   defaultFieldValidationMode = 'realTime',
   className = 'reactaform-container',
+  defaultDisplayInstanceName = true
 }: ReactaFormProviderProps & { defaultFieldValidationMode?: FieldValidationMode }) => {
   const providerDefinitionName = definitionName;
   const localizeName = defaultLocalizeName;
@@ -233,8 +235,11 @@ export const ReactaFormProvider = ({
       fieldStyle,
       t,
       fieldValidationMode: defaultFieldValidationMode,
+      displayInstanceName: defaultDisplayInstanceName
     }),
-    [providerDefinitionName, language, theme, fieldStyle, formStyle, t, defaultFieldValidationMode]
+    [ providerDefinitionName, language, theme, 
+      fieldStyle, formStyle, t,
+      defaultFieldValidationMode, defaultDisplayInstanceName ]
   );
 
   // Only apply height: 100% if the user provided a height in their style prop

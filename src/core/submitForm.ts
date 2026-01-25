@@ -1,4 +1,4 @@
-import type { ReactaDefinition, FieldValueType, ReactaInstance, TranslationFunction } from "./reactaFormTypes";
+import type { ReactaDefinition, FieldValueType, ReactaInstance, TranslationFunction, FormSubmissionHandler, FormValidationHandler } from "./reactaFormTypes";
 import { validateFormValues } from "../validation/validation";
 import { getFormSubmissionHandler } from "./submissionHandlerRegistry";
 
@@ -14,7 +14,9 @@ export async function submitForm(
   instance: ReactaInstance | null,
   valuesMap: Record<string, FieldValueType | unknown>,
   t: TranslationFunction,
-  errors: Record<string, string>
+  errors: Record<string, string>,
+  onSubmit?: FormSubmissionHandler | undefined,
+  onValidation?: FormValidationHandler | undefined
 ): Promise<SubmitResult> {
   // mark `instance` as used to avoid unused parameter compile errors in some tsconfigs
   void instance;
@@ -91,17 +93,49 @@ export async function submitForm(
   }
 
   // Perform form-level validation
-  const validationErrors = await validateFormValues(definition, finalMap, t);
-  if (validationErrors && validationErrors.length > 0) {
-    return {
-      success: false,
-      message: t("Validation failed"),
-      errors: validationErrors,
-    };
+  // First use callback inValidation if provided
+  // Otherwise use validation defined in defintion
+  if (onValidation) {
+    const validationErrors = await onValidation(finalMap, t);
+    if (validationErrors && validationErrors.length > 0) {
+      return {
+        success: false,
+        message: t("Validation failed"),
+        errors: validationErrors,
+      };
+    }
+  } else {
+    const validationErrors = await validateFormValues(definition, finalMap, t);
+    if (validationErrors && validationErrors.length > 0) {
+      return {
+        success: false,
+        message: t("Validation failed"),
+        errors: validationErrors,
+      };
+    }
   }
 
   // Execute custom submission handler if defined
-  if (definition && typeof definition.submitHandlerName === 'string') {
+  // first use onSubmit callback if provided
+  // otherwise use submission handler defined in definition
+  if (onSubmit) {
+    try {
+      const submitResult = await onSubmit(definition, instance?.name ?? null, finalMap, t);
+      if (submitResult && submitResult.length > 0) {
+        return { 
+          success: false, 
+          message: t("Submission failed"),
+          errors: Array.isArray(submitResult) ? submitResult : [String(submitResult)]
+        };
+      }
+    } catch (error) {
+      return {
+        success: false,
+        message: t("Submission handler error occurred"),
+        errors: [String(error instanceof Error ? error.message : error)]
+      };
+    }
+  } else if (definition && typeof definition.submitHandlerName === 'string') {
     const submitHandler = getFormSubmissionHandler(definition.submitHandlerName);
 
     if (submitHandler) {

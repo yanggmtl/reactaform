@@ -118,3 +118,7 @@ All notable changes to this project are documented in this file.
 ## 1.8.8 - 2026-01-20
 - Fix plugin issue
 - Update/add plugin examples for vite and next.js (No CRA)
+
+## 1.8.9 - 2026-01-25
+- Add onSubmit, onValidation in ReactaForm props
+- Add displayInstanceName in Reactaform props to let the user control instance name display

@@ -113,6 +113,9 @@ export interface ReactaFormProps {
   theme?: string;
   style?: React.CSSProperties;
   fieldValidationMode?: FieldValidationMode; // 'field' (default) or 'form'
+  displayInstanceName?: boolean;
+  onSubmit?: FormSubmissionHandler;
+  onValidation?: FormValidationHandler;
 }
 
 // Translation helper types
@@ -140,7 +143,7 @@ export type FieldTypeValidationHandler = (
 export type FormValidationHandler = (
   valuesMap: Record<string, FieldValueType | unknown>,
   t: TranslationFunction,
-) => string[] | Promise<string[] | undefined>;
+) => string[] | Promise<string[] | undefined> | undefined;
 
 // Submission function: returns error string or undefined if valid
 export type FormSubmissionHandler = (
@@ -175,6 +178,7 @@ export type ReactaFormContextType = {
   fieldStyle: Record<string, unknown>;
   t: TranslationFunction;
   fieldValidationMode?: FieldValidationMode;
+  displayInstanceName?: boolean;
 };
 
 // Provider props types
@@ -187,6 +191,7 @@ export type ReactaFormProviderProps = {
   defaultLocalizeName?: string;
   defaultFieldValidationMode?: FieldValidationMode;
   className?: string;
+  defaultDisplayInstanceName?: boolean;
 };
 
 // Translation cache types

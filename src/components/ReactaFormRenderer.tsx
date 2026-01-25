@@ -5,6 +5,8 @@ import type {
   DefinitionPropertyField,
   ReactaDefinition,
   ReactaInstance,
+  FormSubmissionHandler,
+  FormValidationHandler,
 } from "../core/reactaFormTypes";
 import useReactaFormContext, { ReactaFormContext } from "../hooks/useReactaFormContext";
 import { renderFieldsWithGroups } from "./renderFields";
@@ -23,6 +25,8 @@ import SubmissionButton from "./SubmissionButton";
 export interface ReactaFormRendererProps {
   definition: ReactaDefinition;
   instance: ReactaInstance;
+  onSubmit?: FormSubmissionHandler;
+  onValidation?: FormValidationHandler;
   chunkSize?: number;
   chunkDelay?: number;
 }
@@ -38,12 +42,14 @@ export interface ReactaFormRendererProps {
 const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   definition,
   instance,
+  onSubmit = undefined,
+  onValidation = undefined,
   chunkSize = 50,
   chunkDelay = 50,
 }) => {
   const { properties, displayName } = definition;
   const parentContext = useReactaFormContext();
-  const { t, formStyle, language } = parentContext;
+  const { t, formStyle, language, displayInstanceName } = parentContext;
   const renderContext = {
     ...parentContext,
     definitionName: definition?.name ?? parentContext.definitionName,
@@ -334,7 +340,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
     // No field validation errors, proceed with submission
     // Form validation is processed in submitForm
-    const result = await submitForm(definition, targetInstanceRef.current, valuesMap, t, errorsForSubmit);
+    const result = await submitForm(definition, targetInstanceRef.current, valuesMap, t, errorsForSubmit, onSubmit, onValidation);
     
     // Display result message in the UI
     const msg = typeof result.message === 'string' ? result.message : String(result.message);
@@ -374,7 +380,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
         onDismiss={() => { setSubmissionMessage(null); setSubmissionSuccess(null); }}
         t={t}
       />
-      {instance && (
+      {displayInstanceName && instance && (
         <InstanceName
           name={instanceName}
           onChange={(newName) => {

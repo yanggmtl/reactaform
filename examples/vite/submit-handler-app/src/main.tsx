@@ -4,10 +4,14 @@
 // `FormSubmissionHandler`) and registered inside `React.useEffect` so the
 // example keeps the registration local to the app while following the
 // library interface. Use this app to test submission handler behavior.
+
+// useDefinitionHandler flag controls whether to use the submission handler
+// defined in the form definition (when true) or to use the `onSubmit`
+// callback property (when false).
 import React, { useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ReactaForm, registerSubmissionHandler } from "reactaform";
-import type { FieldValueType, ReactaInstance, ReactaDefinition, TranslationFunction } from "reactaform";
+import { ReactaForm, registerSubmissionHandler} from "reactaform";
+import type { FieldValueType, ReactaInstance, ReactaDefinition, TranslationFunction, FormSubmissionHandler } from "reactaform";
 import "./style.css";
 
 const exampleDefinition = {
@@ -48,43 +52,48 @@ const predefinedInstance = {
     subscribe: false,
   },
 };
+
+const useDefinitionHandler: boolean = false;
+
 export default function App() {
   const [instance, setInstance] = useState<ReactaInstance>(predefinedInstance);
   const [serialized, setSerialized] = useState<string>("");
 
+  const submitHandler : FormSubmissionHandler = (
+    definition: ReactaDefinition | Record<string, unknown>,
+    instanceName: string | null,
+    valuesMap: Record<string, FieldValueType | unknown>,
+    t: TranslationFunction
+  ): string[] | undefined => {
+    void definition;
+    void t;
+    void instanceName;
+
+    // Use functional update to avoid stale closures over `instance` and ensure we always
+    // base the new instance on the latest state.
+    setInstance((prev: ReactaInstance | undefined) => {
+      const prevInst = (prev as ReactaInstance) || ({} as ReactaInstance);
+      const newInstance: ReactaInstance = {
+        ...prevInst,
+        name: instanceName || prevInst.name || "Unnamed Instance",
+        version: definition.version as string,
+        values: valuesMap as Record<string, FieldValueType>,
+      };
+      // update serialized snapshot immediately
+      setSerialized(JSON.stringify(newInstance, null, 2));
+      return newInstance;
+    });
+
+    return undefined;
+  };
+
   // Register a submission handler that stores submitted values into the local `instance` state
   React.useEffect(() => {
-    const handler = (
-      definition: ReactaDefinition | Record<string, unknown>,
-      instanceName: string | null,
-      valuesMap: Record<string, FieldValueType | unknown>,
-      t: TranslationFunction
-    ): string[] | undefined => {
-      void definition;
-      void t;
-      void instanceName;
+    if (!useDefinitionHandler)
+      return;
 
-      // Use functional update to avoid stale closures over `instance` and ensure we always
-      // base the new instance on the latest state.
-      setInstance((prev: ReactaInstance | undefined) => {
-        const prevInst = (prev as ReactaInstance) || ({} as ReactaInstance);
-        const newInstance: ReactaInstance = {
-          ...prevInst,
-          name: instanceName || prevInst.name || "Unnamed Instance",
-          version: definition.version as string,
-          values: valuesMap as Record<string, FieldValueType>,
-        };
-        // update serialized snapshot immediately
-        setSerialized(JSON.stringify(newInstance, null, 2));
-        return newInstance;
-      });
-
-      return undefined;
-    };
-
-    registerSubmissionHandler("exampleSubmitHandler", handler);
-    // no-op cleanup: handlers are registered globally in this simple demo
-  }, [setInstance, setSerialized]);
+    registerSubmissionHandler("exampleSubmitHandler", submitHandler);
+  }, []);
 
   return (
     <div className={`app`}>
@@ -95,6 +104,7 @@ export default function App() {
           <ReactaForm
             definitionData={exampleDefinition}
             instance={instance}
+            onSubmit={!useDefinitionHandler ? submitHandler : undefined}
             style={{ maxWidth: 640, height: "100%" }}
           />
         </div>

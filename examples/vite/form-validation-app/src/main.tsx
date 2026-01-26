@@ -1,25 +1,13 @@
-
-// Custom Register Validation App: cross-field validation demo
-// This demo registers a form-level validation handler that enforces
-// the first numeric field to be less than the second numeric field.
-// It also registers a simple submission handler to mirror the
-// `submit-handler-app` example behavior.
-// Test: input various values to see validation in action.
-//       If lower limit is less than upper limit, submission should succeed.
-//       If not, an error message should appear.
-//       When submission messsage appears, any value change in the form will dismiss the message
+// Form Validation App: cross-field validation demo
+// This demo registers send a function callback to ReactaForm to process a form-level validation
 //
 // Program flow:
-// 1. validationHandlerName is defined in definition: "rangeValidationHandler"
-// 2. form validator function formValidator: FormValidationHandler is defined in useEffect
-// 3. Register the form validator in useEffect
-//    The register name should be same as defined in definition
-// 4. ReactaForm will invoke the form validator during form submission phase
-//    The validator checks the two field values and returns error message if invalid
+// 1. define form validator function
+// 2. Pass this function to ReactaForm by onSubmission prop
 
-import { useEffect } from "react";
+
 import { createRoot } from "react-dom/client";
-import { ReactaForm, registerFormValidationHandler } from "reactaform";
+import { ReactaForm } from "reactaform";
 import type { FormValidationHandler } from "reactaform";
 import "./style.css";
 
@@ -56,7 +44,7 @@ Action: Input a value for each field, then submit the form to see validation in 
 
 export default function App() {
 
-  // 2. Define the form validator function
+  // 1. Define the form validator function
   const formValidator: FormValidationHandler = (valuesMap, t) => {
     // valuesMap contains raw values for all fields
     const lowerLimit = Number(valuesMap["lowerLimit"] ?? NaN);
@@ -70,11 +58,6 @@ export default function App() {
     }
     return undefined;
   };
-  
-  useEffect(() => {
-    // 3. Register the form validator
-    registerFormValidationHandler("rangeValidationHandler", formValidator);
-  }, []);
 
   return (
     <div
@@ -97,6 +80,7 @@ export default function App() {
         >
           <ReactaForm
             definitionData={exampleDefinition}
+            onValidation= {formValidator} // 2. Pass this function to ReactaForm by onValidation prop
           />
         </div>
 

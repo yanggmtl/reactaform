@@ -1,6 +1,24 @@
 "use client";
 
-import React, { useEffect } from "react";
+// Custom Register Validation App: cross-field validation demo
+// This demo registers a form-level validation handler that enforces
+// the first numeric field to be less than the second numeric field.
+// It also registers a simple submission handler to mirror the
+// `submit-handler-app` example behavior.
+// Test: input various values to see validation in action.
+//       If lower limit is less than upper limit, submission should succeed.
+//       If not, an error message should appear.
+//       When submission messsage appears, any value change in the form will dismiss the message
+//
+// Program flow:
+// 1. validationHandlerName is defined in definition: "rangeValidationHandler"
+// 2. form validator function formValidator: FormValidationHandler is defined in useEffect
+// 3. Register the form validator in useEffect
+//    The register name should be same as defined in definition
+// 4. ReactaForm will invoke the form validator during form submission phase
+//    The validator checks the two field values and returns error message if invalid
+
+import { useEffect } from "react";
 import { ReactaForm, registerFormValidationHandler } from "reactaform";
 import type { FormValidationHandler } from "reactaform";
 import "./style.css";
@@ -9,10 +27,20 @@ const exampleDefinition = {
   name: "custom_validation_app",
   version: "1.0.0",
   displayName: "Custom Validation Example",
-  validationHandlerName: "rangeValidationHandler",
+  validationHandlerName: "rangeValidationHandler", // 1. Validation handler name reference
   properties: [
-    { name: "lowerLimit", displayName: "Lower Limit", type: "int", defaultValue: 0 },
-    { name: "upperLimit", displayName: "Upper Limit", type: "int", defaultValue: 10 },
+    {
+      name: "lowerLimit",
+      displayName: "Lower Limit",
+      type: "int",
+      defaultValue: 0,
+    },
+    {
+      name: "upperLimit",
+      displayName: "Upper Limit",
+      type: "int",
+      defaultValue: 10,
+    },
   ],
 };
 
@@ -27,18 +55,24 @@ Action: Input a value for each field, then submit the form to see validation in 
 2. If Lower Limit >= Upper Limit, an error message will appear.`;
 
 export default function App() {
-  useEffect(() => {
-    const formValidator: FormValidationHandler = (valuesMap, t) => {
-      const lowerLimit = Number(valuesMap["lowerLimit"] ?? NaN);
-      const upperLimit = Number(valuesMap["upperLimit"] ?? NaN);
 
-      if (Number.isNaN(lowerLimit) || Number.isNaN(upperLimit)) return undefined;
-      if (!(lowerLimit < upperLimit)) {
-        return [t("Lower Limit must be less than Upper Limit.")];
-      }
+  // 2. Define the form validator function
+  const formValidator: FormValidationHandler = (valuesMap, t) => {
+    // valuesMap contains raw values for all fields
+    const lowerLimit = Number(valuesMap["lowerLimit"] ?? NaN);
+    const upperLimit = Number(valuesMap["upperLimit"] ?? NaN);
+
+    // If either value is not a number, we'll let field-level validators handle it.
+    if (Number.isNaN(lowerLimit) || Number.isNaN(upperLimit))
       return undefined;
-    };
-
+    if (!(lowerLimit < upperLimit)) {
+      return [t("Lower Limit must be less than Upper Limit.")];
+    }
+    return undefined;
+  };
+  
+  useEffect(() => {
+    // 3. Register the form validator
     registerFormValidationHandler("rangeValidationHandler", formValidator);
   }, []);
 
@@ -61,7 +95,9 @@ export default function App() {
             flexDirection: "column",
           }}
         >
-          <ReactaForm definitionData={exampleDefinition} style={{ height: "100%" }} />
+          <ReactaForm
+            definitionData={exampleDefinition}
+          />
         </div>
 
         <textarea

@@ -276,11 +276,36 @@ ReactaForm supports both field-level and form-level validation.
 ---
 
 ## Submission Handler
-Since ReactaForm is a dynamic form system, it provides a submission handler mechanism that allows you to define and plug in custom submission logic, such as validation, data processing, or API calls.
+
+ReactaForm provide two ways for submission process:
+
+- Direct submission callback in ReactaForm props
+- Since ReactaForm is a dynamic form system, it provides a registration submission mechanism that allows you to define and plug in custom submission logic. This can provide you flexible submission process for different submission logics.
+
+Note: In bubmission proces, onSubmit callback will be used if it is provided. Otherwise if submissionHandler in defintion is spcified, the registration handler will be invoked.
 
 **How It Works**
 
-Submission handling is configured in two steps:
+### Direct submission callback
+
+```ts
+async function submitFunction(definition, instanceName, valuesMap, t) => {
+  // send valuesMap to your API
+  const res = await fetch('/api/save', { method: 'POST', body: JSON.stringify(valuesMap), headers: { 'Content-Type': 'application/json' } });
+  if (!res.ok) return [t('Server error while submitting form')];
+  return undefined; // returning undefined (or falsy) means success
+});
+```
+
+Then in your app, when call ReactaForm, pass submitFunction to onSubmit:
+```ts
+  <ReactaForm
+    definition={userDefintion}
+    onSubmit= {submitFunction}
+  />
+```
+
+### Submission registration handling is configured in two steps:
 
 1. Define and Register a Submission Handler
 
@@ -346,30 +371,21 @@ Status Legend:
 - 🔵 Logical operators (AND / OR / NOT)
 - 🔵 Multi-field conditions
 - 🔵 Expression-based rules
-- 🔵 Nested condition groups
-- 🔵 Cross-group conditional logic
-- 🔵 Conditional validation rules
-- 🔵 Conditional default values
 
 ### Layout & Structure
+- 🟢 Collapsible sections - Group
 - 🔵 Multi-step / wizard forms
 - 🔵 Tabbed layouts
 - 🔵 Navigation sections / anchors
-- 🔵 Collapsible sections
-- 🔵 Reusable layout templates
-- 🔵 Responsive layout rules
 - 🔵 Grid & column layouts
-- 🟡 Layout-aware conditional logic
 
 ### Visual Builders
 - 🟢 Drag-and-drop form builder
 - 🔵 Advanced conditional logic editor
 - 🔵 Validation rule designer
 - 🔵 Submission workflow editor
-- 🔵 Layout editor (tabs, steps, groups)
-- 🔵 Live schema diff & change preview
+- 🔵 Layout editor (nav, tabs, steps, groups)
 - 🔵 Schema version history & rollback
-- 🔵 Import / export schema packs
 - 🟡 Builder extensibility API
 
 ### Theme System
@@ -378,11 +394,8 @@ Status Legend:
 - 🟢 Per-form theme customization
 - 🔵 Visual theme builder
 - 🔵 CSS variable editor
-- 🔵 Light / dark theme generator
-- 🔵 Live theme preview across field types
 - 🔵 Exportable & versioned theme packages
 - 🔵 Tailwind-compatible themes
-- 🟡 Theme inheritance & overrides
 
 ### Plugin System
 - 🟢 Component registry
@@ -392,10 +405,6 @@ Status Legend:
 - 🔵 Custom field plugin builder
 - 🔵 Validator plugin builder
 - 🔵 Submission handler plugins
-- 🔵 Plugin metadata & versioning
-- 🔵 Plugin dependency management
-- 🟡 One-click plugin export
-- 🟡 Plugin compatibility checks
 
 Internationalization (i18n)
 
@@ -406,7 +415,6 @@ Current: built-in i18n with per-form dictionaries
 - 🔵 Translation key discovery
 - 🔵 Missing translation detection
 - 🔵 Locale fallback strategies
-- 🟡 RTL layout support
 - 🟡 Async translation loaders
 
 ### Ecosystem & Marketplace

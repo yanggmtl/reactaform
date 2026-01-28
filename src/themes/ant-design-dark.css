@@ -10,7 +10,7 @@
   --reactaform-border-hover: #434343;
   --reactaform-border-focus: #1677ff;
 
-  --reactaform-hover-bg: #1a1a1a;
+  --reactaform-option-menu-hover-bg: #1a1a1a;
 
   --reactaform-error-color: #ff4d4f;
   --reactaform-success-color: #52c41a;
@@ -18,7 +18,7 @@
   --reactaform-border-radius: 6px;
 
   --reactaform-shadow:
-    0 6px 20px rgba(0,0,0,.55);
+    0 6px 20px #000000;
 
   --reactaform-button-bg: #1677ff;
   --reactaform-button-text: white;
@@ -26,6 +26,6 @@
   --reactaform-input-padding: 10px 12px;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(40, 40, 40, 0.95);
+  --reactaform-tooltip-color-bg: #282828;
   --reactaform-tooltip-color: #F5F5F5;
 }

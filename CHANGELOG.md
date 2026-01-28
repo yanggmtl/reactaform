@@ -122,3 +122,9 @@ All notable changes to this project are documented in this file.
 ## 1.8.9 - 2026-01-25
 - Add onSubmit, onValidation in ReactaForm props
 - Add displayInstanceName in Reactaform props to let the user control instance name display
+
+## 1.8.91 - 2026-01-28
+- Modify submission logic in documentation
+- Update examples
+- Refactor CSS variables to improve clarity
+- Update themes

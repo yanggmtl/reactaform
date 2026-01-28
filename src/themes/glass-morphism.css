@@ -1,7 +1,7 @@
 [data-reactaform-theme="glass"] {
-  --reactaform-primary-bg: rgba(255,255,255,0.25);
-  --reactaform-secondary-bg: rgba(255,255,255,0.35);
-  --reactaform-input-bg: rgba(255,255,255,0.35);
+  --reactaform-primary-bg: #ffffff40;
+  --reactaform-secondary-bg: #ffffff59;
+  --reactaform-input-bg: #ffffff59;
 
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -9,17 +9,17 @@
   --reactaform-text-color: #111827;
   --reactaform-text-muted: #4b5563;
 
-  --reactaform-border-color: rgba(255,255,255,0.4);
-  --reactaform-border-hover: rgba(255,255,255,0.7);
+  --reactaform-border-color: #ffffff66;
+  --reactaform-border-hover: #ffffffb3;
   --reactaform-border-focus: #38bdf8;
 
   --reactaform-error-color: #e11d48;
   --reactaform-success-color: #059669;
 
   --reactaform-border-radius: 12px;
-  --reactaform-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  --reactaform-shadow: 0 12px 40px #000000;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color-bg: #3c3c3c;
   --reactaform-tooltip-color: #ffffff;
 }

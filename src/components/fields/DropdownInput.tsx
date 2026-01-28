@@ -204,8 +204,8 @@ const DropdownPopup: React.FC<PopupProps> = ({
         styles.getPropertyValue('--reactaform-text-color')
       );
       popupRoot.style.setProperty(
-        '--reactaform-hover-bg',
-        styles.getPropertyValue('--reactaform-hover-bg')
+        '--reactaform-option-menu-hover-bg',
+        styles.getPropertyValue('--reactaform-option-menu-hover-bg')
       );
     }
   }, [controlRef]);
@@ -351,8 +351,8 @@ const DropdownPopup: React.FC<PopupProps> = ({
       {options.map((opt, idx) => {
         const isSelected = String(opt.value) === selectedValue;
         const hoverBg = isThemeDark
-          ? "var(--reactaform-hover-bg, rgba(255,255,255,0.01))"
-          : "var(--reactaform-hover-bg, #eee)";
+          ? "var(--reactaform-option-menu-hover-bg, rgba(255,255,255,0.01))"
+          : "var(--reactaform-option-menu-hover-bg, #eee)";
         const optionStyle: React.CSSProperties = {
           ...mergedPopupOptionStyles,
           background: idx === activeIndex ? hoverBg : mergedPopupOptionStyles.background,

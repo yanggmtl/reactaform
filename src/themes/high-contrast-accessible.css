@@ -17,6 +17,6 @@
   --reactaform-shadow: none;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color-bg: #3c3c3c;
   --reactaform-tooltip-color: #ffffff;
 }

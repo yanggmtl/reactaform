@@ -146,7 +146,7 @@ export function PopupOptionMenu<T extends PopupOption>({
             transition: "background-color 0.15s ease",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--reactaform-hover-bg, #e0e0e0)";
+            e.currentTarget.style.backgroundColor = "var(--reactaform-option-menu-hover-bg, #e0e0e0)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = "transparent";

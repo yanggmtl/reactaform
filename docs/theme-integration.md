@@ -151,7 +151,7 @@ This runs:
   --reactaform-success-color: #4CAF50;
   
   /* Interactive */
-  --reactaform-hover-bg: #f5f5f5;
+  --reactaform-option-menu-hover-bg: #f5f5f5;
   
   /* Tooltips */
   --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);

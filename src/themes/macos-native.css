@@ -13,20 +13,20 @@
   --reactaform-success-color: #34c759;
   --reactaform-error-color: #ff3b30;
 
-  --reactaform-hover-bg: rgba(0,0,0,0.03);
+  --reactaform-option-menu-hover-bg: #000000;
 
-  --reactaform-border-radius: 10px;
+  --reactaform-border-radius: 999px;
 
   --reactaform-shadow:
-    0 8px 30px rgba(0,0,0,.08);
+    0 8px 30px #000000;
 
   --reactaform-button-bg: #0a84ff;
   --reactaform-button-text: white;
   --reactaform-button-border-radius: 999px;
 
-  --reactaform-input-padding: 12px 14px;
+  --reactaform-input-padding: 10px 14px;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color-bg: #3c3c3c;
   --reactaform-tooltip-color: #ffffff;
 }

@@ -16,8 +16,8 @@
   /* Spacing */
   --reactaform-space: 8px;
   --reactaform-space-lg: 12px;
-  /* Hover background for light theme */
-  --reactaform-hover-bg: #f5f5f5;
+  /* Hover background for option menus */
+  --reactaform-option-menu-hover-bg: #80FFFF;
 
     /* Gap variables
       - --reactaform-field-gap: vertical gap between fields (default uses --reactaform-space)
@@ -28,12 +28,16 @@
     --reactaform-field-gap: var(--reactaform-space);
     --reactaform-column-gap: var(--reactaform-space);
     --reactaform-inline-gap: var(--reactaform-space);
-    --reactaform-label-gap: 4px;
+    --reactaform-label-gap: 0px;
   
   /* Typography */
+  --reactaform-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --reactaform-font-size: 14px;
   --reactaform-font-weight: 500;
   
+  --reactaform-label-font-size: 14px;
+  --reactaform-label-font-weight: 600;
+
   /* Layout */
   --reactaform-border-radius: 0px;
   
@@ -68,6 +72,8 @@
   --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
   --reactaform-tooltip-color: #ffffff;
 
+  --reactaform-field-grid-columns: 1fr 2fr;
+
 }
 
 /* Dark Theme */
@@ -93,7 +99,7 @@
   --reactaform-success-color: #4CAF6A;
 
   /* Interactive / Hover */
-  --reactaform-hover-bg: rgba(255, 255, 255, 0.06);
+  --reactaform-option-menu-hover-bg: rgba(255, 255, 255, 0.06);
 
   /* Shadows (subtle for dark mode) */
   --reactaform-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
@@ -105,6 +111,8 @@
 
 /* Base ReactaForm Container */
 .reactaform-container {
+  font-family: var(--reactaform-font-family, sans-serif);
+  font-size: var(--reactaform-font-size, 14px);
   background-color: var(--reactaform-primary-bg);
   color: var(--reactaform-text-color);
   padding: var(--reactaform-container-padding);
@@ -123,7 +131,7 @@
   */
   .reactaform-field {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: var(--reactaform-field-grid-columns, 1fr 2fr);
     align-items: start;
     padding: 0;
     gap: var(--reactaform-column-gap);
@@ -138,8 +146,8 @@
   line-height: 1.4;
   min-width: 100px;
   color: var(--reactaform-text-color);
-  font-weight: 600;
-  font-size: var(--reactaform-font-size);
+  font-weight: var(--reactaform-label-font-weight, 600);
+  font-size: var(--reactaform-label-font-size, 14px);
   user-select: none;
 }
 
@@ -156,6 +164,7 @@
   box-sizing: border-box;
   background-color: var(--reactaform-input-bg);
   font-size: var(--reactaform-font-size);
+  font-weight: var(--reactaform-font-weight);
   transition: border-color 0.2s ease;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
 }
@@ -227,7 +236,30 @@
   gap: 8px;
 }
 
+/* Button */
+.reactaform-button {
+  background-color: var(--reactaform-button-bg);
+  color: var(--reactaform-button-text);
+  padding: var(--reactaform-button-padding);
+  border-radius: var(--reactaform-button-border-radius);
+  font-size: var(--reactaform-button-font-size);
+  font-weight: var(--reactaform-button-font-weight);
+  box-shadow: var(--reactaform-button-shadow);
+  margin-top: var(--reactaform-button-margin-top);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
 
+.reactaform-button:hover:not(:disabled) {
+  opacity: var(--reactaform-button-hover-opacity);
+}
+
+.reactaform-button:disabled {
+  opacity: var(--reactaform-button-disabled-opacity);
+  background-color: var(--reactaform-button-disabled-bg);
+  cursor: var(--reactaform-button-disabled-cursor);
+}
 
 /* Responsive Design */
 @media (max-width: 1024px) {
@@ -260,7 +292,7 @@
   .reactaform-textarea,
   .reactaform-select {
     font-size: 16px; /* Prevent zoom on iOS */
-    padding: 12px;
+    padding: var(--reactaform-input-padding);
   }
   
   .reactaform-checkbox-wrapper,

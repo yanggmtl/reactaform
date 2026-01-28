@@ -14,17 +14,17 @@
   --reactaform-error-color: #fb7185;  /* rose-400 */
   --reactaform-success-color: #34d399; /* emerald-400 */
 
-  --reactaform-hover-bg: rgba(255,255,255,0.05);
+  --reactaform-option-menu-hover-bg: #ffffff;
 
   --reactaform-border-radius: 0.5rem;
 
   --reactaform-shadow:
-      0 2px 8px rgba(0,0,0,.6);
+      0 2px 8px #000000;
 
   --reactaform-button-bg: #4f46e5; /* indigo-600 */
   --reactaform-button-text: #ffffff;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(40, 40, 40, 0.95);
+  --reactaform-tooltip-color-bg: #282828;
   --reactaform-tooltip-color: #F5F5F5;
 }

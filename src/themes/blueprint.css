@@ -18,15 +18,15 @@
   --reactaform-success-color: #0f9960;
 
   /* Interaction */
-  --reactaform-hover-bg: #ebf1f5;
+  --reactaform-option-menu-hover-bg: #ebf1f5;
 
   /* Shape */
   --reactaform-border-radius: 4px;
 
   /* Elevation */
   --reactaform-shadow:
-    0 1px 3px rgba(16,22,26,.1),
-    0 0 0 1px rgba(16,22,26,.1);
+    0 1px 3px #10161a,
+    0 0 0 1px #10161a;
 
   /* Buttons */
   --reactaform-button-bg: #137cbd;
@@ -38,6 +38,6 @@
   --reactaform-font-size: 13px;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color-bg: #3c3c3c;
   --reactaform-tooltip-color: #ffffff;
 }

@@ -13,12 +13,12 @@
   --reactaform-error-color: #ff3b30;
   --reactaform-success-color: #34c759;
 
-  --reactaform-hover-bg: rgba(0,0,0,0.03);
+  --reactaform-option-menu-hover-bg: #000000;
 
   --reactaform-border-radius: 14px;
 
   --reactaform-shadow:
-    0 10px 30px rgba(0,0,0,.10);
+    0 10px 30px #000000;
 
   --reactaform-button-bg: #0a84ff;
   --reactaform-button-text: white;
@@ -27,6 +27,6 @@
   --reactaform-input-padding: 14px 16px;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color-bg: #3c3c3c;
   --reactaform-tooltip-color: #ffffff;
 }

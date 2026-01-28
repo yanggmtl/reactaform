@@ -19,15 +19,15 @@
   --reactaform-success-color: #10b981; /* emerald-500 */
 
   /* Hover */
-  --reactaform-hover-bg: #f3f4f6; /* gray-100 */
+  --reactaform-option-menu-hover-bg: #f3f4f6; /* gray-100 */
 
   /* Radii */
   --reactaform-border-radius: 0.5rem; /* rounded-lg */
 
   /* Shadows (Tailwind style) */
   --reactaform-shadow:
-      0 1px 2px rgba(0,0,0,.05),
-      0 1px 3px rgba(0,0,0,.1);
+      0 1px 2px #000000,
+      0 1px 3px #000000;
 
   /* Typography */
   --reactaform-font-size: 14px;
@@ -42,9 +42,9 @@
   --reactaform-button-text: #ffffff;
   --reactaform-button-border-radius: 0.5rem;
   --reactaform-button-shadow:
-      0 2px 4px rgba(79,70,229,.3);
+      0 2px 4px #4f46e5;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color-bg: #3c3c3c;
   --reactaform-tooltip-color: #ffffff;
 }

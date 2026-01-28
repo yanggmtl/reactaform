@@ -18,14 +18,14 @@
   --reactaform-success-color: #52c41a;
 
   /* Interaction */
-  --reactaform-hover-bg: #fafafa;
+  --reactaform-option-menu-hover-bg: #fafafa;
 
   /* Shape — AntD slightly rounded */
   --reactaform-border-radius: 6px;
 
   /* Elevation */
   --reactaform-shadow:
-    0 2px 8px rgba(0,0,0,.08);
+    0 2px 8px #000000;
 
   /* Buttons */
   --reactaform-button-bg: #1677ff;
@@ -37,6 +37,6 @@
   --reactaform-font-size: 14px;
 
   /* Tooltip */
-  --reactaform-tooltip-color-bg: rgba(60,60,60,0.92);
+  --reactaform-tooltip-color-bg: #3c3c3c;
   --reactaform-tooltip-color: #ffffff;
 }

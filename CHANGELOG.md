@@ -128,3 +128,6 @@ All notable changes to this project are documented in this file.
 - Update examples
 - Refactor CSS variables to improve clarity
 - Update themes
+
+## 1.8.92 - 2026-01-29
+- Separate form border and input border format.

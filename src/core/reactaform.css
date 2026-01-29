@@ -7,6 +7,7 @@
   --reactaform-secondary-bg: #fff;
   --reactaform-text-color: #000;
   --reactaform-text-muted: #666;
+  --reactaform-form-border-color: #000000;
   --reactaform-border-color: #ccc;
   --reactaform-border-hover: #999;
   --reactaform-border-focus: #4CAF50;
@@ -40,9 +41,12 @@
 
   /* Layout */
   --reactaform-border-radius: 0px;
+  --reactaform-form-border-radius: 0px;
+  --reactaform-form-border-style: solid;
+  --reactaform-form-border-width: 0px;
   
   /* Shadows */
-  --reactaform-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --reactaform-form-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   
   /* Button Variables */
   --reactaform-button-bg: var(--reactaform-success-color);
@@ -94,6 +98,8 @@
   --reactaform-border-hover: #4A4A4A;    /* Hover */
   --reactaform-border-focus: #4DA6FF;    /* Accent blue focus */
 
+  --reactaform-form-border-color: #333333;
+
   /* Status colors */
   --reactaform-error-color: #FF6B6B;
   --reactaform-success-color: #4CAF6A;
@@ -102,7 +108,7 @@
   --reactaform-option-menu-hover-bg: rgba(255, 255, 255, 0.06);
 
   /* Shadows (subtle for dark mode) */
-  --reactaform-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --reactaform-form-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
 
   /* Tooltip */
   --reactaform-tooltip-color-bg: rgba(40, 40, 40, 0.95);
@@ -116,8 +122,11 @@
   background-color: var(--reactaform-primary-bg);
   color: var(--reactaform-text-color);
   padding: var(--reactaform-container-padding);
-  border-radius: var(--reactaform-border-radius);
-  box-shadow: var(--reactaform-shadow);
+  border-radius: var(--reactaform-form-border-radius);
+  border-color: var(--reactaform-form-border-color);
+  border-style: var(--reactaform-form-border-style);
+  border-width: var(--reactaform-form-border-width);
+  box-shadow: var(--reactaform-form-shadow);
   gap: var(--reactaform-space-lg);
   max-width: 100%;
   margin: 0 auto;

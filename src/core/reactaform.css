@@ -119,15 +119,15 @@
 .reactaform-container {
   font-family: var(--reactaform-font-family, sans-serif);
   font-size: var(--reactaform-font-size, 14px);
-  background-color: var(--reactaform-primary-bg);
-  color: var(--reactaform-text-color);
-  padding: var(--reactaform-container-padding);
-  border-radius: var(--reactaform-form-border-radius);
-  border-color: var(--reactaform-form-border-color);
-  border-style: var(--reactaform-form-border-style);
-  border-width: var(--reactaform-form-border-width);
-  box-shadow: var(--reactaform-form-shadow);
-  gap: var(--reactaform-space-lg);
+  background: var(--reactaform-primary-bg, #f9f9f9);
+  color: var(--reactaform-text-color, #000000);
+  padding: var(--reactaform-container-padding, 12px);
+  border-radius: var(--reactaform-form-border-radius, 0px);
+  border-color: var(--reactaform-form-border-color, #000000);
+  border-style: var(--reactaform-form-border-style, solid);
+  border-width: var(--reactaform-form-border-width, 0px);
+  box-shadow: var(--reactaform-form-shadow, none);
+  gap: var(--reactaform-space-lg, 12px);
   max-width: 100%;
   margin: 0 auto;
   /* Removed internal scrolling - let parent container handle it */
@@ -143,8 +143,8 @@
     grid-template-columns: var(--reactaform-field-grid-columns, 1fr 2fr);
     align-items: start;
     padding: 0;
-    gap: var(--reactaform-column-gap);
-    margin-bottom: var(--reactaform-field-gap);
+    gap: var(--reactaform-column-gap, 8px);
+    margin-bottom: var(--reactaform-field-gap, 8px);
   }
 
 /* Labels */
@@ -154,7 +154,7 @@
   white-space: normal;
   line-height: 1.4;
   min-width: 100px;
-  color: var(--reactaform-text-color);
+  color: var(--reactaform-text-color, #000000);
   font-weight: var(--reactaform-label-font-weight, 600);
   font-size: var(--reactaform-label-font-size, 14px);
   user-select: none;
@@ -166,25 +166,25 @@
 /* Input Base */
 .reactaform-input {
   width: 100%;
-  color: var(--reactaform-text-color);
-  border: 1px solid var(--reactaform-border-color);
-  border-radius: var(--reactaform-border-radius);
-  padding: var(--reactaform-input-padding);
+  color: var(--reactaform-text-color, #000000);
+  border: 1px solid var(--reactaform-border-color, #ccc);
+  border-radius: var(--reactaform-border-radius, 0px);
+  padding: var(--reactaform-input-padding, 8px);
   box-sizing: border-box;
-  background-color: var(--reactaform-input-bg);
-  font-size: var(--reactaform-font-size);
-  font-weight: var(--reactaform-font-weight);
+  background-color: var(--reactaform-input-bg, #ffffff);
+  font-size: var(--reactaform-font-size, 14px);
+  font-weight: var(--reactaform-font-weight, 400);
   transition: border-color 0.2s ease;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
 }
 
 .reactaform-input:hover {
-  border-color: var(--reactaform-border-hover);
+  border-color: var(--reactaform-border-hover, #4A4A4A);
 }
 
 .reactaform-input:focus {
   outline: none;
-  border-color: var(--reactaform-border-focus);
+  border-color: var(--reactaform-border-focus, #4DA6FF);
   /* Bright, prominent focus ring with cyan glow for maximum visibility on dark backgrounds */
   box-shadow: 0 0 0 3px rgba(34,211,238,0.4),
               0 0 16px rgba(34,211,238,0.25),

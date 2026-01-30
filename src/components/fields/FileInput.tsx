@@ -3,16 +3,19 @@ import { StandardFieldLayout } from "../LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
+import { isDarkTheme } from "../../utils/themeUtils";
 
 export type FileInputProps = BaseInputProps<File | File[] | null, DefinitionPropertyField>;
 
 const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, error: externalError }) => {
-  const { t } = useReactaFormContext();
+  const { t, theme } = useReactaFormContext();
   const [isDragging, setIsDragging] = React.useState<boolean>(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const onErrorRef = React.useRef<FileInputProps["onError"] | undefined>(onError);
   const prevErrorRef = React.useRef<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+
+  const isDarkMode = isDarkTheme(theme);
 
   React.useEffect(() => {
     onErrorRef.current = onError;
@@ -204,6 +207,8 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
     );
   };
 
+  const [isHovering, setIsHovering] = React.useState<boolean>(false);
+
   return (
     <StandardFieldLayout field={field} error={error}>
       <div style={{ width: '100%' }}>
@@ -212,20 +217,24 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
           style={{
             position: 'relative',
             borderStyle: 'dashed',
             borderColor: isDragging
                 ? 'var(--reactaform-color-primary, #2563eb)'
-                : error
-                  ? 'var(--reactaform-color-error, #ef4444)'
-                  : undefined,
+                : isHovering
+                  ? 'var(--reactaform-border-hover, #4A4A4A)'
+                  : error
+                    ? 'var(--reactaform-color-error, #ef4444)'
+                    : undefined,
             borderWidth: '1px',
             borderRadius: 'var(--reactaform-border-radius, 4px)',
             padding: '8px 12px',
             textAlign: 'center',
             backgroundColor: isDragging 
-              ? 'var(--reactaform-bg-hover, #f0f9ff)' 
+              ? `var(--reactaform-bg-hover, ${isDarkMode ? '#070707' : '#eff6ff'})` 
               : undefined,
             transition: 'all 0.2s ease',
             cursor: 'pointer',

@@ -109,8 +109,9 @@ const ConversionButton: React.FC<ConversionButtonProps> = React.memo(({
         aria-disabled={disabled}
         style={{
           width: "var(--reactaform-unit-btn-width, 2.5em)",
-          height: "var(--reactaform-unit-btn-height, 2.5em)",
-          padding: "0",
+          height: "auto",
+          padding: "var(--reactaform-input-padding)",
+          boxSizing: "border-box",
           border: "none",
           borderRadius: "var(--reactaform-button-border-radius, var(--reactaform-border-radius, 0.25em))",
           backgroundColor: disabled
@@ -122,10 +123,11 @@ const ConversionButton: React.FC<ConversionButtonProps> = React.memo(({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          alignSelf: "center",
+          lineHeight: 1,
         }}
-        className={CSS_CLASSES.button}
       >
-        <span style={{ fontSize: "1em", lineHeight: "1", pointerEvents: "none" }}>
+        <span style={{ fontSize: "1em", pointerEvents: "none" }}>
           ⇄
         </span>
       </button>

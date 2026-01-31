@@ -102,6 +102,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     padding: "0 0.75em",
     cursor: "pointer",
     position: "relative",
+    textAlign: "left",
     ...styleFrom(formStyle, 'dropdown', 'control'),
     ...styleFrom(fieldStyle, undefined, 'control'),
   }), [formStyle, fieldStyle]);

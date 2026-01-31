@@ -103,6 +103,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
       alignItems: "center",
       cursor: "pointer",
       position: "relative",
+      textAlign: "left",
       ...styleFrom(formStyle, "multiSelect", "control"),
       ...styleFrom(fieldStyle, undefined, "control"),
     }),

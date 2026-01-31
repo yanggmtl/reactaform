@@ -131,3 +131,11 @@ All notable changes to this project are documented in this file.
 
 ## 1.8.92 - 2026-01-29
 - Separate form border and input border format.
+
+## 1.8.93 - 2026-01-31
+- Fix UniValueInput conversion button position
+- Apply css variable default value
+- Fix style issues
+  - Fix dropdown height issue
+  - Add label font family variable
+  - Align text to left for dropdown and multi-selection components

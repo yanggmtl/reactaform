@@ -95,9 +95,11 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   };
 
   const mergedControlStyle = React.useMemo<React.CSSProperties>(() => ({
-    height: "var(--reactaform-input-height, 2.5rem)",
+    height: "var(--reactaform-input-height, 2.5em)",
     display: "flex",
     alignItems: "center",
+    boxSizing: "border-box",
+    padding: "0 0.75em",
     cursor: "pointer",
     position: "relative",
     ...styleFrom(formStyle, 'dropdown', 'control'),
@@ -137,7 +139,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
             }
           }}
         >
-          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: '1.8em', display: 'block' }}>
             {selectedLabel}
           </span>
           <span style={mergedArrowStyle} aria-hidden>&#x25BC;</span>

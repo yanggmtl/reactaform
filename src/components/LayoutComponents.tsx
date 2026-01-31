@@ -207,7 +207,7 @@ StandardFieldLayout.displayName = 'StandardFieldLayout';
 
 export const ErrorDiv = React.memo(({ children, id }: { children: React.ReactNode; id?: string }) => {
   const style = React.useMemo<React.CSSProperties>(() => ({
-    color: 'var(--reactaform-error-color)',
+    color: 'var(--reactaform-error-color, red)',
     fontSize: '13px',
     marginTop: '4px',
     fontWeight: 'var(--reactaform-font-weight)',
@@ -215,6 +215,7 @@ export const ErrorDiv = React.memo(({ children, id }: { children: React.ReactNod
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "flex-start",
+    userSelect: "none",
   }), []);
 
   return <div id={id} style={style}>{children}</div>;

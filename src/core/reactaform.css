@@ -36,6 +36,7 @@
   --reactaform-font-size: 14px;
   --reactaform-font-weight: 500;
   
+  --reactaform-label-font-family: var(--reactaform-font-family);
   --reactaform-label-font-size: 14px;
   --reactaform-label-font-weight: 600;
 
@@ -155,6 +156,7 @@
   line-height: 1.4;
   min-width: 100px;
   color: var(--reactaform-text-color, #000000);
+  font-family: var(--reactaform-label-font-family, var(--reactaform-font-family, sans-serif));
   font-weight: var(--reactaform-label-font-weight, 600);
   font-size: var(--reactaform-label-font-size, 14px);
   user-select: none;

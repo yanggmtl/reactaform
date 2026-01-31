@@ -246,7 +246,8 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '8px'
+            gap: '8px',
+            userSelect: 'none',
           }}
           onClick={() => inputRef.current?.click()}
           onKeyDown={(e) => {

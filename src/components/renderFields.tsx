@@ -116,7 +116,7 @@ const FieldGroup = React.memo<{
     <fieldset style={fieldsetStyle}>
       <legend onClick={onToggle} style={legendStyle}>
         <span>{t(groupName)}</span>
-        <span>{isOpen ? "▼" : "▶"}</span>
+        <span>{isOpen ? " ▼" : " ▶"}</span>
       </legend>
       {isOpen && fields.map((f) => renderField(f, valuesMap, handleChange, handleError, errorsMap))}
     </fieldset>

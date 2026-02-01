@@ -58,9 +58,9 @@ export function isDarkColor(color: string): boolean {
   else if (c.startsWith('rgb')) {
     const match = c.match(/\d+(\.\d+)?/g);
     if (match && match.length >= 3) {
-      r = parseFloat(match[0]);
-      g = parseFloat(match[1]);
-      b = parseFloat(match[2]);
+      r = Math.min(255, Math.max(0, parseFloat(match[0])));
+      g = Math.min(255, Math.max(0, parseFloat(match[1])));
+      b = Math.min(255, Math.max(0, parseFloat(match[2])));
     }
   }
   // Handle named colors (basic support) or fallback

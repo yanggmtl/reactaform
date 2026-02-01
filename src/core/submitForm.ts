@@ -14,7 +14,7 @@ export async function submitForm(
   instance: ReactaInstance | null,
   valuesMap: Record<string, FieldValueType | unknown>,
   t: TranslationFunction,
-  errors: Record<string, string>,
+  errors?: Record<string, string>,
   onSubmit?: FormSubmissionHandler | undefined,
   onValidation?: FormValidationHandler | undefined
 ): Promise<SubmitResult> {
@@ -22,11 +22,11 @@ export async function submitForm(
   void instance;
 
   // Check for existing validation errors
-  const existingErrors = Object.values(errors).filter(Boolean);
+  const existingErrors = errors ? Object.values(errors).filter(Boolean) : [];
   if (existingErrors.length > 0) {
     return { 
       success: false, 
-      message: t("Please fix validation errors before submitting."),
+      message: t("Please fix validation errors before submitting the form."),
       errors: existingErrors
     };
   }
@@ -43,7 +43,19 @@ export async function submitForm(
       
       const schemaType = prop.type;
       try {
-        if (schemaType === "int" || schemaType === "number" || schemaType === "float") {
+        if (schemaType === "int") {
+          const strValue = String(raw).trim();
+          if (strValue === "") {
+            finalMap[propName] = 0;
+          } else {
+            const numValue = Number(strValue);
+            if (!Number.isInteger(numValue)) {
+              transformationErrors.push(t(`Invalid integer format for field {{1}}`, prop.displayName || propName));
+            } else {
+              finalMap[propName] = Math.trunc(numValue);
+            }
+          }
+        } else if (schemaType === "number" || schemaType === "float") {
           const strValue = String(raw).trim();
           if (strValue === "") {
             finalMap[propName] = 0;
@@ -118,41 +130,50 @@ export async function submitForm(
   // Execute custom submission handler if defined
   // first use onSubmit callback if provided
   // otherwise use submission handler defined in definition
+  const normalizeSubmitResult = (res: unknown): string[] => {
+    if (!res) return [];
+    if (Array.isArray(res)) return res.map((r) => String(r));
+    if (typeof res === "string") return res.trim() ? [res] : [];
+    return [String(res)];
+  };
+
   if (onSubmit) {
     try {
       const submitResult = await onSubmit(definition, instance?.name ?? null, finalMap, t);
-      if (submitResult && submitResult.length > 0) {
-        return { 
-          success: false, 
+      const submitErrors = normalizeSubmitResult(submitResult);
+      if (submitErrors.length > 0) {
+        return {
+          success: false,
           message: t("Submission failed"),
-          errors: Array.isArray(submitResult) ? submitResult : [String(submitResult)]
+          errors: submitErrors,
         };
       }
     } catch (error) {
       return {
         success: false,
         message: t("Submission handler error occurred"),
-        errors: [String(error instanceof Error ? error.message : error)]
+        errors: [String(error instanceof Error ? error.message : error)],
       };
     }
-  } else if (definition && typeof definition.submitHandlerName === 'string') {
+  } else if (definition && typeof definition.submitHandlerName === "string") {
     const submitHandler = getFormSubmissionHandler(definition.submitHandlerName);
 
     if (submitHandler) {
       try {
         const submitResult = await submitHandler(definition, instance?.name ?? null, finalMap, t);
-        if (submitResult && submitResult.length > 0) {
-          return { 
-            success: false, 
+        const submitErrors = normalizeSubmitResult(submitResult);
+        if (submitErrors.length > 0) {
+          return {
+            success: false,
             message: t("Submission failed"),
-            errors: Array.isArray(submitResult) ? submitResult : [String(submitResult)]
+            errors: submitErrors,
           };
         }
       } catch (error) {
         return {
           success: false,
           message: t("Submission handler error occurred"),
-          errors: [String(error instanceof Error ? error.message : error)]
+          errors: [String(error instanceof Error ? error.message : error)],
         };
       }
     }

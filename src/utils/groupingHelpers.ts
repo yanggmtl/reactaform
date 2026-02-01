@@ -74,7 +74,6 @@ export const groupConsecutiveFields = (
     const name = item.group || null;
     if (name !== currentName) {
       if (bucket.length > 0 || includeEmpty) {
-        if (bucket.length === 0) emptyGroups++;
         groups.push({ name: currentName, fields: bucket });
       }
       currentName = name;
@@ -85,10 +84,10 @@ export const groupConsecutiveFields = (
   }
   
   if (bucket.length > 0 || includeEmpty) {
-    if (bucket.length === 0) emptyGroups++;
     groups.push({ name: currentName, fields: bucket });
   }
 
+  emptyGroups = groups.filter(g => g.fields.length === 0).length;
   const largestGroup = Math.max(0, ...groups.map(g => g.fields.length));
 
   return {

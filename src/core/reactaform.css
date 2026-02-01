@@ -148,6 +148,31 @@
     margin-bottom: var(--reactaform-field-gap, 8px);
   }
 
+  /* Field group (fieldset) styling moved from inline styles */
+  .reactaform-group {
+    border: 1px solid var(--reactaform-border-color, #bbb);
+    padding: var(--reactaform-fieldset-padding, 0.5em);
+    border-radius: var(--reactaform-border-radius, 4px);
+    margin-bottom: var(--reactaform-space, 8px);
+  }
+
+  /* Legend for field groups */
+  .reactaform-group_legend {
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--reactaform-space, 8px);
+    color: var(--reactaform-text-color, inherit);
+    margin-left: 0.4em;
+  }
+
+  .reactaform-group_legend_arrow
+   {
+    margin-left: 0.4em;
+  }
+
 /* Labels */
 .reactaform-label {
   justify-self: start;

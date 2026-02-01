@@ -3,7 +3,6 @@ import React from "react";
 export function useDropdownPosition(
   controlRef: React.RefObject<HTMLElement | null>,
   open: boolean,
-  baseWidth = 250,
   maxHeight = 200
 ) {
   const [pos, setPos] = React.useState<{
@@ -42,7 +41,7 @@ export function useDropdownPosition(
       window.removeEventListener("resize", update);
       ro?.disconnect();
     };
-  }, [open, controlRef, baseWidth, maxHeight]);
+  }, [open, controlRef, maxHeight]);
 
   return pos;
 }

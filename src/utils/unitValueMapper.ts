@@ -149,7 +149,7 @@ for (const dim of allDimensions) {
     units[u] = {
       name: typeof displayVal === "string" ? displayVal : String(u),
       shortName: u,
-      factor: Object.prototype.hasOwnProperty.call(factors, u) ? factors[u] : undefined,
+      factor: u in factors ? factors[u] : undefined,
     };
   }
 
@@ -157,7 +157,7 @@ for (const dim of allDimensions) {
   for (const [u, info] of Object.entries(display)) {
     if (!units[u]) {
       const name = typeof info === "string" ? info : String(u);
-      units[u] = { name, shortName: u, factor: Object.prototype.hasOwnProperty.call(factors, u) ? factors[u] : undefined };
+      units[u] = { name, shortName: u, factor: u in factors ? factors[u] : undefined };
     }
   }
 

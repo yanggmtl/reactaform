@@ -56,7 +56,7 @@ export function useUnitValueField(
       onChange?.([v, u], err);
       onError?.(err);
     },
-    [onChange, onError, validate]
+    [validate, onChange, onError]
   );
 
   return {

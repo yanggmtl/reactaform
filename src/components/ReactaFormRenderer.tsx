@@ -9,14 +9,14 @@ import type {
   FormValidationHandler,
 } from "../core/reactaFormTypes";
 import useReactaFormContext, { ReactaFormContext } from "../hooks/useReactaFormContext";
-import { renderFieldsWithGroups } from "./renderFields";
+import { FieldRenderer } from "./FieldRenderer";
+import { FieldGroup } from "./FieldGroup";
 import { InstanceName } from "./LayoutComponents";
 import {
   updateVisibilityMap,
   updateVisibilityBasedOnSelection,
-  initializeVisibility,
 } from "../core/fieldVisibility";
-import { renameDuplicatedGroups } from "../utils/groupingHelpers";
+import { renameDuplicatedGroups, groupConsecutiveFields } from "../utils/groupingHelpers";
 import { submitForm } from "../core/submitForm";
 import { validateField } from "../validation/validation";
 import { SubmissionMessage } from "./SubmissionMessage";
@@ -67,7 +67,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     {}
   );
   const [visibility, setVisibility] = React.useState<Record<string, boolean>>({});
-  const [groupState, setGroupState] = React.useState<Record<string, boolean>>({});
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [submissionMessage, setSubmissionMessage] = React.useState<string | null>(null);
   const [submissionSuccess, setSubmissionSuccess] = React.useState<boolean | null>(null);
@@ -148,15 +147,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     });
 
     // Initialize visibility map
-    const vis = initializeVisibility(updatedProps);
-
-    // Initialize group state
-    const groupInit = {} as Record<string, boolean>;
-    updatedProps.forEach((f) => {
-      if (f.group && !(f.group in groupInit)) {
-        groupInit[f.group] = true;
-      }
-    });
+    const vis = Object.fromEntries(updatedProps.map((field) => [field.name, false]));
 
     // Defer state updates to avoid synchronous setState inside effect
     const raf = requestAnimationFrame(() => {
@@ -166,7 +157,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       setVisibility(
         updateVisibilityMap(updatedProps, valuesMapInit, vis, nameToField)
       );
-      setGroupState(groupInit);
       setInitDone(true);
       // Update instance name in state to sync with current instance
       setInstanceName(instance.name);
@@ -206,6 +196,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       // Clear any previous submission message when the user changes a value
       setSubmissionMessage(null);
       setSubmissionSuccess(null);
+      
       // Update values map using functional update to ensure we operate on latest state
       // For integer, integer array, float and float array, the value is string
       // integer array value: a string which joins integers with commas
@@ -213,34 +204,28 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       // We need to parse them back to number or number[] when submitting the form
       setValuesMap((prevValues) => {
         const newValues = { ...prevValues, [name]: value };
-
-        // If the field affects visibility, compute and update visibility based on the new values
-        const field = fieldMap[name];
-        if (field) {
-          const supportChildren = [
-            "checkbox",
-            "dropdown",
-            "multi-select",
-            "radio",
-            "switch",
-          ].includes(field.type);
-          if (supportChildren) {
-            setVisibility((prevVis) =>
-              updateVisibilityBasedOnSelection(
-                prevVis,
-                fieldMap,
-                newValues,
-                name,
-                String(value)
-              )
-            );
-          }
-        }
-
         return newValues;
       });
+
+      // Update visibility separately to ensure we're using the latest values
+      // Check if the field has children that should be shown/hidden
+      const field = fieldMap[name];
+      if (field && field.children && Object.keys(field.children).length > 0) {
+        setVisibility((prevVis) => {
+          // Get the latest values including the one we just updated
+          // Note: we need to compute this with the new value
+          const latestValues = { ...valuesMap, [name]: value };
+          return updateVisibilityBasedOnSelection(
+            prevVis,
+            fieldMap,
+            latestValues,
+            name,
+            value
+          );
+        });
+      }
     },
-    [fieldMap, setSubmissionMessage, setSubmissionSuccess]
+    [fieldMap, valuesMap]
   );
 
   // Sync language changes: update savedLanguage and clear messages
@@ -359,10 +344,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     }
   };
 
-  const toggleGroup = (groupName: string) => {
-    setGroupState((prev) => ({ ...prev, [groupName]: !prev[groupName] }));
-  };
-
   // Memoize expensive computations
   const isApplyDisabled = React.useMemo(
     () => renderContext.fieldValidationMode === "realTime" ? Object.values(errors).some(Boolean) : false,
@@ -393,18 +374,44 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
         />
       )}
         <>
-          {renderFieldsWithGroups(
-            groupState,
-            updatedProperties,
-            valuesMap,
-            t,
-            handleChange,
-            handleError,
-            visibility,
-            loadedCount,
-            toggleGroup,
-            errors
-          )}
+          {(() => {
+            const visibleFields = updatedProperties.slice(0, loadedCount).filter((field) => visibility[field.name]);
+            const { groups } = groupConsecutiveFields(visibleFields);
+
+            return groups.map((group, index) => {
+              if (group.name) {
+                return (
+                  <FieldGroup
+                    key={group.name}
+                    groupName={group.name}
+                    defaultOpen={true}
+                    fields={group.fields}
+                    valuesMap={valuesMap}
+                    handleChange={handleChange}
+                    handleError={handleError}
+                    errorsMap={errors}
+                    t={t}
+                  />
+                );
+              }
+
+              // Render ungrouped fields
+              return (
+                <React.Fragment key={`ungrouped-${index}`}>
+                  {group.fields.map((field) => (
+                    <FieldRenderer
+                      key={field.name}
+                      field={field}
+                      valuesMap={valuesMap}
+                      handleChange={handleChange}
+                      handleError={handleError}
+                      errorsMap={errors}
+                    />
+                  ))}
+                </React.Fragment>
+              );
+            });
+          })()}
           {loadedCount < updatedProperties.length && (
             <div
               style={{

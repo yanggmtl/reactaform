@@ -40,8 +40,8 @@ export function useUncontrolledValidatedInput<
         setError(err);
       }
 
-      if (inputRef.current && ((inputRef.current as HTMLInputElement | HTMLTextAreaElement).value) !== strValue) {
-        (inputRef.current as HTMLInputElement | HTMLTextAreaElement).value = strValue;
+      if (inputRef.current && inputRef.current.value !== strValue) {
+        inputRef.current.value = strValue;
       }
     }
   }, [value, validate]);
@@ -49,7 +49,7 @@ export function useUncontrolledValidatedInput<
   // Handle user input
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<T>) => {
-      const strValue = (e.target as HTMLInputElement | HTMLTextAreaElement).value;
+      const strValue = e.target.value;
       const err = validate(strValue);
 
       if (err !== prevErrorRef.current) {

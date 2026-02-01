@@ -55,9 +55,11 @@ export function useDebouncedCallback(
   }, []);
 
   const flush = useCallback(() => {
-    if (timer.current && trailing && lastArgs.current) {
+    if (timer.current) {
       clearTimeout(timer.current);
       timer.current = undefined;
+    }
+    if (trailing && lastArgs.current) {
       invoke(lastArgs.current);
       lastArgs.current = null;
     }

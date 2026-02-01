@@ -139,10 +139,6 @@ export const loadCommon = async (
 export const loadCommonTranslation = async (
   language: string
 ): Promise<TranslationLoadResult> => {
-  if (!language) {
-    return { success: false, translations: {}, error: "Language is required" };
-  }
-
   if (!language || language.toLowerCase() === "en") {
     return { success: true, translations: {}, fromCache: false };
   }

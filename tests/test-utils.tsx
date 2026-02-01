@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { DefinitionPropertyField } from '../src/core/reactaFormTypes';
 import { render } from '@testing-library/react';
 import type { RenderOptions } from '@testing-library/react';
-import { ReactaFormProvider } from '../src/components/ReactaFormProvider';
+import { ReactaFormProvider } from '../src/components/form/ReactaFormProvider';
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   theme?: string;

@@ -1,8 +1,8 @@
 import * as React from "react";
-import useReactaFormContext from "../hooks/useReactaFormContext";
-import { combineClasses, CSS_CLASSES } from "../utils/cssClasses";
-import Tooltip from "./Tooltip";
-import type { DefinitionPropertyField } from "../core/reactaFormTypes";
+import useReactaFormContext from "../../hooks/useReactaFormContext";
+import { combineClasses, CSS_CLASSES } from "../../core/cssClasses";
+import Tooltip from "../ui/Tooltip";
+import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 
 const TooltipMemo = React.memo(Tooltip);
 

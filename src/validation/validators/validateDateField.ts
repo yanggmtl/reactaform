@@ -1,4 +1,4 @@
-import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
+import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../../core/reactaFormTypes";
 
 const parseDateTime = (value?: string): number | null => {
   if (!value) return null;

@@ -1,4 +1,4 @@
-import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
+import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../../core/reactaFormTypes";
 
 const HEX_REGEX = /^#([0-9A-F]{3}){1,2}$/i;
 const isValidHexColor = (color: string) => HEX_REGEX.test(color);

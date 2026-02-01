@@ -11,7 +11,7 @@ import {
   getFieldTypeValidationHandler,
   getFieldCustomValidationHandler,
   getFormValidationHandler,
-} from "./validationHandlerRegistry";
+} from "../core/registries/validationHandlerRegistry";
 
 function isThenable<T = unknown>(v: unknown): v is PromiseLike<T> {
   return (

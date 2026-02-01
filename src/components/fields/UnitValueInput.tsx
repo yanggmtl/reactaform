@@ -1,11 +1,11 @@
 import * as React from "react";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { StandardFieldLayout } from "../LayoutComponents";
-import PopupOptionMenu from "../PopupOptionMenu";
-import type { PopupOptionMenuPosition } from "../PopupOptionMenu";
+import { StandardFieldLayout } from "../layout/LayoutComponents";
+import PopupOptionMenu from "../ui/PopupOptionMenu";
+import type { PopupOptionMenuPosition } from "../ui/PopupOptionMenu";
 import { getUnitFactors, convertTemperature } from "../../utils/unitValueMapper";
-import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { CSS_CLASSES, combineClasses } from "../../core/cssClasses";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type UnitValueInputProps = BaseInputProps<[string | number, string], DefinitionPropertyField>;

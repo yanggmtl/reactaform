@@ -1,6 +1,6 @@
 import type { ReactaDefinition, FieldValueType, ReactaInstance, TranslationFunction, FormSubmissionHandler, FormValidationHandler } from "./reactaFormTypes";
 import { validateFormValues } from "../validation/validation";
-import { getFormSubmissionHandler } from "./submissionHandlerRegistry";
+import { getFormSubmissionHandler } from "./registries/submissionHandlerRegistry";
 
 export interface SubmitResult {
   success: boolean;

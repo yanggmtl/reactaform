@@ -1,9 +1,9 @@
 // components/FloatInput.tsx
 import * as React from "react";
-import { StandardFieldLayout } from "../LayoutComponents";
+import { StandardFieldLayout } from "../layout/LayoutComponents";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
-import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { CSS_CLASSES, combineClasses } from "../../core/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 

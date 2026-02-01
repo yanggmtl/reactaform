@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { StandardFieldLayout } from "../LayoutComponents";
+import { StandardFieldLayout } from "../layout/LayoutComponents";
 import type {
   BaseInputProps,
   DefinitionPropertyField,

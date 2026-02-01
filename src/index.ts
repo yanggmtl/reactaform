@@ -19,19 +19,19 @@ export function injectReactaFormStyles() {
 if (typeof document !== 'undefined') injectReactaFormStyles();
 
 // Core Components
-export { default as ReactaForm } from './components/ReactaForm';
-export { default as ReactaFormRenderer } from './components/ReactaFormRenderer';
-export type { ReactaFormRendererProps } from './components/ReactaFormRenderer';
+export { default as ReactaForm } from './components/form/ReactaForm';
+export { default as ReactaFormRenderer } from './components/form/ReactaFormRenderer';
+export type { ReactaFormRendererProps } from './components/form/ReactaFormRenderer';
 
 // Context and Providers  
-export { ReactaFormProvider } from './components/ReactaFormProvider';
+export { ReactaFormProvider } from './components/form/ReactaFormProvider';
 export { default as useReactaFormContext } from './hooks/useReactaFormContext';
 
 // Layout Components for Custom Field Development
-export { StandardFieldLayout } from './components/LayoutComponents';
+export { StandardFieldLayout } from './components/layout/LayoutComponents';
 
 // CSS Utilities for Custom Field Development
-export { CSS_CLASSES, combineClasses } from './utils/cssClasses';
+export { CSS_CLASSES, combineClasses } from './core/cssClasses';
 
 // Types
 export type {
@@ -57,7 +57,7 @@ export type {
 export { 
   registerComponent,
   getComponent,
-} from './core/componentRegistry';
+} from './core/registries/componentRegistry';
 
 // Validation Utilities for custom validation logic
 export {
@@ -78,7 +78,7 @@ export {
   getAllPlugins,
   hasPlugin,
   registerComponents,
-} from './core/pluginRegistry';
+} from './core/registries/pluginRegistry';
 
 // Definition & Instance Management
 export type {
@@ -97,13 +97,13 @@ export {
 // Handler Registries
 export {
   registerSubmissionHandler,
-} from './core/submissionHandlerRegistry';
+} from './core/registries/submissionHandlerRegistry';
 
 export {
   registerFieldCustomValidationHandler,
   registerFieldTypeValidationHandler,
   registerFormValidationHandler,
-} from './validation/validationHandlerRegistry';
+} from './core/registries/validationHandlerRegistry';
 
 // Hooks
 export {

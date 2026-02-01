@@ -15,7 +15,7 @@ import {
   getFieldCustomValidationHandler,
   getFormValidationHandler,
   getFieldTypeValidationHandler,
-} from '../validation/validationHandlerRegistry';
+} from './validationHandlerRegistry';
 import {
   registerSubmissionHandler,
   getSubmissionHandler,
@@ -26,7 +26,7 @@ import type {
   FieldTypeValidationHandler,
   FormValidationHandler,
   FormSubmissionHandler,
-} from './reactaFormTypes';
+} from '../reactaFormTypes';
 
 /** Conflict resolution strategies */
 export type ConflictResolution =

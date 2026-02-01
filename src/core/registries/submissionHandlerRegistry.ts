@@ -1,4 +1,4 @@
-import type { FieldValueType, FormSubmissionHandler, ReactaInstance } from "./reactaFormTypes";
+import type { FieldValueType, FormSubmissionHandler, ReactaInstance } from "../reactaFormTypes";
 import BaseRegistry from "./baseRegistry";
 
 const registry = new BaseRegistry<FormSubmissionHandler>();

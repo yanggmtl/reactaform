@@ -2,8 +2,8 @@
 import * as React from "react";
 import ReactaFormRenderer from "./ReactaFormRenderer";
 import { ReactaFormProvider } from "./ReactaFormProvider";
-import { createInstanceFromDefinition } from "../core/reactaFormModel";
-import type { ReactaDefinition, ReactaFormProps } from "../core/reactaFormTypes";
+import { createInstanceFromDefinition } from "../../core/reactaFormModel";
+import type { ReactaDefinition, ReactaFormProps } from "../../core/reactaFormTypes";
 
 function useNearestReactaformTheme(ref?: React.RefObject<HTMLElement>) {
   const [theme, setTheme] = React.useState<string | null>(null);

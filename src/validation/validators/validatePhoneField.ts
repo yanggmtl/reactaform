@@ -1,4 +1,4 @@
-import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
+import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../../core/reactaFormTypes";
 import validateFieldPattern from "./validateFieldPattern";
 
 export function validatePhoneField(

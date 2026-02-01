@@ -1,4 +1,4 @@
-import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
+import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../../core/reactaFormTypes";
 
 // Cache compiled RegExp objects per field to avoid re-compiling on every validation
 const patternRegexCache: WeakMap<DefinitionPropertyField, { pattern?: string; regex: RegExp | null }> = new WeakMap();

@@ -1,9 +1,9 @@
 import type { 
   FieldCustomValidationHandler,
   FieldTypeValidationHandler,
-  FormValidationHandler } from "../core/reactaFormTypes";
-import BaseRegistry from "../core/baseRegistry";
-import { isBuiltinComponentType } from "../core/componentRegistry";
+  FormValidationHandler } from "../reactaFormTypes";
+import BaseRegistry from "./baseRegistry";
+import { isBuiltinComponentType } from "./componentRegistry";
 
 // Enhanced registry that supports categorized field validators
 class CategoryRegistry<T> extends BaseRegistry<Record<string, T>> {

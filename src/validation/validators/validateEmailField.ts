@@ -1,5 +1,5 @@
 
-import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../core/reactaFormTypes";
+import { DefinitionPropertyField, FieldValueType, TranslationFunction } from "../../core/reactaFormTypes";
 import validateFieldPattern from "./validateFieldPattern";
 
 function isValidEmail(email: string): boolean {

@@ -1,6 +1,6 @@
 import * as React from "react";
-import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../core/reactaFormTypes";
-import { getComponent } from "../core/componentRegistry";
+import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../../core/reactaFormTypes";
+import { getComponent } from "../../core/registries/componentRegistry";
 
 export interface FieldRendererProps {
   field: DefinitionPropertyField;

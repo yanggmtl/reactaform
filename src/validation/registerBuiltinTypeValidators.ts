@@ -5,22 +5,22 @@
  */
 
 // Import all validators for side-effect registration
-import { validateIntegerArrayField, validateIntegerField } from "./validateIntegerField";
-import { validateFloatArrayField, validateFloatField } from "./validateFloatField";
-import { validateTextField } from "./validateTextField";
-import { validateDateField } from "./validateDateField";
-import { validateTimeField } from "./validateTimeField";
-import { validateEmailField } from "./validateEmailField";
-import { validatePhoneField } from "./validatePhoneField";
-import { validateUrlField } from "./validateUrlField";
-import { validateUnitValueField } from "./validateUnitValueField";
-import { validateFileField } from "./validateFileField";
-import { validateDropdownField, validateMultiSelectionField } from "./validateSelectionFields";
-import { validateColorField } from "./validateColorField";
-import { validateRatingField } from "./validateRatingField";
-import { validateSliderField } from "./validateSliderField";
+import { validateIntegerArrayField, validateIntegerField } from "./validators/validateIntegerField";
+import { validateFloatArrayField, validateFloatField } from "./validators/validateFloatField";
+import { validateTextField } from "./validators/validateTextField";
+import { validateDateField } from "./validators/validateDateField";
+import { validateTimeField } from "./validators/validateTimeField";
+import { validateEmailField } from "./validators/validateEmailField";
+import { validatePhoneField } from "./validators/validatePhoneField";
+import { validateUrlField } from "./validators/validateUrlField";
+import { validateUnitValueField } from "./validators/validateUnitValueField";
+import { validateFileField } from "./validators/validateFileField";
+import { validateDropdownField, validateMultiSelectionField } from "./validators/validateSelectionFields";
+import { validateColorField } from "./validators/validateColorField";
+import { validateRatingField } from "./validators/validateRatingField";
+import { validateSliderField } from "./validators/validateSliderField";
 
-import { registerBuiltinFieldTypeValidationHandler } from "./validationHandlerRegistry";
+import { registerBuiltinFieldTypeValidationHandler } from "../core/registries/validationHandlerRegistry";
 
 let registed = false;
 /**

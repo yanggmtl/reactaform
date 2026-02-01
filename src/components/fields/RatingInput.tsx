@@ -1,7 +1,7 @@
 import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
-import { StandardFieldLayout } from "../LayoutComponents";
+import { StandardFieldLayout } from "../layout/LayoutComponents";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 const ratingWrapperStyle: React.CSSProperties = {

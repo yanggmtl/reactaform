@@ -1,12 +1,12 @@
 import * as React from "react";
-import { StandardFieldLayout } from "../LayoutComponents";
+import { StandardFieldLayout } from "../layout/LayoutComponents";
 import type {
   BaseInputProps,
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { CSS_CLASSES } from "../../utils/cssClasses";
+import { CSS_CLASSES } from "../../core/cssClasses";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 // Props expected by SwitchInput component

@@ -1,11 +1,11 @@
 import * as React from "react";
-import { StandardFieldLayout } from "../LayoutComponents";
+import { StandardFieldLayout } from "../layout/LayoutComponents";
 import type {
   BaseInputProps,
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { CSS_CLASSES, combineClasses } from "../../utils/cssClasses";
+import { CSS_CLASSES, combineClasses } from "../../core/cssClasses";
 import { useUncontrolledValidatedInput } from "../../hooks/useUncontrolledValidatedInput";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 

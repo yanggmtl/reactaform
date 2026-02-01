@@ -7,18 +7,18 @@ import type {
   ReactaInstance,
   FormSubmissionHandler,
   FormValidationHandler,
-} from "../core/reactaFormTypes";
-import useReactaFormContext, { ReactaFormContext } from "../hooks/useReactaFormContext";
-import { FieldRenderer } from "./FieldRenderer";
-import { FieldGroup } from "./FieldGroup";
-import { InstanceName } from "./LayoutComponents";
+} from "../../core/reactaFormTypes";
+import useReactaFormContext, { ReactaFormContext } from "../../hooks/useReactaFormContext";
+import { FieldRenderer } from "../layout/FieldRenderer";
+import { FieldGroup } from "../layout/FieldGroup";
+import { InstanceName } from "../layout/LayoutComponents";
 import {
   updateVisibilityMap,
   updateVisibilityBasedOnSelection,
-} from "../core/fieldVisibility";
-import { renameDuplicatedGroups, groupConsecutiveFields } from "../utils/groupingHelpers";
-import { submitForm } from "../core/submitForm";
-import { validateField } from "../validation/validation";
+} from "../../core/fieldVisibility";
+import { renameDuplicatedGroups, groupConsecutiveFields } from "../../utils/groupingHelpers";
+import { submitForm } from "../../core/submitForm";
+import { validateField } from "../../validation/validation";
 import { SubmissionMessage } from "./SubmissionMessage";
 import SubmissionButton from "./SubmissionButton";
 

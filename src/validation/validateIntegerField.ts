@@ -35,6 +35,9 @@ export const validateIntegerField = (
 ): string | null => {
   const inputStr = String(input);
   if (inputStr.trim() === "") {
+    if (field.min !== undefined || field.max !== undefined) {
+      return t("Value required when min or max constraints is set");
+    }
     return field.required ? t("Value required") : null;
   }
 
@@ -97,6 +100,9 @@ export function validateIntegerArrayField(
 ): string | null {
   const inputStr = String(input);
   if (inputStr.trim() === "") {
+    if (field.min !== undefined || field.max !== undefined) {
+      return t("Value required when min or max constraints is set");
+    }
     return field.required ? t("Value required") : null;
   }
 

@@ -15,21 +15,20 @@ type SwitchInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
 /**
  * SwitchInput
  */
-export const SwitchInput: React.FC<SwitchInputProps> = ({
+const SwitchInput: React.FC<SwitchInputProps> = ({
   field,
   value,
   onChange,
   onError,
   error: externalError,
 }) => {
-  const { t, formStyle, fieldStyle, fieldValidationMode } = useReactaFormContext();
+  const { t, formStyle, fieldStyle } = useReactaFormContext();
   const validate = useFieldValidator(field, externalError);
   const err = validate(value);
 
   React.useEffect(() => {
-    if (fieldValidationMode !== 'realTime') return;
     onError?.(err);
-  }, [err, fieldValidationMode, onError]);
+  }, [err, onError]);
   
   const fs = formStyle as Record<string, unknown> | undefined;
   const ffs = fieldStyle as Record<string, unknown> | undefined;
@@ -162,4 +161,5 @@ export const SwitchInput: React.FC<SwitchInputProps> = ({
   );
 };
 
-export default SwitchInput;
+SwitchInput.displayName = "SwitchInput";
+export default React.memo(SwitchInput);

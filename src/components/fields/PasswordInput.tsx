@@ -65,4 +65,5 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   );
 };
 
-export default PasswordInput;
+PasswordInput.displayName = "PasswordInput";
+export default React.memo(PasswordInput);

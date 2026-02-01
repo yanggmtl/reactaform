@@ -19,17 +19,15 @@ const FloatInput: React.FC<FloatInputProps> = ({
   onError,
   error: externalError,
 }) => {
-  const validate =  useFieldValidator(field, externalError);
+  const validate = useFieldValidator(field, externalError);
 
   // Use shared uncontrolled + validated input hook
-  const { inputRef, error : hookError, handleChange } = useUncontrolledValidatedInput({
+  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
     value,
     onChange,
     onError,
     validate,
   });
-
-  const error = externalError ?? hookError;
 
   return (
     <StandardFieldLayout field={field} error={error}>
@@ -56,4 +54,5 @@ const FloatInput: React.FC<FloatInputProps> = ({
   );
 };
 
-export default FloatInput;
+FloatInput.displayName = "FloatInput";
+export default React.memo(FloatInput);

@@ -270,5 +270,6 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
   );
 };
 
+UnitValueInput.displayName = "UnitValueInput";
 export default React.memo(UnitValueInput);
 

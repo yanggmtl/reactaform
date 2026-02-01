@@ -71,13 +71,6 @@ const DateInput: React.FC<DateInputProps> = ({
     validate,
   });
 
-  // Notify parent when validation result changes
-  React.useEffect(() => {
-    if (!externalError) {
-      onError?.(error);
-    }
-  }, [error, externalError, onError]);
-
   return (
     <StandardFieldLayout field={field} error={error}>
       <input
@@ -96,4 +89,5 @@ const DateInput: React.FC<DateInputProps> = ({
   );
 };
 
-export default DateInput;
+DateInput.displayName = "DateInput";
+export default React.memo(DateInput);

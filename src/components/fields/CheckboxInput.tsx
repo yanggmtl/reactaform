@@ -10,7 +10,7 @@ import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type CheckboxInputProps = BaseInputProps<boolean, DefinitionPropertyField>;
 
-export const CheckboxInput: React.FC<CheckboxInputProps> = ({
+const CheckboxInput: React.FC<CheckboxInputProps> = ({
   field,
   value = false,
   onChange,
@@ -91,4 +91,5 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = ({
   );
 };
 
-export default CheckboxInput;
+CheckboxInput.displayName = "CheckboxInput";
+export default React.memo(CheckboxInput);

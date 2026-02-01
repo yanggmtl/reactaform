@@ -317,4 +317,5 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
   );
 };
 
-export default FileInput;
+FileInput.displayName = "FileInput";
+export default React.memo(FileInput);

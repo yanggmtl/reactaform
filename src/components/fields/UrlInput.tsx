@@ -18,16 +18,14 @@ const UrlInput: React.FC<UrlInputProps> = ({
   onError,
   error: externalError,
 }) => {
-  const validate = useFieldValidator(field);
+  const validate = useFieldValidator(field, externalError);
 
-  const { inputRef, error: hookError, handleChange } = useUncontrolledValidatedInput({
-     value,
-     onChange,
-     onError,
-     validate,
-   });
- 
-   const error = externalError ?? hookError;
+  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
+    value,
+    onChange,
+    onError,
+    validate,
+  });
  
   return (
     <StandardFieldLayout field={field} error={error}>
@@ -49,4 +47,5 @@ const UrlInput: React.FC<UrlInputProps> = ({
   );
 };
 
-export default UrlInput;
+UrlInput.displayName = "UrlInput";
+export default React.memo(UrlInput);

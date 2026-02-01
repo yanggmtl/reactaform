@@ -50,4 +50,5 @@ const IntegerArrayInput: React.FC<IntegerArrayInputProps> = ({
   );
 };
 
-export default IntegerArrayInput;
+IntegerArrayInput.displayName = "IntegerArrayInput";
+export default React.memo(IntegerArrayInput);

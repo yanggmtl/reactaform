@@ -45,4 +45,5 @@ const TextInput: React.FC<TextInputProps> = ({
   );
 };
 
+TextInput.displayName = "TextInput";
 export default TextInput;

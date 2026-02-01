@@ -46,4 +46,5 @@ const MultilineTextInput: React.FC<TextInputProps> = ({
   );
 };
 
-export default MultilineTextInput;
+MultilineTextInput.displayName = "MultilineTextInput";
+export default React.memo(MultilineTextInput);

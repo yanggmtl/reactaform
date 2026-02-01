@@ -40,4 +40,5 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   );
 };
 
-export default EmailInput;
+EmailInput.displayName = "EmailInput";
+export default React.memo(EmailInput);

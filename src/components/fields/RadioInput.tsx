@@ -141,4 +141,5 @@ const RadioInput: React.FC<RadioInputProps> = ({
   );
 };
 
-export default RadioInput;
+RadioInput.displayName = "RadioInput";
+export default React.memo(RadioInput);

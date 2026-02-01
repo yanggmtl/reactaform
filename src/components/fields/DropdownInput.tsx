@@ -424,4 +424,5 @@ const DropdownPopup: React.FC<PopupProps> = ({
   );
 };
 
-export default DropdownInput;
+DropdownInput.displayName = "DropdownInput";
+export default React.memo(DropdownInput);

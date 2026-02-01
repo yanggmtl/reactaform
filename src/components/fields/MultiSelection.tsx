@@ -513,4 +513,5 @@ const MultiSelectionPopup: React.FC<PopupProps> = ({
   );
 };
 
-export default MultiSelect;
+MultiSelect.displayName = "MultiSelect";
+export default React.memo(MultiSelect);

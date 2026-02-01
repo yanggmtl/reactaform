@@ -15,16 +15,14 @@ const TimeInput: React.FC<TimeInputProps> = ({
   onError,
   error: externalError,
 }) => {
-  const validate = useFieldValidator(field);
+  const validate = useFieldValidator(field, externalError);
 
-  const { inputRef, error: hookError, handleChange } = useUncontrolledValidatedInput({
+  const { inputRef, error, handleChange } = useUncontrolledValidatedInput({
     value,
     onChange,
     onError,
     validate,
   });
-
-  const error = externalError ?? hookError;
 
   return (
     <StandardFieldLayout field={field} error={error}>
@@ -48,4 +46,5 @@ const TimeInput: React.FC<TimeInputProps> = ({
   );
 };
 
-export default TimeInput;
+TimeInput.displayName = "TimeInput";
+export default React.memo(TimeInput);

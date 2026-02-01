@@ -96,12 +96,6 @@ const ColorInput: React.FC<ColorInputProps> = ({
 
   const [previewColor, setPreviewColor] =
     React.useState(normalizedValue);
-
-  // Notify parent when validation result changes
-  React.useEffect(() => {
-    if (externalError) return;
-    onError?.(error);
-  }, [error, externalError, onError]);
   
   React.useEffect(() => {
     setPreviewColor(normalizedValue);
@@ -199,4 +193,5 @@ const ColorInput: React.FC<ColorInputProps> = ({
   );
 };
 
-export default ColorInput;
+ColorInput.displayName = "ColorInput";
+export default React.memo(ColorInput);

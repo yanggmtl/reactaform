@@ -52,4 +52,5 @@ const NumericStepperInput: React.FC<NumericStepperInputProps> = ({
   );
 };
 
-export default NumericStepperInput;
+NumericStepperInput.displayName = "NumericStepperInput";
+export default React.memo(NumericStepperInput);

@@ -78,44 +78,27 @@ const cacheMetadata = new Map<
  * Enhanced common translation loader with better error handling
  */
 export const loadCommon = async (
-  language: string
+  language: string,
 ): Promise<TranslationLoadResult> => {
   try {
     let translations: TranslationMap = {};
 
     const abbr = language.toLowerCase();
-    switch (abbr) {
-      case "fr":
-        translations = (await import("../locales/fr/common.json")).default;
-        break;
-      case "de":
-        translations = (await import("../locales/de/common.json")).default;
-        break;
-      case "es":
-        translations = (await import("../locales/es/common.json")).default;
-        break;
-      case "zh-cn":
-        translations = (await import("../locales/zh-cn/common.json")).default;
-        break;
-      case "en":
-        translations = {}; // English is the default language
-        break;
-      default: {
-        // No built-in translations available, find language in supportedLanguages
-        // Get the translations from external source or return empty
-        // External source: https://reactaform.vercel.app/locales/{lang}/common.json
-        const langInfo = supportedLanguages[abbr];
-        if (langInfo) {
-          const url = `https://reactaform.vercel.app/locales/${abbr}/common.json`;
-          const response = await fetch(url);
-          if (response.ok) {
-            const data = await response.json();
-            translations = data as TranslationMap;
-          }
-        } else {
-          // Language not supported
-          translations = {};
+    if (abbr === "en") {
+      translations = {};
+    } else {
+      // External source: https://reactaform.com/locales/{lang}/common.json
+      const langInfo = supportedLanguages[abbr];
+      if (langInfo) {
+        const url = `https://reactaform.com/locales/${abbr}/common.json`;
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          translations = data as TranslationMap;
         }
+      } else {
+        // Language not supported
+        translations = {};
       }
     }
 
@@ -137,7 +120,7 @@ export const loadCommon = async (
  * Enhanced common translation loading with caching and metadata
  */
 export const loadCommonTranslation = async (
-  language: string
+  language: string,
 ): Promise<TranslationLoadResult> => {
   if (!language || language.toLowerCase() === "en") {
     return { success: true, translations: {}, fromCache: false };
@@ -174,7 +157,7 @@ export const loadCommonTranslation = async (
  */
 export const loadUserTranslation = async (
   language: string,
-  localizeName: string
+  localizeName: string,
 ): Promise<TranslationLoadResult> => {
   if (!language || !localizeName) {
     return {
@@ -235,7 +218,7 @@ export const loadUserTranslation = async (
         success: false,
         translations: {},
         error: `HTTP ${response.status}`,
-        fromCache: false 
+        fromCache: false,
       };
     }
 
@@ -248,7 +231,7 @@ export const loadUserTranslation = async (
       // Not strictly required, but warn in debug mode
       if (isDebugMode()) {
         console.warn(
-          `Translation file at ${url} has unexpected content-type: ${contentType}`
+          `Translation file at ${url} has unexpected content-type: ${contentType}`,
         );
       }
     }
@@ -287,7 +270,7 @@ export const loadUserTranslation = async (
       Object.entries(parsed as Record<string, unknown>).map(([k, v]) => [
         k,
         typeof v === "string" ? v : String(v),
-      ])
+      ]),
     );
 
     // Cache successful result
@@ -336,7 +319,10 @@ export function isDebugMode(): boolean {
 
   try {
     // Try webpack/CRA process.env.NODE_ENV
-    if (typeof process !== 'undefined' && process?.env?.NODE_ENV === 'development') {
+    if (
+      typeof process !== "undefined" &&
+      process?.env?.NODE_ENV === "development"
+    ) {
       return true;
     }
   } catch {
@@ -370,7 +356,7 @@ function interpolateText(text: string, args: unknown[]): string {
 export const createTranslationFunction = (
   language: string,
   commonMap: TranslationMap,
-  userMap: TranslationMap
+  userMap: TranslationMap,
 ) => {
   return (defaultText: string, ...args: unknown[]): string => {
     let translateText = defaultText;
@@ -403,7 +389,7 @@ export const createTranslationFunction = (
 
     if (!translated && isDebugMode()) {
       console.debug(
-        `Missing translation for "${defaultText}" in language "${language}"`
+        `Missing translation for "${defaultText}" in language "${language}"`,
       );
     }
     return translateText;

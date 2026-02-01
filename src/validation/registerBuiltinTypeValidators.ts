@@ -18,6 +18,7 @@ import { validateFileField } from "./validateFileField";
 import { validateDropdownField, validateMultiSelectionField } from "./validateSelectionFields";
 import { validateColorField } from "./validateColorField";
 import { validateRatingField } from "./validateRatingField";
+import { validateSliderField } from "./validateSliderField";
 
 import { registerBuiltinFieldTypeValidationHandler } from "./validationHandlerRegistry";
 
@@ -33,7 +34,7 @@ export function ensureBuiltinFieldTypeValidatorsRegistered(): void {
   registerBuiltinFieldTypeValidationHandler("stepper", validateIntegerField);
   registerBuiltinFieldTypeValidationHandler("int-array", validateIntegerArrayField);
   registerBuiltinFieldTypeValidationHandler("float", validateFloatField);
-  registerBuiltinFieldTypeValidationHandler("slider", validateFloatField);
+  registerBuiltinFieldTypeValidationHandler("slider", validateSliderField);
   registerBuiltinFieldTypeValidationHandler("float-array", validateFloatArrayField);
   registerBuiltinFieldTypeValidationHandler("text", validateTextField);
   registerBuiltinFieldTypeValidationHandler("string", validateTextField);

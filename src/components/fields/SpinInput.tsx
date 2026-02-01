@@ -197,4 +197,5 @@ const SpinInput: React.FC<SpinInputProps> = ({ field, value, onChange, onError }
   );
 };
 
-export default SpinInput;
+SpinInput.displayName = "SpinInput";
+export default React.memo(SpinInput);

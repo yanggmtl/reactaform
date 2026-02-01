@@ -38,11 +38,9 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const input = e.target.value;
       setInputValue(input);
-      
-      validate(input);
       onChange?.(input);
     },
-    [validate, onChange]
+    [onChange]
   );
 
   const displayValue = !isNaN(Number(inputValue)) ? String(Number(inputValue)) : String(min);
@@ -88,4 +86,5 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
   );
 };
 
-export default SliderInput;
+SliderInput.displayName = "SliderInput";
+export default React.memo(SliderInput);

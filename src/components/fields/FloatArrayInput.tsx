@@ -54,4 +54,5 @@ const FloatArrayInput: React.FC<FloatArrayInputProps> = ({
   );
 };
 
-export default FloatArrayInput;
+FloatArrayInput.displayName = "FloatArrayInput";
+export default React.memo(FloatArrayInput);

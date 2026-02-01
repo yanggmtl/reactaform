@@ -75,4 +75,5 @@ const FieldSeparator: React.FC<FieldSeparatorProps> = ({ field }) => {
   );
 };
 
-export default FieldSeparator;
+FieldSeparator.displayName = "FieldSeparator";
+export default React.memo(FieldSeparator);

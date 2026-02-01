@@ -41,4 +41,5 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   );
 };
 
-export default PhoneInput;
+PhoneInput.displayName = "PhoneInput";
+export default React.memo(PhoneInput);

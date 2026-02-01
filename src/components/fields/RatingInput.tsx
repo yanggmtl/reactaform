@@ -56,10 +56,9 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
   const handleSelect = React.useCallback(
     (val: number) => {
       const normalized = Math.min(Math.max(val, 0), max);
-      validate(normalized);
       onChange?.(normalized);
     },
-    [max, validate, onChange]
+    [max, onChange]
   );
 
   const handleKeyDown = React.useCallback(
@@ -123,4 +122,5 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
   );
 };
 
-export default RatingInput;
+RatingInput.displayName = "RatingInput";
+export default React.memo(RatingInput);

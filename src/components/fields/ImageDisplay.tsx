@@ -186,4 +186,5 @@ const ImageDisplay: React.FC<ImageProps> = ({ field, value }) => {
   );
 };
 
-export default ImageDisplay;
+ImageDisplay.displayName = "ImageDisplay";
+export default React.memo(ImageDisplay);

@@ -1,6 +1,6 @@
 import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { isDarkTheme } from "../../utils/themeUtils";
+import { isDarkTheme } from "../../styles/themeUtils";
 
 interface SeparatorProps {
   color?: string;

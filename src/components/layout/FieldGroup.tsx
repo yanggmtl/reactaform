@@ -1,5 +1,4 @@
 import * as React from "react";
-// Styling for groups is handled by CSS classes in reactaform.css
 import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../../core/reactaFormTypes";
 import { FieldRenderer } from "./FieldRenderer";
 

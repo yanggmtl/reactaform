@@ -6,7 +6,7 @@ import type {
   DefinitionPropertyField,
 } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { isDarkTheme } from "../../utils/themeUtils";
+import { isDarkTheme } from "../../styles/themeUtils";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type DropdownField = DefinitionPropertyField & {

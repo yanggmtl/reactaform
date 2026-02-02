@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { isDarkTheme, isDarkColor } from "../../utils/themeUtils";
+import { isDarkTheme, isDarkColor } from "../../styles/themeUtils";
 
 const QuestionMark = () => (
   <svg

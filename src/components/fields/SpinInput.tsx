@@ -3,7 +3,7 @@ import { StandardFieldLayout } from "../layout/LayoutComponents";
 import type { DefinitionPropertyField, BaseInputProps } from "../../core/reactaFormTypes";
 import { validateField } from "../../validation/validation";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { CSS_CLASSES, combineClasses } from "../../core/cssClasses";
+import { CSS_CLASSES, combineClasses } from "../../styles/cssClasses";
 
 export type SpinInputProps = BaseInputProps<number, DefinitionPropertyField>;
 

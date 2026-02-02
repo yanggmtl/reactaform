@@ -3,7 +3,7 @@ import { StandardFieldLayout } from "../layout/LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
-import { isDarkTheme } from "../../utils/themeUtils";
+import { isDarkTheme } from "../../styles/themeUtils";
 
 export type FileInputProps = BaseInputProps<File | File[] | null, DefinitionPropertyField>;
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
-import { combineClasses, CSS_CLASSES } from "../../core/cssClasses";
+import { combineClasses, CSS_CLASSES } from "../../styles/cssClasses";
 import Tooltip from "../ui/Tooltip";
 import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 

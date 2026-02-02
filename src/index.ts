@@ -2,7 +2,7 @@
 // Import CSS as raw text and inject at runtime so consumers don't need to
 // explicitly import the stylesheet. Vite supports `?raw` to load file contents
 // as a string which will be bundled into the JS output.
-import reactaformCss from './core/reactaform.css?raw';
+import reactaformCss from './styles/reactaform.css?raw';
 
 export function injectReactaFormStyles() {
   if (document.getElementById('reactaform-styles')) return;
@@ -31,7 +31,7 @@ export { default as useReactaFormContext } from './hooks/useReactaFormContext';
 export { StandardFieldLayout } from './components/layout/LayoutComponents';
 
 // CSS Utilities for Custom Field Development
-export { CSS_CLASSES, combineClasses } from './core/cssClasses';
+export { CSS_CLASSES, combineClasses } from './styles/cssClasses';
 
 // Types
 export type {
@@ -124,7 +124,7 @@ export {
 export * as Units from './utils/unitValueMapper';
 
 // Theme Utilities
-export { isDarkTheme } from './utils/themeUtils';
+export { isDarkTheme } from './styles/themeUtils';
 
 // Serialization Utilities
 export {

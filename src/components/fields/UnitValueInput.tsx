@@ -5,7 +5,7 @@ import { StandardFieldLayout } from "../layout/LayoutComponents";
 import PopupOptionMenu from "../ui/PopupOptionMenu";
 import type { PopupOptionMenuPosition } from "../ui/PopupOptionMenu";
 import { getUnitFactors, convertTemperature } from "../../utils/unitValueMapper";
-import { CSS_CLASSES, combineClasses } from "../../core/cssClasses";
+import { CSS_CLASSES, combineClasses } from "../../styles/cssClasses";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type UnitValueInputProps = BaseInputProps<[string | number, string], DefinitionPropertyField>;

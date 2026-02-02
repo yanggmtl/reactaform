@@ -1,7 +1,7 @@
 import * as React from "react";
 import { StandardFieldLayout } from "../layout/LayoutComponents";
 import type { BaseInputProps, DefinitionPropertyField } from "../../core/reactaFormTypes";
-import { CSS_CLASSES, combineClasses } from "../../core/cssClasses";
+import { CSS_CLASSES, combineClasses } from "../../styles/cssClasses";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 type SliderInputProps = BaseInputProps<string | number, DefinitionPropertyField>;

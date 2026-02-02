@@ -5,7 +5,7 @@ import type { DefinitionPropertyField } from "../../core/reactaFormTypes";
 import type { BaseInputProps } from "../../core/reactaFormTypes";
 import useReactaFormContext from "../../hooks/useReactaFormContext";
 import { StandardFieldLayout } from "../layout/LayoutComponents";
-import { isDarkTheme } from "../../utils/themeUtils";
+import { isDarkTheme } from "../../styles/themeUtils";
 import { useFieldValidator } from "../../hooks/useFieldValidator";
 
 export type OptionsField = DefinitionPropertyField & {

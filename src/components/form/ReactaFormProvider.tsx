@@ -10,7 +10,7 @@ import { registerBaseComponents } from '../../core/registries/componentRegistry'
 import { ensureBuiltinFieldTypeValidatorsRegistered } from '../../validation/registerBuiltinTypeValidators';
 
 // Import CSS variables if needed
-import '../../core/reactaform.css';
+import '../../styles/reactaform.css';
 
 registerBaseComponents();
 ensureBuiltinFieldTypeValidatorsRegistered();

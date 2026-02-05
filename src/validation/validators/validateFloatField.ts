@@ -4,13 +4,13 @@ export function validateFloatField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input);
   if (inputStr.trim() === "") {
     if (field.min !== undefined || field.max !== undefined) {
       return t("Value required when min or max constraints is set");
     }
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   const parsedValue = Number(inputStr);
@@ -44,7 +44,7 @@ export function validateFloatField(
     }
   }
 
-  return null;
+  return undefined;
 }
 
 const validFloatRegex = /^[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?$/;
@@ -69,13 +69,13 @@ export function validateFloatArrayField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input);
   if (inputStr.trim() === "") {
     if (field.min !== undefined || field.max !== undefined) {
       return t("Value required when min or max constraints is set");
     }
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   if (!isValidFloatArray(inputStr)) {
@@ -119,5 +119,5 @@ export function validateFloatArrayField(
     }
   }
 
-  return null;
+  return undefined;
 }

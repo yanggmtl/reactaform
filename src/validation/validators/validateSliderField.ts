@@ -4,10 +4,10 @@ export function validateSliderField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input);
   if (inputStr.trim() === "") {
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   const parsedValue = Number(inputStr);
@@ -24,5 +24,5 @@ export function validateSliderField(
     return t("Must be ≤ {{1}}", max);
   }
 
-  return null;
+  return undefined;
 }

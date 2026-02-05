@@ -296,19 +296,6 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
                 : t("Choose File or Drag & Drop")
             }
           </div>
-          
-          {field.accept && (
-            <div style={{ 
-              fontSize: '0.75rem',
-              color: 'var(--reactaform-text-muted, #6b7280)',
-              whiteSpace: 'nowrap',
-              opacity: isDragging ? 0 : 1,
-              transition: 'opacity 0.15s ease',
-              pointerEvents: isDragging ? 'none' : 'auto'
-            }}>
-              {field.accept}
-            </div>
-          )}
         </div>
         
         {renderFileList()}

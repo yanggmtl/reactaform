@@ -7,15 +7,15 @@ export function validateColorField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input).trim();
   if (inputStr === "") {
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   if (!isValidHexColor(inputStr)) {
     return t("Invalid color format");
   }
 
-  return null;
+  return undefined;
 }

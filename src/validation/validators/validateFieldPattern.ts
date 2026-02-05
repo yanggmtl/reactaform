@@ -9,9 +9,9 @@ export function validateFieldPattern(
   t: TranslationFunction,
   fallbackMessage?: string,
   ...args: unknown[]
-): string | null {
+): string | undefined {
   if (field.pattern == null) {
-    return null;
+    return undefined;
   }
   const inputStr = String(input);
 
@@ -43,7 +43,7 @@ export function validateFieldPattern(
     }
   }
 
-  return null;
+  return undefined;
 }
 
 export default validateFieldPattern;

@@ -5,9 +5,9 @@ export function validatePhoneField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input ?? "").trim();
-  if (inputStr === "") return field.required ? t("Value required") : null;
+  if (inputStr === "") return field.required ? t("Value required") : undefined;
 
   return validateFieldPattern(field, inputStr, t, "Invalid phone number format");
 }

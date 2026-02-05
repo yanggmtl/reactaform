@@ -5,14 +5,14 @@ export function validateTextField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   // In Text and multiline fields, spaces are allowed and don't trim them
   const inputStr = String(input);
   if (inputStr === "") {
     if (field.minLength !== undefined || field.maxLength !== undefined) {
-      return field.required ? t("Value required when minLength or maxLength is set") : null;
+      return field.required ? t("Value required when minLength or maxLength is set") : undefined;
     }
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   const min = Math.max(field.minLength ?? 0, 0);

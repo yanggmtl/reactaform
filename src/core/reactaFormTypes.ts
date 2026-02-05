@@ -135,7 +135,7 @@ export type FieldTypeValidationHandler = (
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction,
-) => string | null;
+) => string | undefined;
 
 // Form validator function: takes entire values map,
 // and returns error string or undefined if valid
@@ -194,50 +194,3 @@ export type ReactaFormProviderProps = {
   defaultDisplayInstanceName?: boolean;
 };
 
-// Translation cache types
-export type TranslationMap = Record<string, string>;
-export type TranslationCache = Map<string, TranslationMap>;
-
-// Registry operation result types
-export interface RegistryResult<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-// Field group configuration
-export interface FieldGroup {
-  name: string;
-  displayName: string;
-  description?: string;
-  collapsed?: boolean;
-  order?: number;
-}
-
-// Enhanced validation result
-export interface ValidationResult {
-  isValid: boolean;
-  errors: string[];
-  warnings?: string[];
-}
-
-// Form lifecycle events
-export type FormEventType = 'init' | 'change' | 'validate' | 'submit' | 'reset';
-
-export interface FormEvent {
-  type: FormEventType;
-  timestamp: Date;
-  data?: unknown;
-}
-
-// Enhanced field configuration
-export interface EnhancedDefinitionPropertyField extends DefinitionPropertyField {
-  category?: string;
-  tags?: string[];
-  dependencies?: string[];
-  conditional?: {
-    field: string;
-    value: unknown;
-    operator?: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
-  };
-}

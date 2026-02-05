@@ -4,13 +4,13 @@ export function validateFileField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   if (Array.isArray(input)) {
     if (input.length === 0) {
       return t("Select a file");
     }
 
-    return !(input as File[]).every(f => f instanceof File) ? t("Invalid file input") : null;
+    return !(input as File[]).every(f => f instanceof File) ? t("Invalid file input") : undefined;
   }
 
   if (!(input instanceof File)) {
@@ -20,5 +20,5 @@ export function validateFileField(
     }
     return t("Invalid file input: {{1}}", inputString);
   }
-  return null;
+  return undefined;
 }

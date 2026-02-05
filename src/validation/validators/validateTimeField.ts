@@ -4,10 +4,10 @@ export function validateTimeField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input);
   if (!inputStr || inputStr.trim() === "") {
-    return (field.required || field.min || field.max) ? t("Value required") : null;
+    return (field.required || field.min || field.max) ? t("Value required") : undefined;
   }
   // Time comparison: treat as HH:MM or HH:MM:SS; compare lexicographically when zero-padded
   const toSeconds = (s: string) => {
@@ -45,5 +45,5 @@ export function validateTimeField(
       return t("Time must be on or before {{1}}", field.max);
   }
 
-  return null;
+  return undefined;
 }

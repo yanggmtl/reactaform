@@ -1,11 +1,12 @@
 import * as React from 'react';
-import type { FieldValidationMode, ReactaFormProviderProps, TranslationMap } from '../../core/reactaFormTypes';
+import type { FieldValidationMode, ReactaFormProviderProps } from '../../core/reactaFormTypes';
 import { ReactaFormContext } from '../../hooks/useReactaFormContext';
 import {
   loadCommonTranslation,
   loadUserTranslation,
-  createTranslationFunction
-} from '../../utils/translationCache';
+  createTranslationFunction,
+  type TranslationMap
+} from '../../utils/translationUtils';
 import { registerBaseComponents } from '../../core/registries/componentRegistry';
 import { ensureBuiltinFieldTypeValidatorsRegistered } from '../../validation/registerBuiltinTypeValidators';
 

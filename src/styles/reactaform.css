@@ -7,6 +7,7 @@
   --reactaform-secondary-bg: #fff;
   --reactaform-text-color: #000;
   --reactaform-text-muted: #666;
+  --reactaform-label-text-color: #000000;
   --reactaform-form-border-color: #000000;
   --reactaform-border-color: #ccc;
   --reactaform-border-hover: #999;
@@ -42,9 +43,16 @@
 
   /* Layout */
   --reactaform-border-radius: 0px;
+  --reactaform-border-width: 1px;
+  --reactaform-border-style: solid;
+
   --reactaform-form-border-radius: 0px;
   --reactaform-form-border-style: solid;
   --reactaform-form-border-width: 0px;
+
+  --reactaform-group-border-radius: var(--reactaform-border-radius);
+  --reactaform-group-border-style: var(--reactaform-border-style);
+  --reactaform-group-border-width: var(--reactaform-border-width);
   
   /* Shadows */
   --reactaform-form-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -148,15 +156,16 @@
     margin-bottom: var(--reactaform-field-gap, 8px);
   }
 
-  /* Field group (fieldset) styling moved from inline styles */
+  /* Fieldset / Group */
   .reactaform-group {
     border: 1px solid var(--reactaform-border-color, #bbb);
     padding: var(--reactaform-fieldset-padding, 0.5em);
-    border-radius: var(--reactaform-border-radius, 4px);
+    border-radius: var(--reactaform-group-border-radius, var(--reactaform-border-radius, 4px));
+    border-style: var(--reactaform-group-border-style, var(--reactaform-border-style, solid));
+    border-width: var(--reactaform-group-border-width, var(--reactaform-border-width, 1px));
     margin-bottom: var(--reactaform-space, 8px);
   }
 
-  /* Legend for field groups */
   .reactaform-group_legend {
     font-weight: bold;
     cursor: pointer;
@@ -180,10 +189,10 @@
   white-space: normal;
   line-height: 1.4;
   min-width: 100px;
-  color: var(--reactaform-text-color, #000000);
+  color: var(--reactaform-label-text-color, var(--reactaform-text-color, #000000));
   font-family: var(--reactaform-label-font-family, var(--reactaform-font-family, sans-serif));
-  font-weight: var(--reactaform-label-font-weight, 600);
-  font-size: var(--reactaform-label-font-size, 14px);
+  font-weight: var(--reactaform-label-font-weight, var(--reactaform-font-weight, 600));
+  font-size: var(--reactaform-label-font-size, var(--reactaform-font-size, 14px));
   user-select: none;
 }
 
@@ -196,6 +205,8 @@
   color: var(--reactaform-text-color, #000000);
   border: 1px solid var(--reactaform-border-color, #ccc);
   border-radius: var(--reactaform-border-radius, 0px);
+  border-style: var(--reactaform-border-style, solid);
+  border-width: var(--reactaform-border-width, 1px);
   padding: var(--reactaform-input-padding, 8px);
   box-sizing: border-box;
   background-color: var(--reactaform-input-bg, #ffffff);

@@ -4,10 +4,10 @@ export function validateRatingField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input ?? "").trim();
   if (inputStr === "") {
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   let parsedValue = input;
@@ -24,5 +24,5 @@ export function validateRatingField(
     return t("Must be ≤ {{1}}", field.max);
   }
 
-  return null;
+  return undefined;
 }

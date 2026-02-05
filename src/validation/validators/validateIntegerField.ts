@@ -32,13 +32,13 @@ export const validateIntegerField = (
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null => {
+): string | undefined => {
   const inputStr = String(input);
   if (inputStr.trim() === "") {
     if (field.min !== undefined || field.max !== undefined) {
       return t("Value required when min or max constraints is set");
     }
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   // Check integer format. This is needed because parseInt will parse partial strings.
@@ -90,20 +90,20 @@ export const validateIntegerField = (
     }
   }
 
-  return null;
+  return undefined;
 };
 
 export function validateIntegerArrayField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const inputStr = String(input);
   if (inputStr.trim() === "") {
     if (field.min !== undefined || field.max !== undefined) {
       return t("Value required when min or max constraints is set");
     }
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   if (!isValidIntegerArray(inputStr)) {
@@ -148,5 +148,5 @@ export function validateIntegerArrayField(
     }
   }
 
-  return null;
+  return undefined;
 }

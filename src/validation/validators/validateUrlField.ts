@@ -18,16 +18,16 @@ export function validateUrlField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   const trimmed = String(input ?? "").trim();
 
   if (trimmed === "") {
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   // Absolute URL
   if (urlRegex.test(trimmed) || isValidUrl(trimmed)) {
-    return null;
+    return undefined;
   }
 
   // Relative URL (only if allowed)
@@ -43,7 +43,7 @@ export function validateUrlField(
 
     try {
       new URL(trimmed, "http://example.com");
-      return null;
+      return undefined;
     } catch {
       return t("Must be a valid URL");
     }

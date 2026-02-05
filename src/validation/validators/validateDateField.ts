@@ -27,9 +27,9 @@ export function validateDateField(
   field: DefinitionPropertyField,
   input: FieldValueType,
   t: TranslationFunction
-): string | null {
+): string | undefined {
   if (input == null || String(input).trim() === "") {
-    return field.required ? t("Value required") : null;
+    return field.required ? t("Value required") : undefined;
   }
 
   const inputStr = String(input).trim();
@@ -48,5 +48,5 @@ export function validateDateField(
     return t("Date must be on or before {{1}}", field.maxDate);
   }
 
-  return null;
+  return undefined;
 }

@@ -1,4 +1,6 @@
-import type { TranslationMap, TranslationCache } from "../core/reactaFormTypes";
+// Translation cache types
+export type TranslationMap = Record<string, string>;
+export type TranslationCache = Map<string, TranslationMap>;
 
 export const supportedLanguages: Record<
   string,

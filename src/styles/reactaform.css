@@ -61,7 +61,7 @@
   --reactaform-button-bg: var(--reactaform-success-color);
   --reactaform-button-text: #ffffff;
   --reactaform-button-padding: var(--reactaform-space) 12px;
-  --reactaform-button-border-radius: var(--reactaform-border-radius);
+  --reactaform-button-border-radius: 6px;
   --reactaform-button-font-size: 14px;
   --reactaform-button-font-weight: var(--reactaform-font-weight);
   --reactaform-button-hover-opacity: 0.9;
@@ -288,7 +288,7 @@
   background-color: var(--reactaform-button-bg, var(--reactaform-success-color, #4CAF50));
   color: var(--reactaform-button-text, var(--reactaform-text-color, #000000));
   padding: var(--reactaform-button-padding);
-  border-radius: var(--reactaform-button-border-radius);
+  border-radius: var(--reactaform-button-border-radius, 6px);
   font-size: var(--reactaform-button-font-size);
   font-weight: var(--reactaform-button-font-weight);
   box-shadow: var(--reactaform-button-shadow);
@@ -296,10 +296,15 @@
   border: none;
   cursor: pointer;
   transition: opacity 0.2s ease;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .reactaform-button:hover:not(:disabled) {
   opacity: var(--reactaform-button-hover-opacity);
+  background-color: var(--reactaform-button-bg-hover, #0056b3);
 }
 
 .reactaform-button:disabled {

@@ -51,6 +51,7 @@ const formDefinition = {
       name: "calculateButton",
       displayName: "Calculate Sum",
       type: "button",
+      width: 120,
       action: "calculateSum",
       tooltip: "Click to calculate the sum of Number 1 and Number 2"
     },

@@ -64,15 +64,19 @@ const Button: React.FC<ButtonInputProps> = ({
   }, [field, valuesMap, handleChange, handleError, t]);
 
   const baseButtonStyle: React.CSSProperties = {
-    padding: "8px 16px",
     cursor: isProcessing ? "wait" : "pointer",
     opacity: isProcessing ? 0.6 : 1,
-    width: "100%",
-    minHeight: "var(--reactaform-input-height, 34px)",
   };
 
+  const mergedStyle: React.CSSProperties = { ...baseButtonStyle };
+
+  // If field.width provided, use pixel width override
+  if (field.width  && typeof field.width === 'number' && field.width > 0) {
+    mergedStyle.width = `${field.width}px`;
+  }
+
   return (
-    <StandardFieldLayout field={field} rightAlign={false} error={buttonError}>
+    <StandardFieldLayout field={field} rightAlign={true} error={buttonError}>
       <button
         type="button"
         className={CSS_CLASSES.button}
@@ -80,17 +84,7 @@ const Button: React.FC<ButtonInputProps> = ({
         disabled={isProcessing}
         aria-label={t(field.displayName)}
         aria-busy={isProcessing}
-        style={baseButtonStyle}
-        onMouseEnter={(e) => {
-          if (!isProcessing) {
-            e.currentTarget.style.backgroundColor = "var(--reactaform-button-bg-hover, var(--reactaform-success-color-hover, #0056b3))";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isProcessing) {
-            e.currentTarget.style.backgroundColor = "var(--reactaform-button-bg, var(--reactaform-success-color, #4CAF50))";
-          }
-        }}
+        style={mergedStyle}
       >
         {isProcessing ? t("Processing...") : t(field.displayName)}
       </button>

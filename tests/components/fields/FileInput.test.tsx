@@ -23,10 +23,11 @@ describe('FileInput', () => {
 
   it('renders drag and drop area', () => {
     const field = createMockField<DefinitionPropertyField>({ label: 'Upload', accept: '*' });
-    renderWithProvider(<FileInput {...baseFieldProps} field={field} value={null} />);
+    const { container } = renderWithProvider(<FileInput {...baseFieldProps} field={field} value={null} />);
 
     expect(screen.getByText('Choose File or Drag & Drop')).toBeInTheDocument();
-    expect(screen.getByText('*')).toBeInTheDocument();
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toHaveAttribute('accept', '*');
   });
 
   it('displays initial value on mount', () => {

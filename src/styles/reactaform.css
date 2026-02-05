@@ -285,8 +285,8 @@
 
 /* Button */
 .reactaform-button {
-  background-color: var(--reactaform-button-bg);
-  color: var(--reactaform-button-text);
+  background-color: var(--reactaform-button-bg, var(--reactaform-success-color, #4CAF50));
+  color: var(--reactaform-button-text, var(--reactaform-text-color, #000000));
   padding: var(--reactaform-button-padding);
   border-radius: var(--reactaform-button-border-radius);
   font-size: var(--reactaform-button-font-size);

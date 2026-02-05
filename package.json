@@ -1,6 +1,6 @@
 {
   "name": "reactaform",
-  "version": "1.8.93",
+  "version": "1.9.0",
   "description": "A powerful, type-safe React form builder library with dynamic field rendering, conditional visibility, multi-language support, and extensible validation",
   "keywords": [
     "react",
@@ -86,8 +86,5 @@
   },
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "reactaform": "^1.8.9"
   }
 }

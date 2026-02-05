@@ -105,6 +105,15 @@ export {
   registerFormValidationHandler,
 } from './core/registries/validationHandlerRegistry';
 
+export {
+  registerButtonHandler,
+  getButtonHandler,
+  hasButtonHandler,
+  unregisterButtonHandler,
+  listButtonHandlers,
+  type ButtonHandler,
+} from './core/registries/buttonHandlerRegistry';
+
 // Hooks
 export {
   type DebouncedCallback,

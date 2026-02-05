@@ -139,3 +139,11 @@ All notable changes to this project are documented in this file.
   - Fix dropdown height issue
   - Add label font family variable
   - Align text to left for dropdown and multi-selection components
+
+## 1.9.0 - 2026-02-05
+- Add Button component
+- Refactor codes:
+  - Field components to improve performance and remove redundent code.
+  - Restructure folders
+  - Remove unused scripts
+  

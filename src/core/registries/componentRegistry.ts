@@ -29,6 +29,7 @@ import TextInput from "../../components/fields/TextInput";
 import TimeInput from "../../components/fields/TimeInput";
 import UnitValueInput from "../../components/fields/UnitValueInput";
 import UrlInput from "../../components/fields/UrlInput";
+import Button from "../../components/fields/Button";
 
 // Now DebounceConfig and DEBOUNCE_CONFIG are only used in this file
 // In future we can move them to a separate file if needed
@@ -50,6 +51,7 @@ export const DEBOUNCE_CONFIG: Record<string, DebounceConfig> = {
   file: false,
   image: false,
   separator: false,
+  button: false, // Buttons don't need debouncing
 
   // Standard text inputs
   string: { wait: 200 },
@@ -81,6 +83,7 @@ type RegisteredComponent = unknown;
 const registry = new BaseRegistry<RegisteredComponent>();
 
 const baseComponents: Record<string, RegisteredComponent> = {
+  button: Button,
   checkbox: CheckboxInput,
   color: ColorInput,
   date: DateInput,

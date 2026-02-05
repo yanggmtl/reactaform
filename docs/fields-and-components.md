@@ -20,6 +20,11 @@ Reference for common field types. Link each entry to dedicated examples where av
 ## File / Image
 - `file`, `image-display`; configure accept types, size limits, preview behavior.
 
+## Actions
+- `button` - Interactive buttons that can read and modify form values.
+- Options: `action` (required - name of registered button handler).
+- See [Button Type Documentation](button-type.md) for complete guide and examples.
+
 ## Custom Field
 - Register via component registry; supply schema (e.g., `fancy-input` demo) and renderer.
 

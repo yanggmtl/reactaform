@@ -1,6 +1,7 @@
 import * as React from "react";
 import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../../core/reactaFormTypes";
 import { getComponent } from "../../core/registries/componentRegistry";
+import type { ButtonInputProps } from "../fields/Button";
 
 export interface FieldRendererProps {
   field: DefinitionPropertyField;
@@ -33,6 +34,18 @@ export const FieldRenderer = React.memo<FieldRendererProps>(
     );
 
     if (!Component) return null;
+
+    // Button type needs special props - pass valuesMap, handleChange, handleError
+    if (field.type === 'button') {
+      const buttonProps: ButtonInputProps = {
+        field,
+        value: null,
+        valuesMap,
+        handleChange,
+        handleError: handleError || (() => {}),
+      };
+      return <Component {...buttonProps} />;
+    }
 
     return (
       <Component

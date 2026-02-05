@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, CSSProperties } from 'react';
 
 // You can't enforce Integer vs Float at compile time in TS, so both are number aliases
 type Integer = number;
@@ -86,6 +86,12 @@ export interface DefinitionPropertyField {
 
   // Url input properties
   allowRelative?: boolean; // for 'url' type fields
+  
+  // Button properties
+  action?: string; // for 'button' type fields - name of registered button handler
+  // Optional className and inline style overrides applied to the rendered button
+  buttonClassName?: string;
+  buttonStyle?: CSSProperties;
 }
 
 export interface ReactaDefinition {

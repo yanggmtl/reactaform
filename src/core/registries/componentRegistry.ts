@@ -7,6 +7,7 @@ import { IS_TEST_ENV } from "../env";
 import CheckboxInput from "../../components/fields/CheckboxInput";
 import ColorInput from "../../components/fields/ColorInput";
 import DateInput from "../../components/fields/DateInput";
+import Description from "../../components/fields/Description";
 import DropdownInput from "../../components/fields/DropdownInput";
 import EmailInput from "../../components/fields/EmailInput";
 import FieldSeparator from "../../components/fields/Separator";
@@ -51,6 +52,7 @@ export const DEBOUNCE_CONFIG: Record<string, DebounceConfig> = {
   file: false,
   image: false,
   separator: false,
+  description: false,
   button: false, // Buttons don't need debouncing
 
   // Standard text inputs
@@ -87,6 +89,7 @@ const baseComponents: Record<string, RegisteredComponent> = {
   checkbox: CheckboxInput,
   color: ColorInput,
   date: DateInput,
+  description: Description,
   dropdown: DropdownInput,
   email: EmailInput,
   file: FileInput,

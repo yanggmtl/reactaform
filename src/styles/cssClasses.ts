@@ -10,6 +10,7 @@ export const CSS_CLASSES = {
   inputSelect: 'reactaform-select',
   rangeInput: 'reactaform-input--range',
   button: 'reactaform-button',
+  description: 'reactaform-description',
 } as const;
 
 export const combineClasses = (

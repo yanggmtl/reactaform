@@ -196,6 +196,15 @@
   user-select: none;
 }
 
+/* Description (UI-only display text) */
+.reactaform-description {
+  font-size: var(--reactaform-font-size, 14px);
+  font-weight: var(--reactaform-font-weight, 500);
+  margin: var(--reactaform-space, 8px) 0;
+  color: var(--reactaform-text-color, #000000);
+  user-select: none;
+}
+
 /* Ensure row layout labels are left-aligned */
 
 

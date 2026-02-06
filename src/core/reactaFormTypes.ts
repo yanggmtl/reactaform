@@ -89,6 +89,10 @@ export interface DefinitionPropertyField {
   
   // Button properties
   action?: string; // for 'button' type fields - name of registered button handler
+  
+  // Description properties
+  displayText?: string; // for 'description' type fields - text content to display
+  textAlign?: 'left' | 'center' | 'right'; // for 'description' type fields - text alignment
 }
 
 export interface ReactaDefinition {

@@ -32,6 +32,14 @@ const formDefinition = {
   displayName: "Simple Calculator with Buttons",
   properties: [
     {
+      name: "desc",
+      displayName: "Welcome Message",
+      type: "description",
+      textAlign: "left",
+      allowHtml: true,
+      displayText: "This form allows you to add two numbers using buttons.<ol><li>Enter two positive numbers</li><li>Click 'Calculate Sum' to compute the result</li><li>Click 'Reset Form' to clear all fields</li><li>Click 'Apply' to submit the form</li></ol>",
+    },
+    {
       name: "number1",
       displayName: "Number 1",
       type: "int",
@@ -72,7 +80,7 @@ const formDefinition = {
   ]
 };
 
-function App() {
+export default function App() {
   return (
     <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
       <ReactaForm
@@ -86,17 +94,6 @@ function App() {
           return [];
         }}
       />
-      
-      <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-        <h3>Instructions:</h3>
-        <ol>
-          <li>Enter two positive numbers</li>
-          <li>Click "Calculate Sum" to compute the result</li>
-          <li>Click "Validate Numbers" to check if inputs are valid</li>
-          <li>Click "Reset Form" to clear all fields</li>
-          <li>Click "Apply" to submit the form</li>
-        </ol>
-      </div>
     </div>
   );
 }

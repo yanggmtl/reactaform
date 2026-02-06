@@ -146,4 +146,7 @@ All notable changes to this project are documented in this file.
   - Field components to improve performance and remove redundent code.
   - Restructure folders
   - Remove unused scripts
-  
+## 1.9.1 - 2026-02-06
+- Add Description component
+- Add width property to Button
+

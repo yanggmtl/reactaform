@@ -7,7 +7,9 @@ export function useFieldValidator(field: DefinitionPropertyField, externalError?
   const { definitionName, t, fieldValidationMode } = useReactaFormContext();
   return React.useCallback(
     (value: FieldValueType) => 
-      fieldValidationMode === "realTime" ? validateField(definitionName, field, value, t) : externalError ?? null,
+      (fieldValidationMode === "onEdit" || fieldValidationMode === "realTime") 
+      ? validateField(definitionName, field, value, t)
+      : externalError ?? null,
     [definitionName, field, t, fieldValidationMode, externalError]
   );
 }

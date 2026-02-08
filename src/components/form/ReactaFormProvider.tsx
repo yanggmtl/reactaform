@@ -143,7 +143,7 @@ const getFieldStyle = (
  * @param {string} [props.defaultLanguage='en'] - Default language code for translations
  * @param {string} [props.defaultTheme='light'] - Default theme name
  * @param {string} [props.defaultLocalizeName] - Name of custom localization file
- * @param {FieldValidationMode} [props.defaultFieldValidationMode='realTime'] - Validation timing mode
+ * @param {FieldValidationMode} [props.defaultFieldValidationMode='onEdit'] - Field Validation mode
  * @param {string} [props.className='reactaform-container'] - CSS class name for the container
  * @param {boolean} [props.displayInstanceName] - Whether to display the instance name
  */
@@ -154,7 +154,7 @@ export const ReactaFormProvider = ({
   defaultLanguage = 'en',
   defaultTheme = 'light',
   defaultLocalizeName = '',
-  defaultFieldValidationMode = 'realTime',
+  defaultFieldValidationMode = 'onEdit',
   className = 'reactaform-container',
   defaultDisplayInstanceName = true
 }: ReactaFormProviderProps & { defaultFieldValidationMode?: FieldValidationMode }) => {

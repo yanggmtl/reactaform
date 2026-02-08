@@ -346,7 +346,10 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
 
   // Memoize expensive computations
   const isApplyDisabled = React.useMemo(
-    () => renderContext.fieldValidationMode === "realTime" ? Object.values(errors).some(Boolean) : false,
+    () => 
+      (renderContext.fieldValidationMode === "onEdit" || renderContext.fieldValidationMode === "realTime") 
+      ? Object.values(errors).some(Boolean)
+      : false,
     [errors, renderContext.fieldValidationMode]
   );
 

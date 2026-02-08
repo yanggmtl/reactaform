@@ -119,7 +119,7 @@ export interface ReactaFormProps {
   className?: string;
   theme?: string;
   style?: React.CSSProperties;
-  fieldValidationMode?: FieldValidationMode; // 'field' (default) or 'form'
+  fieldValidationMode?: FieldValidationMode; // 'onEdit' (default), 'onSubmission', or 'realTime'
   displayInstanceName?: boolean;
   onSubmit?: FormSubmissionHandler;
   onValidation?: FormValidationHandler;
@@ -128,8 +128,12 @@ export interface ReactaFormProps {
 // Translation helper types
 export type TranslationFunction = (text: string, ...args: unknown[]) => string;
 
-/** Validation mode controls where validation is performed. */
-export type FieldValidationMode = 'realTime' | 'onSubmission';
+/** Validation mode controls where validation is performed.
+ * 'onEdit' (default) - Validate fields as they are edited, showing errors immediately.
+ * 'onSubmission' - Validate only when the form is submitted, showing errors after submission attempt.
+ * 'realTime' - deprecated, use 'onEdit' instead.
+ */
+export type FieldValidationMode = 'onEdit' | 'onSubmission' | 'realTime';
 
 // Field validator function: returns error string or undefined if valid
 export type FieldCustomValidationHandler = (
@@ -184,8 +188,8 @@ export type ReactaFormContextType = {
   formStyle: { container?: React.CSSProperties; titleStyle?: React.CSSProperties };
   fieldStyle: Record<string, unknown>;
   t: TranslationFunction;
-  fieldValidationMode?: FieldValidationMode;
-  displayInstanceName?: boolean;
+  fieldValidationMode: FieldValidationMode;
+  displayInstanceName: boolean;
 };
 
 // Provider props types

@@ -1,4 +1,4 @@
-# Customized Components
+# Custom Components
 
 Customized components allow you to extend **ReactaForm** with your own field types while fully integrating with its validation, layout, localization, and builder ecosystem. This enables you to model complex data structures, create specialized inputs, and maintain a consistent form experience across your application.
 
@@ -17,72 +17,73 @@ The following example demonstrates a **Point2D** component that captures a pair 
 ## Step 1: Implement Component
 
 ```ts
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { BaseInputProps } from "reactaform";
-import { StandardFieldLayout, validateFieldValue, useReactaFormContext } from "reactaform";
+import React, { useEffect, useRef } from "react";
+import type { BaseInputProps, DefinitionPropertyField, FieldValueType, TranslationFunction } from "reactaform";
+import { StandardFieldLayout, useReactaFormContext, useFieldValidator } from "reactaform";
+import { registerFieldTypeValidationHandler } from "reactaform";
 import { CSS_CLASSES, combineClasses } from "reactaform";
 
 type Point2DValue = [string, string];
 
-const Point2DInput: React.FC<BaseInputProps<Point2DValue>> = ({ field, value, onChange, onError }) => {
-  const { t, definitionName } = useReactaFormContext();
+// Define a FieldTypeValidationHandler to process validation for the new type
+// For example: following validation handler is registered for type point2d
+// When field validate called, this type validator will be invoked.
+registerFieldTypeValidationHandler('point2d', (
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction) => 
+{
+  void field; // unused  
+  if (!Array.isArray(input) || input.length !== 2) {
+    return t('Value must be a 2D point array');
+  }
+  const [x, y] = input;
+  const xNum = Number(x);
+  const yNum = Number(y);
+  if (!Number.isFinite(xNum)) {
+    return t('X must be a valid number');
+  }
+  
+  if (!Number.isFinite(yNum)) {
+    return t('Y must be a valid number');
+  }
+  return null;
+});
 
-  // Uncontrolled inputs: use refs and keep an `error` state.
+
+const Point2DInput: React.FC<BaseInputProps<Point2DValue>> = ({ field, value, onChange, onError, error: externalError }) => {
+  const { t } = useReactaFormContext();
+
+  // For each component, two field validation modes are supported:
+  //    realTime:     field validation happens when field is in edit
+  //    onSubmission: field validation happens in submission process
+  // Important: useFieldValidator will take care of real time validation or on submit validation
+  const validate = useFieldValidator(field, externalError);
+
+  // Uncontrolled inputs: use refs
   const xRef = useRef<HTMLInputElement | null>(null);
   const yRef = useRef<HTMLInputElement | null>(null);
-  const validate = useCallback((xs: string, ys: string): string | null => {
-    if ((xs.trim() === "" && ys.trim() === "") ) {
-      return field.required ? t('Value required') : null;
-    }
 
-    const x = xs.trim() === "" ? 0 : Number(xs);
-    if (!Number.isFinite(x)) return t('Invalid X value');
-    const y = ys.trim() === "" ? 0 : Number(ys);
-    if (!Number.isFinite(y)) return t('Invalid Y value');
+  // Call field validate to check whether there is error
+  const error = validate(value)
 
-    // allow library-level validation to run as well
-    const err = validateFieldValue(definitionName, field, [xs, ys], t);
-    return err ?? null;
-  },
-    [field, definitionName, t]
-  );
-
-  // initialize error from incoming value so initial instance errors are visible
-  const [error, setError] = useState<string | null>(() => {
-    if (value && Array.isArray(value)) {
-      return validate(String(value[0] ?? ""), String(value[1] ?? ""));
-    }
-    return null;
-  });
-
-  useEffect(() => {
-    // sync when external value changes by setting input values on refs
-    if (value && Array.isArray(value)) {
-      if (xRef.current) xRef.current.value = String(value[0] ?? "");
-      if (yRef.current) yRef.current.value = String(value[1] ?? "");
-    }
-    // Do not run validation here; validation runs on user input handlers.
-  }, [value]);
-
-  // keep parent informed when our local error state changes
+  // keep parent informed when local error change
   useEffect(() => {
     onError?.(error ?? null);
   }, [error, onError]);
 
+  // Process X input change
   const handleXChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const xs = e.target.value;
     const ys = yRef.current ? yRef.current.value : "";
-    const err = validate(xs, ys);
-    setError(err);
-    onChange?.([xs, ys] as Point2DValue, err ?? null);
+    onChange?.([xs, ys] as Point2DValue);
   };
 
+  // Process Y input change
   const handleYChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const ys = e.target.value;
     const xs = xRef.current ? xRef.current.value : "";
-    const err = validate(xs, ys);
-    setError(err);
-    onChange?.([xs, ys] as Point2DValue, err ?? null);
+    onChange?.([xs, ys] as Point2DValue);
   };
 
   return (
@@ -122,10 +123,10 @@ registerComponent("point2d", Point2DInput);
 
 ```
 
-## Step 3: Create a example definition using the component
+## Step 3: Create an example definition using the component
 
 ```ts
-const point2DDef: ReactaDefinition = {
+const rectDef: ReactaDefinition = {
 {
   "name": "point2dDemo",
   "displayName": "Point2D Custom Component Demo",
@@ -133,11 +134,21 @@ const point2DDef: ReactaDefinition = {
   "properties": [
     {
       "type": "point2d",
-      "name": "position",
-      "displayName": "Position",
+      "name": "topLeft",
+      "displayName": "Top Left",
       "defaultValue": [
         "0",
         "0"
+      ],
+      "required": true
+    },
+    {
+      "type": "point2d",
+      "name": "bottomRight",
+      "displayName": "bottomRight",
+      "defaultValue": [
+        "640",
+        "480"
       ],
       "required": true
     }
@@ -158,10 +169,14 @@ const instance =
   "version": "1.0.0",
   "definition": "point2dDemo",
   "values": {
-    "position": [
+    "topLeft": [
       "10",
-      "20"
-    ]
+      "20",
+    ],
+    "bottomRight": [
+      "300",
+      "200",
+    ],
   }
 };
 
@@ -169,7 +184,7 @@ export default function App() {
   return (
     <div className="app">
       <h2>Custom Component: Point2D</h2>
-      <ReactaForm definitionData={point2DDef} instance={instance} />
+      <ReactaForm definitionData={rectDef} instance={instance} />
     </div>
   );
 }

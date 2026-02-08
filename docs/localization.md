@@ -54,7 +54,7 @@ This project provides builtin messages localization support for the following la
 | uk | Ukrainian | Українська |
 | vi | Vietnamese | Tiếng Việt |
 
-The builtin messsages of first 5 languages can be found in ReactaForm library and others can be found in `https://reactaform.vercel.app/locales/<abbr>/common.json`.
+The builtin messsages of first 5 languages can be found in ReactaForm library and others can be found in `https://reactaform.com/locales/<abbr>/common.json`.
 
 ## Translation Features
 

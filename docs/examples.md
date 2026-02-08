@@ -1,4 +1,4 @@
-# Example Apps (packages/apps)
+# Example Apps
 
 This folder contains small demo apps that exercise features of the `reactaform` library. The apps are intended to:
 
@@ -14,7 +14,7 @@ The examples are located at [Github Examples](https://github.com/yanggmtl/reacta
 
 ---
 
-## ? Demo Applications
+## 🎮 Demo Applications
 
 The `example/<vite|next_js|create_react_app>` directory contains working examples demonstrating various ReactaForm features:
 

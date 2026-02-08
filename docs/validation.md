@@ -2,7 +2,7 @@
 
 ## Built-in Validation
 
-ReactaForm provides a set of declarative, built-in validators you can set directly on property definitions. These cover the most common needs and work out-of-the-box in the renderer and builder.
+ReactaForm provides a set of declarative, built-in validators you can set directly on property definitions. These cover the most common needs and work out-of-the-box in the renderer.
 
 - Required: set `required: true`.
 - Numeric bounds: `min`, `max` with optional `minInclusive` / `maxInclusive` flags for inclusive/exclusive checks.
@@ -43,23 +43,24 @@ Notes:
 
 ## Field Validation Mode
 
-The field validation mode determines when field validation is performed: either in real time while the user is editing, or when the form is submitted.
+The field validation mode determines when field validation is performed: either in the field is in editing, or when the form is submitted.
 
 FieldValidationMode values:
 
-  - "realTime" — Validation occurs as the user edits a field. Errors are displayed immediately.
-  - "onSubmission" — Validation occurs during submission. If validation fails, the form is not submitted.”
+  - "onEdit" — Validation occurs as the field is in editing. Errors are displayed immediately.
+  - "onSubmission" — Validation occurs during form submission. If validation fails, the form is not submitted.
+  - "realTime" — Deprecated. Same as "onEdit".
 
 Example:
 ```ts
-  // Real-time field validation
+  // Field validation on field edit
   <ReactaForm
     definitionData={definition}
     instance={instance}
-    fieldValidationMode="realTime"
+    fieldValidationMode="onEdit"
   />;
 
-  // On-submission field validation
+  // Field validation on form submission
   <ReactaForm
     definitionData={definition}
     instance={instance}

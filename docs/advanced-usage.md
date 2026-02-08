@@ -104,5 +104,5 @@ ReactaForm exposes typed registration APIs for custom validation at both field a
 Please see reference [Validation](./validation.md)
 
 ## Theming and CSS variable control
-Please see reference [Styling & UI](./styling-ui.md)
+Please see reference [Styling & UI](./style-theming.md)
 

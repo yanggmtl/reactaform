@@ -117,9 +117,6 @@ registerSubmissionHandler('mySubmit', submitHandler);
 - `FormSubmissionHandler` — submission handler signature `(definition, instanceName, valuesMap, t) => string[] |  Promise<string[] | undefined>`.
 - `InputOnChange<T>` — generic input change callback `(value: T | string, error: string | null) => void`.
 - `BaseInputProps<TValue, TField>` — base props for input components (`field`, `value`, `onChange`, `onError`).
-- `RegistryResult<T>` — generic registry operation result `{ success, data?, error? }`.
-- `ValidationResult` — enhanced validation result `{ isValid, errors[], warnings? }`.
-- `EnhancedDefinitionPropertyField` — extended property field with category/tags/dependencies/conditional 
 
 ## Extensibility tips
 - Extend field types in your app by re-exporting or augmenting the exported `FieldDefinition`/`FormDefinition` types so your domain-specific fields stay typed across code.

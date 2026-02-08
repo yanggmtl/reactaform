@@ -1,4 +1,4 @@
-# ReactaForm API Reference
+# API Reference
 
 A structured overview of the public API exported from the package root.  
 See source root: `src/index.ts`.
@@ -10,13 +10,12 @@ See source root: `src/index.ts`.
 2. [Components](#components)
 3. [Context & Hooks & Debounce](#context--hooks--debounce)
 4. [Layout Components](#layout-components)
-5. [CSS Utilities](#css-utilities)
+5. [Style & theming](#style--theming)
 6. [Component Registry](#component-registry)
-7. [Plugin System](#plugin-system)
-8. [Translation](#translation)
-9. [Validation API](#validation-api)
-10. [Definition & Instance Model](#definition--instance-model)
-11. [Handler Registries](#handler-registries)
+7. [Translation](#translation)
+8. [Definition & Instance Model Other Types](#definition--instance-model-other-types)
+9. [Handler Registries](#handler-registries)
+10. [Plugin System](#plugin-system)
 
 ---
 
@@ -40,19 +39,69 @@ Source: `src/core/reactaFormTypes.ts`
 
 ### DefinitionPropertyField
 Defines a single field within a form definition.
+
 ```ts
 export interface DefinitionPropertyField {
   name: string;
   displayName: string;
-  type: string;
+  type: string; // 'string' | 'number' | 'boolean' | etc.
   defaultValue: FieldValueType;
   required?: boolean;
-  parents?: Record<string, string[] | number[]>;
+  parents?: ParentField;
   children?: Record<string, string[]>;
   group?: string;
   tooltip?: string;
-  validationHandlerName?: string | [string] | [string, string];
-  ......
+  labelLayout?: 'row' | 'column-left' | 'column-center'; // Optional label layout: 'row' (default), 'column-left' (label left-aligned), or 'column-center' (label center-aligned)
+
+  // Custom validation handler name
+  validationHandlerName?: ValidationHandlerName;
+
+  // Unit field properties
+  dimension?: string; // for 'unit' type fields, e.g. 'length', 'angle', etc.
+  defaultUnit?: string; // for 'unit' type fields
+
+  // Enum/select field properties
+  options?: Array<{ label: string; value: string }>;
+
+  // Text/String field properties
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  patternErrorMessage?: string;
+  placeholder?: string;
+  
+  // Numeric field properties
+  min?: number;
+  max?: number;
+  minInclusive?: boolean;
+  maxInclusive?: boolean;
+  step?: number;
+
+  // Array/collection properties
+  minCount?: number;
+  maxCount?: number;
+  
+  // Date/Time field properties
+  minDate?: string;
+  maxDate?: string;
+  includeSeconds?: boolean; // for 'time' type fields
+  
+  // Layout properties
+  layout?: 'horizontal' | 'vertical' | 'row' | 'column';
+  alignment?: 'left' | 'center' | 'right';
+  
+  // Image/Display properties
+  width?: number;
+  height?: number;
+  localized?: string;
+  minHeight?: string; // For textarea minimum height
+  
+  // File input properties
+  accept?: string; // e.g. "image/*,.pdf"
+  multiple?: boolean;
+
+  // Url input properties
+  allowRelative?: boolean; // for 'url' type fields
 }
 ```
 Check component schema files for the fields used by different type of components. [Built-in Components](./built-in-components.md)
@@ -87,52 +136,64 @@ export interface ReactaInstance {
 ---
 
 ### ReactaFormProps
-```ts
+```tsx
 export interface ReactaFormProps {
   definitionData: string | Record<string, unknown> | ReactaDefinition; // JSON string, plain object, or typed definition
-  language?: string;                 // Language, "en", "fr", ...
-  instance?: ReactaInstance;         // Optional instance (if omitted, ReactaForm creates one from the definition)
-  className?: string;                // Container css class
-  theme?: string;                    // Theme name (e.g. "light", "material-dark", custom)
-  style?: React.CSSProperties;       // Inline styles (merged into default style)
+  language?: string;          // Language, "en", "fr", ...              
+  instance?: ReactaInstance;  // Optional instance (if omitted, ReactaForm creates one from the definition)
+  className?: string;         // Container css class
+  theme?: string;             // Theme name (e.g. "light", "material-dark", custom)
+  style?: React.CSSProperties; // Inline styles (merged into default style)
   fieldValidationMode?: FieldValidationMode; // "realTime" | "onSubmission"
+  displayInstanceName?: boolean;             // Display and edit instance name in form
+  onSubmit?: FormSubmissionHandler;          // Submission handler callback. When this is specified, the submit handler defined in definition will be skipped
+  onValidation?: FormValidationHandler;      // Validation handler callback. When this is specified, the validation handler defined in definition will be skipped
 }
 ```
-
 ---
 
 ### Validator & Handler Types
-```ts
-// Callback handler for field validation
-// Note: Don't use time consuming remote logic for validate field to avoid UI delay
-// Return: undefined when success, otherwise return error message
-export type FieldValidationHandler = (
-  fieldName: string;                // Field name to validate
-  value: FieldValueType | unknown,  // Input field value
-  t: TranslationFunction            // Translation function for translating error messages
-) => string | undefined;           
+#### FieldCustomValidationHandler
+- Description
+  - Callback handler for field validation
+  - Note: Don't use time consuming remote logic for validate field to avoid UI delay
+  - Return: undefined when success, otherwise return error message
+
+```tsx
+export type FieldCustomValidationHandler = (
+  fieldName: string,
+  value: FieldValueType | unknown,
+  t: TranslationFunction,
+) => string | undefined;
 ```
 
-```ts
-// Callback handler for form validation
-// Used for validate relationship of fields, also can put time consuming field validation here
-// Return: if success, return undefined, otherwise return error messages
+#### FormSubmissionHandler
+- Description
+  - Callback handler for form submission
+  - Support async operation and can transfer input data to server.
+  - Return: undefined when success, otherwise return error messages
+
+```tsx
 export type FormValidationHandler = (
-  valuesMap: Record<string, unknown>,
-  t: TranslationFunction
-) => string[] | undefined | Promise<string[] | undefined>;
+  valuesMap: Record<string, FieldValueType | unknown>,
+  t: TranslationFunction,
+) => string[] | Promise<string[] | undefined> | undefined;
 ```
 
-```ts
-// Callback handler for form submission
-// Support async operation and can transfer input data to server.
-// Return: undefined when success, otherwise return error messages
-export type FormSubmissionHandler = (
-  definition: ReactaDefinition | Record<string, unknown>,
-  instanceName: string | null,
-  valuesMap: Record<string, unknown>,
-  t: TranslationFunction
-) => string[] | undefined | Promise<string[] | undefined>;
+
+#### FieldTypeValidationHandler
+- Description
+  - Callback validation handler for new type component
+  - When you register a custom field component/type, provide its validation contract (e.g., `validateValue(value)`), so the form can call it during standard validation cycles.
+  - This keeps validation logic close to component behavior while still integrating with form-level flows.
+  - Return: if success, return undefined, otherwise return error messages
+
+```tsx
+export type FieldTypeValidationHandler = (
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction,
+) => string | undefined;
 ```
 
 ---
@@ -142,7 +203,6 @@ export type FormSubmissionHandler = (
 ### ReactaForm (default)
 Top level convenience component.
 ```ts
-
 const ReactaForm: React.FC<ReactaFormProps>;
 ```
 Renders provider + renderer automatically.
@@ -170,20 +230,22 @@ export const ReactaFormProvider: React.FC<ReactaFormProviderProps>;
 
 ## Context & Hooks & Debounce
 
-
 ### Context types
-```ts
+#### ReactaFormContextType
+```tsx
 export type ReactaFormContextType = {
-  definitionName: string;               // Definition name
-  language: string;                     // Form language
-  theme: string;                        // Theme name
-  formStyle: { container?: React.CSSProperties; titleStyle?: React.CSSProperties }; // Form style
-  fieldStyle: Record<string, unknown>;  // Field style
-  t: TranslationFunction;               // Translation function
-  fieldValidationMode?: FieldValidationMode; // Field validation timing
-};
+  definitionName: string;
+  language: string;
+  theme: string;
+  formStyle: { container?: React.CSSProperties; titleStyle?: React.CSSProperties };
+  fieldStyle: Record<string, unknown>;
+  t: TranslationFunction;
+  fieldValidationMode?: FieldValidationMode;
+  displayInstanceName?: boolean;
+}
 ```
-### useReactaFormContext
+
+### useReactaFormContext hook
 Returns form context.
 ```ts
 // Declaration
@@ -218,8 +280,10 @@ export function useDebouncedCallback(
 
 ## Layout Components
 - `StandardFieldLayout`
+
 This layout is used for defining custom component value input element
 Standard layout signature:
+
 ```ts
 export const StandardFieldLayout: React.FC<{
   field: DefinitionPropertyField; // Field definition
@@ -231,67 +295,63 @@ export const StandardFieldLayout: React.FC<{
 
 ---
 
-## CSS Utilities
+## Style & theming
 
-### <a id="css-variables-reference"></a> CSS Variables Reference
+ReactaForm uses CSS variables as the single source of truth for styling.
+
+### CSS Variables Reference {#css-variables-reference}
 
 All themes use the same CSS variable system. Override these for custom styling:
 
 #### Colors & Surfaces
-```css
---reactaform-primary-bg        /* Main container background */
---reactaform-secondary-bg      /* Card/surface background */
---reactaform-input-bg          /* Input field background */
---reactaform-text-color        /* Primary text color */
---reactaform-text-muted        /* Secondary/muted text */
---reactaform-border-color      /* Default border */
---reactaform-border-hover      /* Hover border */
---reactaform-border-focus      /* Focus border */
---reactaform-error-color       /* Error state */
---reactaform-success-color     /* Success state */
---reactaform-link-color        /* Link color */
-```
+- `--reactaform-primary-bg`:         Main container background
+- `--reactaform-secondary-bg`:       Card/surface background
+- `--reactaform-input-bg`:           Input field background
+- `--reactaform-text-color`:         Primary text color
+- `--reactaform-text-muted`:         Secondary/muted text
+- `--reactaform-form-border-color`:  Form border color
+- `--reactaform-border-color`:       Default border
+- `--reactaform-border-hover`:       Hover border
+- `--reactaform-border-focus`:       Focus border
+- `--reactaform-error-color`:        Error state
+- `--reactaform-success-color`:      Success state
 
 #### Spacing & Layout
-```css
---reactaform-space             /* Base spacing unit */
---reactaform-space-lg          /* Large spacing */
---reactaform-field-gap         /* Gap between fields */
---reactaform-column-gap        /* Gap between columns */
---reactaform-inline-gap        /* Inline element gap */
---reactaform-label-gap         /* Label to input gap */
---reactaform-container-padding /* Container padding */
---reactaform-input-padding     /* Input padding */
-```
+- `--reactaform-space`:             Base spacing unit
+- `--reactaform-field-gap`:         Gap between fields
+- `--reactaform-column-gap`:        Label to input gap in row layout
+- `--reactaform-label-gap`:         Label to input gap in column layout
+- `--reactaform-container-padding`: Form padding
+- `--reactaform-input-padding`:     Input padding
 
 #### Typography
-```css
---reactaform-font-family       /* Font stack */
---reactaform-font-size         /* Base font size */
---reactaform-font-weight       /* Font weight */
---reactaform-line-height       /* Line height */
-```
+- `--reactaform-font-family`:       Font stack
+- `--reactaform-font-size `:        Base font size
+- `--reactaform-font-weight`:       Font weight
+- `--reactaform-label-font-family`: Field label font family
+- `--reactaform-label-font-size`:   Field label font size
+- `--reactaform-label-font-weight`: Field label font weight
 
 #### Shape & Borders
-```css
---reactaform-border-radius     /* Border radius */
---reactaform-border-width      /* Border width */
-```
+- `--reactaform-border-radius`:       Control border radius
+- `--reactaform-border-width`:        Border width
+- `--reactaform-form-border-radius`:  Form border radius
+- `--reactaform-form-border-style`:   Form border style
+- `--reactaform-form-border-width`:   Form border width
+- `--reactaform-group-border-radius`: Group border radius
+- `--reactaform-group-border-style`:  Group boder style
+- `--reactaform-group-border-width`:  Group border width
 
 #### Buttons & Controls
-```css
---reactaform-button-bg         /* Button background */
---reactaform-button-text       /* Button text color */
---reactaform-button-hover-bg   /* Button hover state */
---reactaform-button-padding    /* Button padding */
---reactaform-button-font-size  /* Button font size */
-```
+- `--reactaform-button-bg`:         Button background
+- `--reactaform-button-text`:       Button text color
+- `--reactaform-button-hover-bg`:   Button hover state
+- `--reactaform-button-padding`:    Button padding
+- `--reactaform-button-font-size`:  Button font size
 
 #### Tooltips
-```css
---reactaform-tooltip-bg        /* Tooltip background */
---reactaform-tooltip-color     /* Tooltip text color */
-```
+- `--reactaform-tooltip-bg`:        Tooltip background
+- `--reactaform-tooltip-color`:     Tooltip text color
 
 ### CSS_CLASSES
 Constant class registry.
@@ -340,7 +400,7 @@ export type TranslationFunction = (
 ```
 ###  Notes
 
-<code v-pre>{{&lt;index&gt;}}</code> is used to insert arguments dynamically.
+`{{'<index>'}}` is used to insert arguments dynamically.
 
 - `index` represents the **(index + 1)-th argument**
 - Arguments are replaced in order
@@ -367,9 +427,163 @@ Result
 ### Runtime Usage
 | Language | Output                                                |
 |----------|-------------------------------------------------------|
-| English  | t(text, args) → **Number 2 + Number 3 is equal to 5** |
-| French   | t(text, args) → **Nombre 2 + Nombre 3 est égal à 5**  |
+| English  | t(text, args) — **Number 2 + Number 3 is equal to 5** |
+| French   | t(text, args) — **Nombre 2 + Nombre 3 est égal à 5**  |
 
+---
+
+## Definition & Instance Model Other Types
+
+### LoadDefinitionOptions
+
+```ts
+export interface LoadDefinitionOptions {
+  validateSchema?: boolean;
+}
+```
+
+### DefinitionLoadResult
+
+```tsx
+export interface DefinitionLoadResult {
+  success: boolean;
+  definition?: ReactaDefinition;
+  error?: string;
+}
+```
+
+### InstanceLoadResult
+```tsx
+export interface InstanceLoadResult {
+  success: boolean;
+  instance?: ReactaInstance;
+  error?: string;
+}
+```
+
+### loadJsonDefinition
+
+```ts
+export async function loadJsonDefinition(
+  jsonData: string,
+  options: LoadDefinitionOptions = {}
+): Promise<DefinitionLoadResult>;
+```
+
+### createInstanceFromDefinition
+```ts
+export function createInstanceFromDefinition(
+  definition: ReactaDefinition, 
+  name: string
+): InstanceLoadResult;
+```
+
+loadInstance(instanceData);
+```ts
+export function loadInstance(
+  instanceData: string | Record<string, unknown>
+): InstanceLoadResult;
+```
+
+### upgradeInstanceToLatestDefinition
+```ts
+export function upgradeInstanceToLatestDefinition(
+  oldInstance: ReactaInstance,
+  latestDefinition: ReactaDefinition,
+  // optional callback allowing custom upgrade logic
+  callback?: (oldInstance: ReactaInstance, newInstance: Record<string, unknown>, latestDefinition: ReactaDefinition) => void
+): InstanceLoadResult;
+```
+
+---
+
+## Handler Registries
+
+Handler registries enables users inject custom process in ReactaForm
+
+### Types
+
+#### FieldCustomValidationHandler
+- Description
+  Custom field validator function which user defined extra field validation locgic, returns error string or undefined if validation is valid.
+```tsx
+export type FieldCustomValidationHandler = (
+  fieldName: string,
+  value: FieldValueType | unknown,
+  t: TranslationFunction,
+) => string | undefined;
+```
+
+#### FieldTypeValidationHandler
+- Description
+  When define a new type of component, field type validator function should be defined to make Reactaform applying same validate logic to it as other existing components, returns error string or undefined if validation is valid.
+
+```tsx
+export type FieldTypeValidationHandler = (
+  field: DefinitionPropertyField,
+  input: FieldValueType,
+  t: TranslationFunction,
+) => string | undefined;
+```
+
+#### FormValidationHandler
+- Description
+  Custom form validator function to let the user defining validation before form submission. This validation includes cross fields check and time consuming validations. It returns error string or undefined if valid.
+
+```tsx
+export type FormValidationHandler = (
+  valuesMap: Record<string, FieldValueType | unknown>,
+  t: TranslationFunction,
+) => string[] | Promise<string[] | undefined> | undefined;
+```
+---
+
+### Registration functions
+
+#### registerSubmissionHandler
+
+Registrate custom submission handler
+
+```ts
+export function registerSubmissionHandler(
+  submitterName: string, // The submission registered name for submission handler
+  fn: FormSubmissionHandler
+): void;
+```
+
+#### registerFieldCustomValidationHandler
+
+Registrate field custom validation handler
+
+```ts
+export function registerFieldCustomValidationHandler(
+  category: string,                 // Custom validation category which can be the name of definition
+  name: string,                     // The validation registered name for validation handler
+  fn: FieldCustomValidationHandler
+): void
+```
+
+#### registerFieldTypeValidationHandler
+
+Registrate field custom type validation handler for new type of component
+
+```ts
+export function registerFieldTypeValidationHandler(
+  name: string,                    // new type name
+  fn: FieldTypeValidationHandler   // type valifdation handler
+): void
+```
+
+#### registerFormValidationHandler
+
+Registrate form validation handler
+
+```ts
+export function registerFormValidationHandler(
+  name: string, // The validation registered name for validation handler
+  fn: FormValidationHandler // Form validation handler
+): void;
+```
 ---
 
 ## Plugin System
@@ -422,134 +636,9 @@ registerComponents(record);
 
 ### API overview:
 
-registerPlugin — Registers a plugin and all of its contributions
+- registerPlugin — Registers a plugin and all of its contributions
+- unregisterPlugin — Removes a plugin and optionally its registered items
+- getPlugin / getAllPlugins — Plugin introspection utilities
+- hasPlugin — Checks if a plugin is registered
+- registerComponents — Convenience helper for registering components only
 
-unregisterPlugin — Removes a plugin and optionally its registered items
-
-getPlugin / getAllPlugins — Plugin introspection utilities
-
-hasPlugin — Checks if a plugin is registered
-
-registerComponents — Convenience helper for registering components only
-
----
-
-
-## Definition & Instance Model
-### Types
-```ts
-export interface ReactaDefinition {
-  name: string;
-  version: string;
-  displayName: string;
-  localization?: string;
-  properties: DefinitionPropertyField[];
-  validationHandlerName?: string;
-  submitHandlerName?: string;
-}
-
-export interface ReactaInstance {
-  name: string;
-  definition: string;
-  version: string;
-  values: Record<string, FieldValueType>;
-}
-
-export interface LoadDefinitionOptions {
-  validateSchema?: boolean;
-}
-
-export interface DefinitionLoadResult {
-  success: boolean;
-  definition?: ReactaDefinition;
-  error?: string;
-}
-
-export interface InstanceLoadResult {
-  success: boolean;
-  instance?: ReactaInstance;
-  error?: string;
-}
-
-```
-
-### loadJsonDefinition
-```ts
-export async function loadJsonDefinition(
-  jsonData: string,
-  options: LoadDefinitionOptions = {}
-): Promise<DefinitionLoadResult>;
-```
-
-### createInstanceFromDefinition
-```ts
-export function createInstanceFromDefinition(
-  definition: ReactaDefinition, 
-  name: string
-): InstanceLoadResult;
-```
-
-loadInstance(instanceData);
-```ts
-export function loadInstance(
-  instanceData: string | Record<string, unknown>
-): InstanceLoadResult;
-```
-
-### upgradeInstanceToLatestDefinition
-```ts
-export function upgradeInstanceToLatestDefinition(
-  oldInstance: ReactaInstance,
-  latestDefinition: ReactaDefinition,
-  // optional callback allowing custom upgrade logic
-  callback?: (oldInstance: ReactaInstance, newInstance: Record<string, unknown>, latestDefinition: ReactaDefinition) => void
-): InstanceLoadResult;
-```
-
----
-
-## Handler Registries
-Handler registries enables users inject custom process in ReactaForm
-### Types
-```ts
-// Field validator function: returns error string or undefined if valid
-export type FieldValidationHandler = (
-  fieldName: string,
-  value: FieldValueType | unknown,
-  t: TranslationFunction,
-) => string | undefined;
-
-// Form validator function: takes entire values map,
-// and returns error string or undefined if valid
-// This is used for cross fields validation
-export type FormValidationHandler = (
-  valuesMap: Record<string, FieldValueType | unknown>,
-  t: TranslationFunction,
-) => string[] | undefined | Promise<string[] | undefined>;
-```
-
-
-### registerSubmissionHandler
-```ts
-export function registerSubmissionHandler(
-  submitterName: string,
-  fn: FormSubmissionHandler
-): void
-```
-
-### registerFieldCustomValidationHandler
-```ts
-export function registerFieldCustomValidationHandler(
-  category: string,
-  name: string,
-  fn: FieldCustomValidationHandler
-): void
-```
-
-### registerFormValidationHandler
-```ts
-export function registerFormValidationHandler(
-  name: string,
-  fn: FormValidationHandler
-): void
-```

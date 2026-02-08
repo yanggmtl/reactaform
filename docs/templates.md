@@ -46,7 +46,7 @@ This workflow makes templates:
 
 The official ReactaForm templates gallery is available at:
 
-[https://reactaform.vercel.app/templates](https://reactaform.vercel.app/templates)
+[https://reactaform.com/templates](https://reactaform.com/templates)
 
 From the gallery you can:
 

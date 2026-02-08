@@ -1,16 +1,17 @@
 # Getting Started
 
-Welcome to **ReactaForm**! This guide will get you productive in under **5 minutes** by walking you through installation, basic usage, and core concepts. ReactaForm allows you to define forms as JSON, render them with React components, and handle validation, state, and user input seamlessly.
+Welcome to **ReactaForm**! This guide gets you productive in under **5 minutes** by walking through installation, the smallest “render a form” example, and how to handle submission.
 
 You’ll quickly learn how to:
 - Install the library
-- Define forms and instances
-- Render forms with ReactaForm components
-- Understand core concepts like fields, validation, and state
+- Define forms as JSON
+- Render a form at runtime (no JSX per field)
+- Handle submissions via `onSubmit` or a registered handler
 
-By the end of this guide, you’ll be ready to create, render, and manage forms in your React applications efficiently.
+By the end, you’ll have a working form rendering from a JSON definition.
 
 ## Installation
+
 ```bash
 npm install reactaform
 # or
@@ -21,16 +22,17 @@ pnpm add reactaform
 
 ## Quick Start
 
+### Render a form from a JSON definition
 
-### A simple example for display ReactaForm
 1. Define your form as JSON.
 2. (Optional) Provide an instance (values) if you want to load/edit existing data.
 3. Render it with `ReactaForm`.
 
 ```tsx
+import * as React from 'react';
 import { ReactaForm } from 'reactaform';
 
-// Define definition or get from server
+// Define a form definition (or fetch it from your API)
 const definition = {
   name: 'contactForm',
   version: '1.0.0',
@@ -43,76 +45,122 @@ const definition = {
 };
 
 export function App() {
-  // If you don't pass `instance`, ReactaForm will create one from the definition.
+  // If you don't pass an instance/value object, ReactaForm will initialize one from the definition
   return <ReactaForm definitionData={definition} />;
 }
 ```
 
-### Example for submit values
-In the example above, the form is displayed and the inputs can be exited. The next question is how to retrieve these inputvalues and process them?
-ReactaForm provides a submission registration system that allows you define custom submission logic for each form definition.
-The process is straightforward:
+### Handle submission
 
-1. Specify the submission handler name in your form definition with property "submitHandlerName".
-```ts
-// Define definition or get from server
+In the example above, users can enter values. Next, you’ll typically submit those values to an API.
+
+ReactaForm supports two common approaches:
+
+1. Pass an `onSubmit` function directly to `ReactaForm` (simplest).
+2. Use the **submission registration system** so each definition can reference a handler by name.
+
+#### Option A — submit via `onSubmit`
+
+```tsx
+import * as React from 'react';
+import { ReactaForm } from 'reactaform';
+
 const definition = {
   name: 'contactForm',
   version: '1.0.0',
   displayName: 'Contact Form',
-  // name of the registered submit handler to invoke on submit
-  submitHandlerName: "exampleSubmitHandler",
   properties: [
     { name: 'name', type: 'text', displayName: 'Name', required: true },
     { name: 'email', type: 'email', displayName: 'Email', required: true },
-    { name: 'message', type: 'multiline', displayName: 'Message', minHeight: '80px' }
-  ]
-};
-```
-
-2. Implement your custom submission handler
-```ts
-// Define submission handler to process input data
-const handler: FormSubmissionHandler = (
-  definition,
-  instanceName,
-  valuesMap,
-  t
-): string[] | undefined => {
-  // you can get valuesMap and process it
-  // ... 
-
-  // Return undefined when submission success; when submission fail, return error message string
-  // Function t is used for translate the error message
-  return undefined; 
+    { name: 'message', type: 'multiline', displayName: 'Message', minHeight: '80px' },
+  ],
 };
 
-```
-3. Register the submission handler with ReactaForm
-
-```ts
-export default function App() {
-  React.useEffect(() => {
-    // Register the submission handler
-    // Name is the submitHandlerName in definition
-    registerSubmissionHandler("exampleSubmitHandler", handler); 
-  }, []);
-
+export function App() {
   return (
-    <ReactaForm definitionData={definition} />
+    <ReactaForm
+      definitionData={definition}
+      onSubmit={async (_definition, _instanceName, valuesMap, t) => {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(valuesMap),
+        });
+
+        // Return undefined for success
+        if (res.ok) return undefined;
+
+        // Return a list of error messages for failure
+        return [t('Server error while submitting form')];
+      }}
+    />
   );
 }
 ```
 
+#### Option B — register a submission handler
+
+This option is very useful when you have multiple forms and each form has different submission process.
+The submission handlers can be registered and reference in form defintion without passing specific submission  by onSubmit.
+
+1. Reference a handler in your definition using `submitHandlerName`.
+
+```ts
+const definition = {
+  name: 'contactForm',
+  version: '1.0.0',
+  displayName: 'Contact Form',
+  submitHandlerName: 'exampleSubmitHandler',
+  properties: [
+    { name: 'name', type: 'text', displayName: 'Name', required: true },
+    { name: 'email', type: 'email', displayName: 'Email', required: true },
+    { name: 'message', type: 'multiline', displayName: 'Message', minHeight: '80px' },
+  ],
+};
+```
+
+2. Register a handler with the same name.
+
+```tsx
+import * as React from 'react';
+import { ReactaForm, registerSubmissionHandler } from 'reactaform';
+
+export function App() {
+  React.useEffect(() => {
+    registerSubmissionHandler('exampleSubmitHandler', async (_definition, _instanceName, valuesMap, t) => {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(valuesMap),
+      });
+
+      if (res.ok) return undefined;
+      return [t('Server error while submitting form')];
+    });
+  }, []);
+
+  // There is no need passing onSubmit callback function
+  // ReactaForm will get submission handler by submitHandlerName and invoke it automatically
+  return <ReactaForm definitionData={definition} />;
+}
+```
+
+Note: onSubmit callback has higher priority than registration submission handler. When onSubmit is specified, registrated submission handler will be skipped. 
+
 ## Core Concepts
-- **Form**: top-level container managing values, validation, submission.
-            definition and instance are input.
-- **Definition**: a json schema discribe the form rendering and default values
-- **Instance**:  instance data for editing
-- **Field**: leaf component rendering input (Text, Select, Date, etc.).
-- **Validation**: declarative rules (built-in) plus custom validators.
-- **State Management**: values, errors, touched, submission state.
+
+- **Definition**: the JSON schema describing fields, labels, defaults, and behavior.
+- **Instance**: existing values for editing (optional).
+- **Field**: a rendered input (text, select, date, etc.) described by the definition.
+- **Validation**: built-in rules plus custom validators.
+- **Submission**: send the current values map to your handler (`onSubmit` or a registered handler).
 
 ## Next Steps
-- Try the visual builder to author definitions and export JSON.
-- Explore examples and templates to reuse common patterns.
+
+- Learn the mental model: [Fundamentals](./fundamentals.md)
+- Configure your own form style: [Style & Theming](./style-theming.md)
+- Define custom component: [Custom Components](./custom-components.md)
+- Define field and form validation logics: [Validation](./validation.md)
+- [Advanced Usage](./advanced-usage.md)
+- [ReactaForm Builder](./reactaform-builder.md)
+- [Theme & Styling](./style-theming.md)

@@ -1,64 +1,81 @@
 import { ReactaForm } from "reactaform";
 import "./style.css";
+import { createRoot } from "react-dom/client";
 
 const testDefinition = {
-  name: "customer",
-  displayName: "Customer",
-  version: "1.0.0",
-  properties: [
+  "name": "definition",
+  "displayName": "Definition",
+  "version": "1.0.0",
+  "properties": [
     {
-      type: "text",
-      name: "name",
-      displayName: "Name",
-      defaultValue: "",
-      required: true,
-    },
-    {
-      type: "dropdown",
-      name: "country",
-      displayName: "Country",
-      defaultValue: "US",
-      options: [
-        { label: "United States", value: "US" },
-        { label: "Canada", value: "CA" },
+      "type": "radio",
+      "name": "radio",
+      "displayName": "Radio",
+      "options": [
+        {
+          "label": "Option 1",
+          "value": "1"
+        },
+        {
+          "label": "Option 2",
+          "value": "2"
+        }
       ],
+      "defaultValue": "1",
+      "parents": {}
     },
     {
-      type: "dropdown",
-      name: "state",
-      displayName: "State",
-      defaultValue: "",
-      options: [
-        { label: "Alaska", value: "AK " },
-        { label: "California", value: "CA" },
-        { label: "New York", value: "NY" },
+      "type": "dropdown",
+      "name": "dropdown",
+      "displayName": "dropdown",
+      "options": [
+        {
+          "label": "Option 1",
+          "value": "1"
+        },
+        {
+          "label": "Option 2",
+          "value": "2"
+        }
       ],
-      parents: { country: ["US"] },
+      "defaultValue": "1"
     },
     {
-      type: "dropdown",
-      name: "province",
-      displayName: "Province",
-      defaultValue: "",
-      options: [
-        { label: "British Columbia", value: "BC" },
-        { label: "Ontario", value: "ON" },
-        { label: "Quebec", value: "QC" },
+      "type": "multi-selection",
+      "name": "multipleSelection",
+      "displayName": "multipleSelection",
+      "options": [
+        {
+          "label": "Option 1",
+          "value": "1"
+        },
+        {
+          "label": "Option 2",
+          "value": "2"
+        }
       ],
-      parents: { country: ["CA"] },
+      "defaultValue": [
+        "1"
+      ]
     },
-  ],
-};
-
-const predefined_instance = {
-  name: "parentsExampleInstance",
-  version: "1.0.0",
-  definition: "customer",
-  values: {
-    name: "John Doe",
-    country: "CA",
-    province: "ON",
-  },
+    {
+      "type": "text",
+      "name": "testText",
+      "displayName": "Test Text",
+      "defaultValue": "",
+      "parents": {
+        "radio": [
+          "1"
+        ],
+        "dropdown": [
+          "2"
+        ],
+        "multipleSelection": [
+          "2"
+        ]
+      }
+    }
+  ]
 };
 
 export default function App() {
@@ -67,8 +84,10 @@ export default function App() {
       <h2>Reactaform Parents Example</h2>
       <ReactaForm
         definitionData={{ ...testDefinition }}
-        instance={predefined_instance}
       />
     </div>
   );
 }
+
+const container = document.getElementById("root");
+if (container) createRoot(container).render(<App />);

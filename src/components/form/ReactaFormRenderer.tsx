@@ -208,9 +208,15 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       });
 
       // Update visibility separately to ensure we're using the latest values
-      // Check if the field has children that should be shown/hidden
+      // Check if the field has children that should be shown/hidden OR
+      // if any other fields have this field as a parent
       const field = fieldMap[name];
-      if (field && field.children && Object.keys(field.children).length > 0) {
+      const hasChildren = field && field.children && Object.keys(field.children).length > 0;
+      const isParentToOthers = Object.values(fieldMap).some(
+        (f) => f.parents && name in f.parents
+      );
+      
+      if (hasChildren || isParentToOthers) {
         setVisibility((prevVis) => {
           // Get the latest values including the one we just updated
           // Note: we need to compute this with the new value

@@ -104,6 +104,13 @@ export const updateVisibilityBasedOnSelection = (
     }
   }
 
+  // Also update visibility for all fields that have the changed field as a parent
+  for (const [otherFieldName, otherField] of Object.entries(fieldMap)) {
+    if (otherField.parents && fieldName in otherField.parents) {
+      newVisibility[otherFieldName] = isFieldVisible(otherFieldName, fieldMap, valuesMap);
+    }
+  }
+
   return newVisibility;
 };
 
@@ -123,28 +130,39 @@ export const isFieldVisible = (
     return true;
   }
 
-  // Check if all parent conditions are satisfied (AND logic)
+  // Check if any parent condition is satisfied (OR logic)
   for (const [parentName, expectedValues] of Object.entries(field.parents)) {
     const parentField = fieldMap[parentName];
     
     // Parent must exist and be visible
     if (!parentField || !isFieldVisible(parentName, fieldMap, values)) {
-      return false;
+      continue;
     }
     
     const parentValue = values[parentName];
     if (parentValue === undefined || parentValue === null) {
-      return false;
+      continue;
     }
 
-    const parentValueStr = String(parentValue);
     const expectedValuesStr = expectedValues.map(v => String(v));
     
-    if (!expectedValuesStr.includes(parentValueStr)) {
-      return false;
+    // Handle multi-selection fields (arrays)
+    if (Array.isArray(parentValue)) {
+      const parentValuesStr = parentValue.map(v => String(v));
+      // Check if any of the selected values match any expected value
+      const hasMatch = parentValuesStr.some(val => expectedValuesStr.includes(val));
+      if (hasMatch) {
+        return true;
+      }
+    } else {
+      // Handle single-value fields
+      const parentValueStr = String(parentValue);
+      if (expectedValuesStr.includes(parentValueStr)) {
+        return true;
+      }
     }
   }
 
-  return true;
+  return false;
 };
 

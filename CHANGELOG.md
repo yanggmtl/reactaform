@@ -153,3 +153,6 @@ All notable changes to this project are documented in this file.
 
 ## 1.9.2 - 2026-02-08
 - Refactor field validation modes: add 'onEdit', deprecate 'realTime'
+
+## 1.9.21 - 2026-02-09
+- Fix parent display issue

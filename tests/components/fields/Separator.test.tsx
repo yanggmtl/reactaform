@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import FieldSeparator from '../../../src/components/fields/Separator';
+import FieldSeparator from '../../../src/components/fields/ui-elements/Separator';
 import { renderWithProvider } from '../../test-utils';
 
 describe('Separator', () => {

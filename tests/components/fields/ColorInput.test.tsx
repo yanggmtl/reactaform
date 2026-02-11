@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import ColorInput from '../../../src/components/fields/ColorInput';
+import ColorInput from '../../../src/components/fields/advanced/ColorInput';
 import { type DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 

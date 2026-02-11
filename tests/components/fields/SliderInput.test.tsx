@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import SliderInput from '../../../src/components/fields/SliderInput';
+import SliderInput from '../../../src/components/fields/advanced/SliderInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import Description from '../../../src/components/fields/Description';
+import Description from '../../../src/components/fields/ui-elements/Description';
 import { renderWithProvider } from '../../test-utils';
 
 describe('Description', () => {

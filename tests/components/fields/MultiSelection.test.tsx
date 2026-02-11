@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import MultiSelection, {type OptionsField } from '../../../src/components/fields/MultiSelection';
+import MultiSelection, {type OptionsField } from '../../../src/components/fields/choices/MultiSelection';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 
 describe('MultiSelection', () => {

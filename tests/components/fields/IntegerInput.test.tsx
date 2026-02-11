@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import IntegerInput from '../../../src/components/fields/IntegerInput';
+import IntegerInput from '../../../src/components/fields/text-numeric/IntegerInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 
 describe('IntegerInput', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import FloatInput from '../../../src/components/fields/FloatInput';
+import FloatInput from '../../../src/components/fields/text-numeric/FloatInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 
 describe('FloatInput', () => {

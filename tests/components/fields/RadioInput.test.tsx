@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import RadioInput from '../../../src/components/fields/RadioInput';
+import RadioInput from '../../../src/components/fields/choices/RadioInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 

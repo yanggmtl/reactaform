@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
-import CheckboxInput from '../../../src/components/fields/CheckboxInput';
+import CheckboxInput from '../../../src/components/fields/choices/CheckboxInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 
 describe('CheckboxInput', () => {

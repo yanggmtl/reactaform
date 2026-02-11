@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import FileInput from '../../../src/components/fields/FileInput';
+import FileInput from '../../../src/components/fields/advanced/FileInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 

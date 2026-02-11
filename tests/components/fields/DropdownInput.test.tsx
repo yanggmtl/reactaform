@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import DropdownInput from '../../../src/components/fields/DropdownInput';
+import DropdownInput from '../../../src/components/fields/choices/DropdownInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 

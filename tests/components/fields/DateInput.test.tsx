@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen, fireEvent } from '@testing-library/react';
-import DateInput from '../../../src/components/fields/DateInput';
+import DateInput from '../../../src/components/fields/date-time/DateInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 

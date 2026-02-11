@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import UrlInput from '../../../src/components/fields/UrlInput';
+import UrlInput from '../../../src/components/fields/advanced/UrlInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 

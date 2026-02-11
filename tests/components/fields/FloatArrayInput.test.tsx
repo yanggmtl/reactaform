@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FloatArrayInput from '../../../src/components/fields/FloatArrayInput';
+import FloatArrayInput from '../../../src/components/fields/text-numeric/FloatArrayInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 

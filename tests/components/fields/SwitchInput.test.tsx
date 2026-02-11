@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
-import SwitchInput from '../../../src/components/fields/SwitchInput';
+import SwitchInput from '../../../src/components/fields/choices/SwitchInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 
 describe('SwitchInput', () => {

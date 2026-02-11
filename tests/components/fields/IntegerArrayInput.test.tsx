@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import IntegerArrayInput from '../../../src/components/fields/IntegerArrayInput';
+import IntegerArrayInput from '../../../src/components/fields/text-numeric/IntegerArrayInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 

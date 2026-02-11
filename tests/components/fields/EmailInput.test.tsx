@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { renderWithProvider, createMockField, baseFieldProps, waitForUpdate } from '../../test-utils';
-import EmailInput from '../../../src/components/fields/EmailInput';
+import EmailInput from '../../../src/components/fields/advanced/EmailInput';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 
 describe('EmailInput', () => {

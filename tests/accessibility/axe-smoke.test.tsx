@@ -1,7 +1,7 @@
 import React from 'react';
 import { describe, it, expect } from 'vitest';
 import { renderWithProvider, createMockField } from '../test-utils';
-import TextInput from '../../src/components/fields/TextInput';
+import TextInput from '../../src/components/fields/text-numeric/TextInput';
 
 // This test tries to dynamically import axe-core. If it's not installed
 // the test is skipped and a friendly message is printed explaining how

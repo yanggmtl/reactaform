@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { screen } from '@testing-library/react';
-import ImageDisplay from '../../../src/components/fields/ImageDisplay';
+import ImageDisplay from '../../../src/components/fields/ui-elements/ImageDisplay';
 import type { DefinitionPropertyField } from '../../../src/core/reactaFormTypes';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
 

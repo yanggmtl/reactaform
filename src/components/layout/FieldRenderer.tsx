@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { DefinitionPropertyField, FieldValueType, ErrorType } from "../../core/reactaFormTypes";
 import { getComponent } from "../../core/registries/componentRegistry";
-import type { ButtonInputProps } from "../fields/Button";
+import type { ButtonInputProps } from "../fields/ui-elements/Button";
 
 export interface FieldRendererProps {
   field: DefinitionPropertyField;

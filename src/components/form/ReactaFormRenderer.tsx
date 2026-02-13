@@ -193,6 +193,11 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
    */
   const handleChange = React.useCallback(
     (name: string, value: FieldValueType) => {
+      const field = fieldMap[name];
+      if (!field) {
+        return;
+      }
+
       // Clear any previous submission message when the user changes a value
       setSubmissionMessage(null);
       setSubmissionSuccess(null);
@@ -210,7 +215,6 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       // Update visibility separately to ensure we're using the latest values
       // Check if the field has children that should be shown/hidden OR
       // if any other fields have this field as a parent
-      const field = fieldMap[name];
       const hasChildren = field && field.children && Object.keys(field.children).length > 0;
       const isParentToOthers = Object.values(fieldMap).some(
         (f) => f.parents && name in f.parents
@@ -277,6 +281,15 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
   // map up to date when components validate on mount or when external props
   // change without invoking the full handleChange lifecycle.
   const handleError = React.useCallback((name: string, error: ErrorType) => {
+    if (fieldMap[name]?.disabled) {
+      setErrors((prev) => {
+        if (!(name in prev)) return prev;
+        const rest = Object.fromEntries(Object.entries(prev).filter(([k]) => k !== name)) as Record<string, string>;
+        return rest;
+      });
+      return;
+    }
+
     setErrors((prev) => {
       if (error) {
         return { ...prev, [name]: String(error) };
@@ -285,7 +298,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
       const rest = Object.fromEntries(Object.entries(prev).filter(([k]) => k !== name)) as Record<string, string>;
       return rest;
     });
-  }, []);
+  }, [fieldMap]);
 
   const handleSubmit = async () => {
     // Temporarily apply the edited name so submission handlers receive it.
@@ -306,6 +319,7 @@ const ReactaFormRenderer: React.FC<ReactaFormRendererProps> = ({
     if (renderContext.fieldValidationMode === "onSubmission") {
       const newErrors: Record<string, string> = {};
       updatedProperties.forEach((field) => {
+        if (field.disabled) return;
         const value = valuesMap[field.name];
         if (value === undefined) return;
         const err = validateField(renderContext.definitionName, field, value, t);

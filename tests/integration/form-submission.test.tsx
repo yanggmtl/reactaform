@@ -142,4 +142,83 @@ describe('Form integration: rendering and submission', () => {
       expect(screen.getByText('Value required')).toBeInTheDocument();
     });
   });
+
+  it('allows button handlers to update disabled fields', async () => {
+    let receivedValues: Record<string, unknown> | null = null;
+
+    registerSubmissionHandler('testDisabledSubmitHandler', (_definition, _instanceName, valuesMap) => {
+      receivedValues = { ...valuesMap } as Record<string, unknown>;
+      return undefined;
+    });
+
+    // Dynamic import avoids top-level coupling in this integration test file.
+    const { registerButtonHandler } = await import('../../src/core/registries/buttonHandlerRegistry');
+    registerButtonHandler('calcSumForDisabledResult', (valuesMap, handleChange, handleError) => {
+      const left = Number(valuesMap['left']) || 0;
+      const right = Number(valuesMap['right']) || 0;
+      handleChange('result', left + right);
+      handleError('result', null);
+    });
+
+    const definition = {
+      name: 'test-def-disabled',
+      version: '1',
+      displayName: 'Test Form',
+      submitHandlerName: 'testDisabledSubmitHandler',
+      properties: [
+        {
+          name: 'left',
+          displayName: 'Left',
+          type: 'int',
+          defaultValue: 2,
+        },
+        {
+          name: 'right',
+          displayName: 'Right',
+          type: 'int',
+          defaultValue: 3,
+        },
+        {
+          name: 'calc',
+          displayName: 'Calculate Sum',
+          type: 'button',
+          action: 'calcSumForDisabledResult',
+        },
+        {
+          name: 'result',
+          displayName: 'Result',
+          type: 'int',
+          defaultValue: 0,
+          disabled: true,
+        },
+      ],
+    } as unknown as ReactaDefinition;
+
+    const result = createInstanceFromDefinition(definition, 'test-instance');
+    expect(result.success).toBe(true);
+    const instance = result.instance!;
+
+    await act(async () => {
+      renderWithProvider(
+        <ReactaFormRenderer definition={definition} instance={instance} chunkDelay={0} chunkSize={1000} />
+      );
+    });
+
+    const user = userEvent.setup();
+    const calcButton = await screen.findByRole('button', { name: /calculate sum/i });
+    await user.click(calcButton);
+
+    const submitBtn = screen.getByRole('button', { name: /submit/i });
+    await user.click(submitBtn);
+
+    await waitFor(() => {
+      expect(receivedValues).not.toBeNull();
+    });
+
+    expect(receivedValues).toMatchObject({
+      left: 2,
+      right: 3,
+      result: 5,
+    });
+  });
 });

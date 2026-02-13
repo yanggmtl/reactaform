@@ -20,6 +20,7 @@ export const FieldRenderer = React.memo<FieldRendererProps>(
     const Component = getComponent(field.type) as JSX.ElementType | undefined;
     const value = valuesMap[field.name];
     const fieldError = errorsMap ? errorsMap[field.name] ?? null : undefined;
+    const isDisabled = Boolean(field.disabled);
 
     const stableValue = React.useMemo(() => value, [value]);
 
@@ -40,21 +41,35 @@ export const FieldRenderer = React.memo<FieldRendererProps>(
       const buttonProps: ButtonInputProps = {
         field,
         value: null,
+        disabled: isDisabled,
         valuesMap,
         handleChange,
         handleError: handleError || (() => {}),
       };
-      return <Component {...buttonProps} />;
+      return (
+        <div
+          aria-disabled={isDisabled}
+          style={isDisabled ? { opacity: 0.6, pointerEvents: "none" } : undefined}
+        >
+          <Component {...buttonProps} />
+        </div>
+      );
     }
 
     return (
-      <Component
-        field={field}
-        value={stableValue}
-        onChange={onChange}
-        onError={onError}
-        error={fieldError}
-      />
+      <div
+        aria-disabled={isDisabled}
+        style={isDisabled ? { opacity: 0.6, pointerEvents: "none" } : undefined}
+      >
+        <Component
+          field={field}
+          value={stableValue}
+          disabled={isDisabled}
+          onChange={onChange}
+          onError={onError}
+          error={fieldError}
+        />
+      </div>
     );
   },
   (prevProps, nextProps) =>

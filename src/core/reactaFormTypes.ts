@@ -30,6 +30,7 @@ export interface DefinitionPropertyField {
   displayName: string;
   type: string; // 'string' | 'number' | 'boolean' | etc.
   defaultValue: FieldValueType;
+  disabled?: boolean;
   required?: boolean;
   parents?: ParentField;
   children?: Record<string, string[]>;
@@ -175,6 +176,7 @@ export interface BaseInputProps<
 > {
   field: TField;
   value: TValue;
+  disabled?: boolean;
   placeholder?: string;
   onChange?: InputOnChange<TValue>;
   onError?: (error: string | null) => void;

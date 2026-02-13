@@ -43,11 +43,12 @@ Notes:
 
 ## Field Validation Mode
 
-The field validation mode determines when field validation is performed: either in the field is in editing, or when the form is submitted.
+The field validation mode determines when field validation is performed.
 
 FieldValidationMode values:
 
   - "onEdit" — Validation occurs as the field is in editing. Errors are displayed immediately.
+  - "onBlur" — Validation occurs when a field loses focus. This reduces validation work while typing.
   - "onSubmission" — Validation occurs during form submission. If validation fails, the form is not submitted.
   - "realTime" — Deprecated. Same as "onEdit".
 
@@ -58,6 +59,13 @@ Example:
     definitionData={definition}
     instance={instance}
     fieldValidationMode="onEdit"
+  />;
+
+  // Field validation on field blur
+  <ReactaForm
+    definitionData={definition}
+    instance={instance}
+    fieldValidationMode="onBlur"
   />;
 
   // Field validation on form submission

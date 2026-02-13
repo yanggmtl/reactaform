@@ -96,7 +96,7 @@
     - When you register a custom field component/type, provide its validation contract (e.g., `validateValue(value)`), so the form can call it during standard validation cycles.
     - This keeps validation logic close to component behavior while still integrating with form-level flows.
 
-  5) Use the `fieldValidationMode` prop on ReactaForm to control whether field validation runs during editing or only on form submission.
+  5) Use the `fieldValidationMode` prop on ReactaForm to control whether field validation runs during editing, on blur, or only on form submission.
 
   Validation best practices
 

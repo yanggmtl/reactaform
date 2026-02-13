@@ -54,10 +54,12 @@ registerFieldTypeValidationHandler('point2d', (
 const Point2DInput: React.FC<BaseInputProps<Point2DValue>> = ({ field, value, onChange, onError, error: externalError }) => {
   const { t } = useReactaFormContext();
 
-  // For each component, two field validation modes are supported:
-  //    realTime:     field validation happens when field is in edit
+  // Field validation modes:
+  //    onEdit:       field validation happens when field is in edit
+  //    onBlur:       field validation happens when field loses focus
   //    onSubmission: field validation happens in submission process
-  // Important: useFieldValidator will take care of real time validation or on submit validation
+  //    realTime:     deprecated alias of onEdit
+  // Important: useFieldValidator handles mode-specific timing for you.
   const validate = useFieldValidator(field, externalError);
 
   // Uncontrolled inputs: use refs

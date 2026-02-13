@@ -144,7 +144,7 @@ export interface ReactaFormProps {
   className?: string;         // Container css class
   theme?: string;             // Theme name (e.g. "light", "material-dark", custom)
   style?: React.CSSProperties; // Inline styles (merged into default style)
-  fieldValidationMode?: FieldValidationMode; // "realTime" | "onSubmission"
+  fieldValidationMode?: FieldValidationMode; // "onEdit" | "onBlur" | "onSubmission" | "realTime"(deprecated)
   displayInstanceName?: boolean;             // Display and edit instance name in form
   onSubmit?: FormSubmissionHandler;          // Submission handler callback. When this is specified, the submit handler defined in definition will be skipped
   onValidation?: FormValidationHandler;      // Validation handler callback. When this is specified, the validation handler defined in definition will be skipped

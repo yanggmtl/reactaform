@@ -259,14 +259,16 @@ Example — `Address` group contains `address1` and `address2`
 
 ReactaForm supports both field-level and form-level validation.
 
-- Field-level: validation for a single field; can happen in real-time (while editing) or on submission.
+- Field-level: validation for a single field; can happen while editing, on blur, or on submission.
 - Form-level: cross-field validation performed during submission.
 
 ### Field validation modes
 
 `FieldValidationMode`:
-- `realTime`: Runs validation while the user edits a field.
+- `onEdit`: Runs validation while the user edits a field.
+- `onBlur`: Runs validation when the field loses focus.
 - `onSubmission`: Runs validation only when the form is submitted.
+- `realTime`: Deprecated. Same behavior as `onEdit`.
 
 ### Validators
 

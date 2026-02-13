@@ -46,7 +46,7 @@ export default function App() {
   return (
     <div className="app">
       <h2>Custom Component: Point2D</h2>
-      <ReactaForm definitionData={def} instance={instance} fieldValidationMode="realTime" />
+      <ReactaForm definitionData={def} instance={instance} />
     </div>
   );
 }

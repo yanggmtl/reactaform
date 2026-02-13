@@ -1,10 +1,6 @@
 // Script to copy theme CSS files to dist/themes folder
-import { copyFileSync, mkdirSync, readdirSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const { copyFileSync, mkdirSync, readdirSync } = require('fs');
+const { join } = require('path');
 
 const projectRoot = join(__dirname, '..');
 const themesDir = join(projectRoot, 'src', 'themes');

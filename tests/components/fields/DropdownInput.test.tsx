@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DropdownInput from '../../../src/components/fields/choices/DropdownInput';
 import { renderWithProvider, createMockField, baseFieldProps } from '../../test-utils';
@@ -170,5 +170,29 @@ describe('DropdownInput', () => {
     
     select = screen.getByRole('combobox');
     expect(select).toHaveTextContent('Option 3');
+  });
+
+  it('defers validation error until blur when mode is onBlur', () => {
+    const onError = vi.fn();
+    const field = createMockField<DefinitionPropertyField>({
+      type: 'dropdown',
+      displayName: 'Required Dropdown',
+      options: mockOptions,
+      required: true,
+    });
+
+    renderWithProvider(
+      <DropdownInput {...baseFieldProps} field={field} value="" onError={onError} />,
+      { fieldValidationMode: 'onBlur' }
+    );
+
+    const select = screen.getByRole('combobox');
+
+    expect(onError.mock.calls.some((c) => c[0] !== null)).toBeFalsy();
+
+    select.focus();
+    fireEvent.blur(select);
+
+    expect(onError.mock.calls.some((c) => c[0] !== null)).toBeTruthy();
   });
 });

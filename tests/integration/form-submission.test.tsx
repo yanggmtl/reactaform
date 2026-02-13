@@ -98,4 +98,48 @@ describe('Form integration: rendering and submission', () => {
       choice: 'two',
     });
   });
+
+  it('shows required field error only after blur when fieldValidationMode is onBlur', async () => {
+    const definition = {
+      name: 'test-def-onblur',
+      version: '1',
+      displayName: 'Test Form',
+      properties: [
+        {
+          name: 'fullName',
+          displayName: 'Full Name',
+          type: 'string',
+          defaultValue: '',
+          required: true,
+        },
+      ],
+    } as unknown as ReactaDefinition;
+
+    const result = createInstanceFromDefinition(definition, 'test-instance');
+    expect(result.success).toBe(true);
+    const instance = result.instance!;
+
+    await act(async () => {
+      renderWithProvider(
+        <ReactaFormRenderer definition={definition} instance={instance} chunkDelay={0} chunkSize={1000} />,
+        { fieldValidationMode: 'onBlur' }
+      );
+    });
+
+    const user = userEvent.setup();
+    const nameInput = await screen.findByLabelText('Full Name');
+
+    expect(screen.queryByText('Value required')).not.toBeInTheDocument();
+
+    await user.type(nameInput, 'A');
+    await user.clear(nameInput);
+
+    expect(screen.queryByText('Value required')).not.toBeInTheDocument();
+
+    await user.tab();
+
+    await waitFor(() => {
+      expect(screen.getByText('Value required')).toBeInTheDocument();
+    });
+  });
 });

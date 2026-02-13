@@ -35,6 +35,21 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
 
   const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
   const starRefs = React.useRef<Array<HTMLSpanElement | null>>([]);
+  const [error, setError] = React.useState<string | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef(onError);
+
+  React.useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  const updateError = React.useCallback((next: string | null) => {
+    if (next !== prevErrorRef.current) {
+      prevErrorRef.current = next;
+      setError(next);
+      onErrorRef.current?.(next ?? null);
+    }
+  }, []);
 
   // Normalize value
   const ratingValue = React.useMemo(() => {
@@ -42,23 +57,26 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
     return Math.min(Math.max(v, 0), max);
   }, [value, max]);
 
-  // Validation
-  const error = React.useMemo(() => {
-    return validate(ratingValue) ?? null;
-  }, [validate, ratingValue]);
-
-  // Notify parent of errors
   React.useEffect(() => {
-    onError?.(error);
-  }, [error, onError]);
+    updateError(validate(ratingValue, "sync") ?? null);
+  }, [validate, ratingValue, updateError]);
 
   // Handlers
   const handleSelect = React.useCallback(
     (val: number) => {
       const normalized = Math.min(Math.max(val, 0), max);
+      updateError(validate(normalized, "change") ?? null);
       onChange?.(normalized);
     },
-    [max, onChange]
+    [max, onChange, updateError, validate]
+  );
+
+  const handleGroupBlur = React.useCallback(
+    (e: React.FocusEvent<HTMLDivElement>) => {
+      if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+      updateError(validate(ratingValue, "blur") ?? null);
+    },
+    [ratingValue, updateError, validate]
   );
 
   const handleKeyDown = React.useCallback(
@@ -92,6 +110,7 @@ const RatingInput: React.FC<RatingInputProps> = ({ field, value, onChange, onErr
         aria-invalid={!!error}
         aria-describedby={error ? `${field.name}-error` : undefined}
         style={ratingWrapperStyle}
+        onBlur={handleGroupBlur}
       >
         {Array.from({ length: max }, (_, i) => {
           const isActive = i < ratingValue;

@@ -1,10 +1,11 @@
 import * as React from "react";
+import type { ValidationTrigger } from "./useFieldValidator";
 
 export type UseUncontrolledValidatedInputProps = {
   value?: string | number;
   onChange?: (value: string) => void;
   onError?: (error: string | null) => void;
-  validate: (value: string) => string | null; // validation always receives string
+  validate: (value: string, trigger?: ValidationTrigger) => string | null; // validation always receives string
 };
 
 /**
@@ -33,7 +34,7 @@ export function useUncontrolledValidatedInput<
     const isFocused = document.activeElement === inputRef.current;
 
     if (!isFocused) {
-      const err = validate(strValue);
+      const err = validate(strValue, "sync");
       if (err !== prevErrorRef.current) {
         prevErrorRef.current = err;
         onErrorRef.current?.(err ?? null);
@@ -50,7 +51,7 @@ export function useUncontrolledValidatedInput<
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<T>) => {
       const strValue = e.target.value;
-      const err = validate(strValue);
+      const err = validate(strValue, "change");
 
       if (err !== prevErrorRef.current) {
         prevErrorRef.current = err;
@@ -63,5 +64,26 @@ export function useUncontrolledValidatedInput<
     [onChange, validate]
   );
 
-  return { inputRef, error, handleChange };
+  const handleBlur = React.useCallback(() => {
+    const strValue = String(inputRef.current?.value ?? value ?? "");
+    const err = validate(strValue, "blur");
+
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
+  }, [validate, value]);
+
+  React.useEffect(() => {
+    const element = inputRef.current;
+    if (!element) return;
+
+    element.addEventListener("blur", handleBlur);
+    return () => {
+      element.removeEventListener("blur", handleBlur);
+    };
+  }, [handleBlur]);
+
+  return { inputRef, error, handleChange, handleBlur };
 }

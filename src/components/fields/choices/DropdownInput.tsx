@@ -50,7 +50,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
 
   React.useEffect(() => {
     const safeVal = String(value ?? "");
-    let err = validate(safeVal);
+    let err = validate(safeVal, "sync");
     if (err && field.options.length > 0) {
       const first = String(field.options[0].value);
       onChange?.(first);
@@ -71,7 +71,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
   };
 
   const handleOptionClick = (val: string) => {
-    const err = validate(val);
+    const err = validate(val, "change");
     if (err !== prevErrorRef.current) {
       prevErrorRef.current = err;
       setError(err);
@@ -80,6 +80,15 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
     onChange?.(val);
     setMenuOpen(false);
   };
+
+  const handleBlur = React.useCallback(() => {
+    const err = validate(String(value ?? ""), "blur");
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      onErrorRef.current?.(err ?? null);
+    }
+  }, [validate, value]);
 
   const selectedLabel = React.useMemo(() => {
     const opt = field.options.find(o => String(o.value) === String(value));
@@ -139,6 +148,7 @@ const DropdownInput: React.FC<DropdownInputProps> = ({
               handleControlClick();
             }
           }}
+          onBlur={handleBlur}
         >
           <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: '1.8em', display: 'block' }}>
             {selectedLabel}

@@ -52,7 +52,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
    */
   React.useEffect(() => {
     const safeValue = value != null ? String(value) : "";
-    const err = validate(safeValue);
+    const err = validate(safeValue, "sync");
 
     if (err && field.options.length > 0) {
       const firstValue = String(field.options[0].value);
@@ -64,10 +64,18 @@ const RadioInput: React.FC<RadioInputProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = e.target.value;
-    const err = validate(nextValue);
+    const err = validate(nextValue, "change");
     updateError(err);
     onChange?.(nextValue);
   };
+
+  const handleBlur = React.useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      const err = validate(e.target.value, "blur");
+      updateError(err);
+    },
+    [validate, updateError]
+  );
 
   const containerStyle: React.CSSProperties = {
     display: "flex",
@@ -121,6 +129,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
                 value={optValue}
                 checked={String(value ?? "") === optValue}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 style={{ width: "1.1em", height: "1.1em" }}
               />
               <span

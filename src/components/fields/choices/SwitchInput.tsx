@@ -24,11 +24,25 @@ const SwitchInput: React.FC<SwitchInputProps> = ({
 }) => {
   const { t, formStyle, fieldStyle } = useReactaFormContext();
   const validate = useFieldValidator(field, externalError);
-  const err = validate(value);
+  const [error, setError] = React.useState<string | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef(onError);
 
   React.useEffect(() => {
-    onError?.(err);
-  }, [err, onError]);
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  const updateError = React.useCallback((next: string | null) => {
+    if (next !== prevErrorRef.current) {
+      prevErrorRef.current = next;
+      setError(next);
+      onErrorRef.current?.(next ?? null);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    updateError(validate(Boolean(value), "sync"));
+  }, [value, validate, updateError]);
   
   const fs = formStyle as Record<string, unknown> | undefined;
   const ffs = fieldStyle as Record<string, unknown> | undefined;
@@ -106,11 +120,16 @@ const SwitchInput: React.FC<SwitchInputProps> = ({
   // Toggles boolean value on click
   const handleToggle = () => {
     const newVal = !isOn;
+    updateError(validate(newVal, "change"));
     onChange?.(newVal);
   };
 
+  const handleBlur = React.useCallback(() => {
+    updateError(validate(isOn, "blur"));
+  }, [isOn, updateError, validate]);
+
   return (
-    <StandardFieldLayout field={field} error={null} rightAlign={false}>
+    <StandardFieldLayout field={field} error={error} rightAlign={false}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
         <label 
           className={CSS_CLASSES.label}
@@ -136,9 +155,10 @@ const SwitchInput: React.FC<SwitchInputProps> = ({
             data-testid="switch"
             tabIndex={0}
             aria-checked={isOn}
-            aria-invalid={false}
-            aria-describedby={undefined}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${field.name}-error` : undefined}
             onClick={handleToggle}
+            onBlur={handleBlur}
             onKeyDown={(e) => {
               if (e.key === ' ' || e.key === 'Spacebar' || e.key === 'Space' || e.key === 'Enter') {
                 e.preventDefault();

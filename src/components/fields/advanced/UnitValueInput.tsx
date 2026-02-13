@@ -149,6 +149,21 @@ ConversionButton.displayName = "ConversionButton";
 const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange, onError }) => {
   const { t } = useReactaFormContext();
   const validate = useFieldValidator(field);
+  const [error, setError] = React.useState<string | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef(onError);
+
+  React.useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  const updateError = React.useCallback((next: string | null) => {
+    if (next !== prevErrorRef.current) {
+      prevErrorRef.current = next;
+      setError(next);
+      onErrorRef.current?.(next ?? null);
+    }
+  }, []);
   
   const dimension = field.dimension;
 
@@ -175,34 +190,34 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
     setSelectedUnit(currentUnit);
   }, [currentUnit]);
 
-  // Validation
-  const error = validate([inputValue, selectedUnit]);
-
-  // Notify parent of errors
   React.useEffect(() => {
-    onError?.(error);
-  }, [error, onError]);
+    updateError(validate([inputValue, selectedUnit], "sync"));
+  }, [inputValue, selectedUnit, updateError, validate]);
 
   // Handlers
   const handleValueChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setInputValue(newValue);
-      validate([newValue, selectedUnit]);
+      updateError(validate([newValue, selectedUnit], "change"));
       onChange?.([newValue, selectedUnit]);
     },
-    [selectedUnit, validate, onChange]
+    [selectedUnit, validate, onChange, updateError]
   );
 
   const handleUnitChange = React.useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const newUnit = e.target.value;
       setSelectedUnit(newUnit);
-      validate([inputValue, newUnit]);
+      updateError(validate([inputValue, newUnit], "change"));
       onChange?.([inputValue, newUnit]);
     },
-    [inputValue, validate, onChange]
+    [inputValue, validate, onChange, updateError]
   );
+
+  const handleBlur = React.useCallback(() => {
+    updateError(validate([inputValue, selectedUnit], "blur"));
+  }, [inputValue, selectedUnit, updateError, validate]);
 
   const handleConversionSelect = React.useCallback(
     (option: UnitOption) => {
@@ -238,6 +253,7 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
           type="text"
           value={inputValue}
           onChange={handleValueChange}
+          onBlur={handleBlur}
           style={{ flex: "2 1 0" }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.textInput)}
           aria-invalid={!!error}
@@ -248,6 +264,7 @@ const UnitValueInput: React.FC<UnitValueInputProps> = ({ field, value, onChange,
           id={`${field.name}-unit`}
           value={selectedUnit}
           onChange={handleUnitChange}
+          onBlur={handleBlur}
           style={{ flex: "1 1 0" }}
           className={combineClasses(CSS_CLASSES.input, CSS_CLASSES.inputSelect)}
           aria-invalid={!!error}

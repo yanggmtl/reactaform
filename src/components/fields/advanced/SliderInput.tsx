@@ -23,24 +23,42 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
     setInputValue(newVal);
   }, [value, min]);
 
-  // Validation
-  const error = React.useMemo(() => {
-    return validate(inputValue) ?? null;
-  }, [validate, inputValue]);
+  const [error, setError] = React.useState<string | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
+  const onErrorRef = React.useRef(onError);
 
-  // Notify parent of errors
   React.useEffect(() => {
-    onError?.(error);
-  }, [error, onError]);
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  const updateError = React.useCallback((next: string | null) => {
+    if (next !== prevErrorRef.current) {
+      prevErrorRef.current = next;
+      setError(next);
+      onErrorRef.current?.(next ?? null);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    updateError(validate(inputValue, "sync") ?? null);
+  }, [validate, inputValue, updateError]);
 
   // Handle changes from both range and text inputs
   const handleValueChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const input = e.target.value;
       setInputValue(input);
+      updateError(validate(input, "change") ?? null);
       onChange?.(input);
     },
-    [onChange]
+    [onChange, updateError, validate]
+  );
+
+  const handleBlur = React.useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      updateError(validate(e.target.value, "blur") ?? null);
+    },
+    [updateError, validate]
   );
 
   const displayValue = !isNaN(Number(inputValue)) ? String(Number(inputValue)) : String(min);
@@ -53,6 +71,7 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
           type="range"
           value={displayValue}
           onChange={handleValueChange}
+          onBlur={handleBlur}
           min={min}
           max={max}
           step="1.0"
@@ -69,6 +88,7 @@ const SliderInput: React.FC<SliderInputProps> = ({ field, value, onChange, onErr
           type="text"
           value={inputValue}
           onChange={handleValueChange}
+          onBlur={handleBlur}
           required
           style={{
             width: "40px",

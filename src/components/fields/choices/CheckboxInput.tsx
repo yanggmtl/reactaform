@@ -19,20 +19,45 @@ const CheckboxInput: React.FC<CheckboxInputProps> = ({
 }) => {
   const { t,  } = useReactaFormContext();
   const validate = useFieldValidator(field, externalError);
+  const onErrorRef = React.useRef(onError);
+  const [error, setError] = React.useState<string | null>(null);
+  const prevErrorRef = React.useRef<string | null>(null);
 
-  const error = validate(value);
-
-  // Notify parent when validation result changes
   React.useEffect(() => {
-    if (externalError) return;
-    onError?.(error);
-  }, [error, externalError, onError]);
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  React.useEffect(() => {
+    const err = validate(value, "sync");
+    if (err !== prevErrorRef.current) {
+      prevErrorRef.current = err;
+      setError(err);
+      if (!externalError) {
+        onErrorRef.current?.(err ?? null);
+      }
+    }
+  }, [value, validate, externalError]);
+
+  const updateError = React.useCallback(
+    (next: string | null) => {
+      if (next !== prevErrorRef.current) {
+        prevErrorRef.current = next;
+        setError(next);
+        if (!externalError) {
+          onErrorRef.current?.(next ?? null);
+        }
+      }
+    },
+    [externalError]
+  );
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange?.(e.target.checked);
+      const checked = e.target.checked;
+      updateError(validate(checked, "change"));
+      onChange?.(checked);
     },
-    [onChange]
+    [onChange, updateError, validate]
   );
 
   const handleKeyDown = React.useCallback(
@@ -41,10 +66,19 @@ const CheckboxInput: React.FC<CheckboxInputProps> = ({
       const isSpace = e.key === " " || e.key === "Space" || e.key === "Spacebar" || e.code === "Space";
       if (isSpace || e.key === "Enter") {
         e.preventDefault();
-        onChange?.(!value);
+        const next = !value;
+        updateError(validate(next, "change"));
+        onChange?.(next);
       }
     },
-    [onChange, value]
+    [onChange, value, updateError, validate]
+  );
+
+  const handleBlur = React.useCallback(
+    (e: React.FocusEvent<HTMLInputElement>) => {
+      updateError(validate(e.target.checked, "blur"));
+    },
+    [updateError, validate]
   );
 
   const inputId = field.name;
@@ -74,6 +108,7 @@ const CheckboxInput: React.FC<CheckboxInputProps> = ({
           checked={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
+          onBlur={handleBlur}
           aria-checked={value}
           aria-invalid={!!error}
           aria-describedby={error ? `${field.name}-error` : undefined}

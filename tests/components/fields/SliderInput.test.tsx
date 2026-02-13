@@ -171,4 +171,30 @@ describe('SliderInput', () => {
 
     expect(screen.getByTestId('tooltip-icon')).toBeInTheDocument();
   });
+
+  it('defers validation error until blur when mode is onBlur', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onError = vi.fn();
+    const field = createMockField<DefinitionPropertyField>({
+      type: 'slider',
+      label: 'Required Value',
+      min: 0,
+      max: 100,
+      required: true,
+    });
+    const { container } = renderWithProvider(
+      <SliderInput {...baseFieldProps} field={field} value={50} onChange={onChange} onError={onError} />,
+      { fieldValidationMode: 'onBlur' }
+    );
+
+    const textInput = container.querySelector('input[type="text"]') as HTMLInputElement;
+    await user.clear(textInput);
+
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeFalsy();
+
+    fireEvent.blur(textInput);
+
+    expect(onError.mock.calls.some(c => c[0] !== null)).toBeTruthy();
+  });
 });

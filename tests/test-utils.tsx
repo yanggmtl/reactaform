@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { DefinitionPropertyField } from '../src/core/reactaFormTypes';
+import type { DefinitionPropertyField, FieldValidationMode } from '../src/core/reactaFormTypes';
 import { render } from '@testing-library/react';
 import type { RenderOptions } from '@testing-library/react';
 import { ReactaFormProvider } from '../src/components/form/ReactaFormProvider';
@@ -7,6 +7,7 @@ import { ReactaFormProvider } from '../src/components/form/ReactaFormProvider';
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   theme?: string;
   language?: string;
+  fieldValidationMode?: FieldValidationMode;
 }
 
 // Custom render function that wraps components with ReactaFormProvider
@@ -15,6 +16,7 @@ export function renderWithProvider(
   {
     theme = 'light',
     language = 'en',
+    fieldValidationMode,
     ...renderOptions
   }: CustomRenderOptions = {}
 ): ReturnType<typeof render> {
@@ -24,6 +26,7 @@ export function renderWithProvider(
         defaultTheme={theme}
         defaultLanguage={language}
         definitionName="test-form"
+        defaultFieldValidationMode={fieldValidationMode}
       >
         {children}
       </ReactaFormProvider>

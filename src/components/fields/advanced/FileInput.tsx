@@ -32,19 +32,23 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
 
   const validate = useFieldValidator(field, externalError);
 
+  const updateError = React.useCallback((next: string | null) => {
+    if (next !== prevErrorRef.current) {
+      prevErrorRef.current = next;
+      setError(next);
+      onErrorRef.current?.(next ?? null);
+    }
+  }, []);
+
   React.useEffect(() => {
-    const err = validate(value ?? []);
+    const err = validate(value ?? [], "sync");
     // Call onChange for initial validation so consumers/tests receive the
     // current validation state on mount. This mirrors previous behavior and
     // keeps test expectations stable.
     onChange?.(value);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      setError(err);
-      onErrorRef.current?.(err ?? null);
-    }
+    updateError(err);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, validate]);
+  }, [value, validate, updateError]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.files;
@@ -61,12 +65,8 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
         selected = newFiles[0];
       }
     }
-    const err = validate(selected ?? []);
-    if (err !== prevErrorRef.current) {
-      prevErrorRef.current = err;
-      setError(err);
-      onErrorRef.current?.(err ?? null);
-    }
+    const err = validate(selected ?? [], "change");
+    updateError(err);
     onChange?.(selected);
     
     // Reset input value to allow selecting the same file again if needed
@@ -94,12 +94,8 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
         selected = newFiles[0];
       }
       
-      const err = validate(selected);
-      if (err !== prevErrorRef.current) {
-        prevErrorRef.current = err;
-        setError(err);
-        onErrorRef.current?.(err ?? null);
-      }
+      const err = validate(selected, "change");
+      updateError(err);
       onChange?.(selected);
     }
   };
@@ -120,23 +116,19 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
     if (Array.isArray(value) && typeof index === 'number') {
       const newFiles = value.filter((_, i) => i !== index);
       const selected = newFiles.length > 0 ? newFiles : null;
-      const err = validate(selected ?? []);
-      if (err !== prevErrorRef.current) {
-        prevErrorRef.current = err;
-        setError(err);
-        onErrorRef.current?.(err ?? null);
-      }
+      const err = validate(selected ?? [], "change");
+      updateError(err);
       onChange?.(selected);
     } else {
-      const err = validate([]);
-      if (err !== prevErrorRef.current) {
-        prevErrorRef.current = err;
-        setError(err);
-        onErrorRef.current?.(err ?? null);
-      }
+      const err = validate([], "change");
+      updateError(err);
       onChange?.(null);
     }
   };
+
+  const handleBlur = React.useCallback(() => {
+    updateError(validate(value ?? [], "blur"));
+  }, [updateError, validate, value]);
 
   const renderFileList = () => {
     const files = Array.isArray(value) ? value : value ? [value] : [];
@@ -219,6 +211,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
           onDragLeave={handleDragLeave}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
+          onBlur={handleBlur}
           style={{
             position: 'relative',
             borderStyle: 'dashed',
@@ -257,6 +250,7 @@ const FileInput: React.FC<FileInputProps> = ({ field, value, onChange, onError, 
             }
           }}
           role="button"
+          tabIndex={0}
           aria-label={field.multiple ? t("Choose Files or Drag & Drop") : t("Choose File or Drag & Drop")}
           aria-invalid={!!error}
           aria-describedby={error ? `${field.name}-error` : undefined}

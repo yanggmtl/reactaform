@@ -119,7 +119,7 @@ export interface ReactaFormProps {
   className?: string;
   theme?: string;
   style?: React.CSSProperties;
-  fieldValidationMode?: FieldValidationMode; // 'onEdit' (default), 'onSubmission', or 'realTime'
+  fieldValidationMode?: FieldValidationMode; // 'onEdit' (default), 'onBlur', 'onSubmission', or 'realTime'
   displayInstanceName?: boolean;
   onSubmit?: FormSubmissionHandler;
   onValidation?: FormValidationHandler;
@@ -130,10 +130,11 @@ export type TranslationFunction = (text: string, ...args: unknown[]) => string;
 
 /** Validation mode controls where validation is performed.
  * 'onEdit' (default) - Validate fields as they are edited, showing errors immediately.
+ * 'onBlur' - Validate fields when they lose focus, reducing validation work while typing.
  * 'onSubmission' - Validate only when the form is submitted, showing errors after submission attempt.
  * 'realTime' - deprecated, use 'onEdit' instead.
  */
-export type FieldValidationMode = 'onEdit' | 'onSubmission' | 'realTime';
+export type FieldValidationMode = 'onEdit' | 'onBlur' | 'onSubmission' | 'realTime';
 
 // Field validator function: returns error string or undefined if valid
 export type FieldCustomValidationHandler = (

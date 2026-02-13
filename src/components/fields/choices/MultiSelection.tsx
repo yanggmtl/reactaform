@@ -67,7 +67,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
   const prevErrorLocalRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    const err = validate(Array.isArray(value) ? value : []);
+    const err = validate(Array.isArray(value) ? value : [], "sync");
     if (err !== prevErrorLocalRef.current) {
       prevErrorLocalRef.current = err;
       setMultiError(err);
@@ -87,7 +87,7 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     const newValues = selectedValues.includes(val)
       ? selectedValues.filter((v) => v !== val)
       : [...selectedValues, val];
-    const err = validate(newValues);
+    const err = validate(newValues, "change");
     if (err !== prevErrorLocalRef.current) {
       prevErrorLocalRef.current = err;
       setMultiError(err);
@@ -95,6 +95,15 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
     }
     onChange?.(newValues);
   };
+
+  const handleBlur = React.useCallback(() => {
+    const err = validate(selectedValues, "blur");
+    if (err !== prevErrorLocalRef.current) {
+      prevErrorLocalRef.current = err;
+      setMultiError(err);
+      onErrorRef.current?.(err ?? null);
+    }
+  }, [selectedValues, validate]);
 
   const mergedControlStyle = React.useMemo<React.CSSProperties>(
     () => ({
@@ -152,6 +161,8 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
             className={`reactaform-multiselection-control reactaform-input`}
             style={mergedControlStyle}
             onClick={handleControlClick}
+            onBlur={handleBlur}
+            tabIndex={0}
             role="button"
             aria-haspopup="listbox"
             aria-expanded={menuOpen}
@@ -176,6 +187,12 @@ const MultiSelect: React.FC<MultiSelectionProps> = ({
                 aria-label="Clear selections"
                 onClick={(e) => {
                   e.stopPropagation();
+                  const err = validate([], "change");
+                  if (err !== prevErrorLocalRef.current) {
+                    prevErrorLocalRef.current = err;
+                    setMultiError(err);
+                    onErrorRef.current?.(err ?? null);
+                  }
                   onChange?.([]);
                 }}
                 style={mergedClearButtonStyle}

@@ -86,7 +86,7 @@ const ColorInput: React.FC<ColorInputProps> = ({
     [value]
   );
 
-  const { inputRef, error, handleChange } =
+  const { inputRef, error, handleChange, handleBlur } =
     useUncontrolledValidatedInput({
       value: normalizedValue,
       onChange,
@@ -148,6 +148,7 @@ const ColorInput: React.FC<ColorInputProps> = ({
           id={field.name}
           value={previewColor}
           onChange={handleSelectChange}
+          onBlur={handleBlur}
           className={combineClasses(
             CSS_CLASSES.input,
             CSS_CLASSES.inputSelect
@@ -184,6 +185,7 @@ const ColorInput: React.FC<ColorInputProps> = ({
             type="color"
             defaultValue={previewColor}
             onChange={handleColorChange}
+            onBlur={handleBlur}
             style={{ opacity: 0, width: "100%", height: "100%" }}
             aria-invalid={!!error}
           />

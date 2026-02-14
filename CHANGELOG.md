@@ -160,3 +160,6 @@ All notable changes to this project are documented in this file.
 ## 1.9.30 - 2026-02-13
 - Add `onBlur` coverage in component and integration tests.
 - Re-organize fields folder.
+
+## 1.9.40 - 2026-02-13
+- Add disable property for component 
